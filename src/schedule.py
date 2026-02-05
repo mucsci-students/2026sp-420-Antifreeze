@@ -18,10 +18,10 @@ class schedule:
         try:
             config = load_config_from_file(CombinedConfig, fileName)
         except Exception as e:
-            if(e)
-            print("Could not load file, try again")
-            print(e)
-            return
+            if(e):
+                print("Could not load file, try again")
+                print(e)
+                return
         configLoaded = True
         scheduler = Scheduler(config)
 
