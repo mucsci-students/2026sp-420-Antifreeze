@@ -39,6 +39,7 @@ class schedule:
     #LABS
     #TODO Implement feature
     def addLab(self):
+        # Manuel was here
         return
 
     #TODO Implement feature
