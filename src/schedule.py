@@ -124,7 +124,7 @@ class schedule:
 
         self.delete_lab("Linux")
         print("After delete:", self.config.config.labs)
-        
+    
     #--------------#
     #ROOMS
     #TODO Implement feature
@@ -286,9 +286,6 @@ class schedule:
         print("CONFLICT TESTS COMPLETED")
         print("="*60 + "\n")
 
-    #Read labs function to help testing
-    def read_labs(self, file):
-            return json.load(open(file))["config"]["labs"]
 
     #--------------#
     #FACULTY
