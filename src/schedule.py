@@ -124,11 +124,6 @@ class schedule:
 
         self.delete_lab("Linux")
         print("After delete:", self.config.config.labs)
-
-
-    #Read labs function to help testing
-    def read_labs(self, file):
-            return json.load(open(file))["config"]["labs"]
         
     #--------------#
     #ROOMS
