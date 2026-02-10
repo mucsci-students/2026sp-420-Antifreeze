@@ -12,7 +12,7 @@ import shutil
 
 class schedule:
     def __init__(self):
-        self.config = create_empty_config()
+        self.config = createEmptyConfig()
         self.configLoaded = False
         self.scheduler = None
 
@@ -100,8 +100,8 @@ class schedule:
 
 
 #Creates an empty config file
-def create_empty_config():
-    empty_config = {
+def createEmptyConfig():
+    emptyConfig = {
         "config": {
             "rooms": [],
             "labs": [],
@@ -121,4 +121,4 @@ def create_empty_config():
         "limit": 100,
         "optimizer_flags": []
     }
-    return empty_config
+    return emptyConfig

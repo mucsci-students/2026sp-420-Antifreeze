@@ -65,7 +65,7 @@ def modifyRoom(self, oldName: str, newName: str):
         print(f"Room renamed from '{oldName}' to '{newName}' successfully.") 
     
     #Add/Delete/Modify Room tests
-def run_tests(self):
+def runTests(self):
         self.loadFile("example.json")
 
         print("Initial rooms:", self.config.config.rooms)

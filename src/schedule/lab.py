@@ -2,7 +2,7 @@
     #Adds a lab to the configuration json
     #Parameters: Configuration file, Lab to add
     #Example usage: add_lab(example.json, Windows)
-def add_lab(self, lab_name: str):
+def addLab(self, lab_name: str):
 
         #Reference to labs list inside database
         labs = self.config.config.labs
@@ -21,7 +21,7 @@ def add_lab(self, lab_name: str):
     #Deletes a lab from the configuration JSON
     #Parameters: Configuration file, Lab to delete
     #Example usage: delete_lab(example.json, Linux)
-def delete_lab(self, lab_name: str):
+def deleteLab(self, lab_name: str):
 
         #Reference to labs list inside database
         labs = self.config.config.labs
@@ -38,7 +38,7 @@ def delete_lab(self, lab_name: str):
     #Modifies a lab from the configuration JSON
     #Parameters: Configuration file, old name for lab, new name for lab
     #Example usage: modify_lab(example.json, Linux, Linux_0)
-def modify_lab(self, old_name: str, new_name: str):
+def modifyLab(self, old_name: str, new_name: str):
 
 
         #Reference to labs list inside database
@@ -59,7 +59,7 @@ def modify_lab(self, old_name: str, new_name: str):
         print(f"Lab renamed from '{old_name}' to '{new_name}'.") 
     
     #Add/Remove/Delete Lab tests
-def run_tests(self):
+def runTests(self):
         source_file = "example.json"
         test_file = "example_test.json"
         self.loadFile("example.json")
