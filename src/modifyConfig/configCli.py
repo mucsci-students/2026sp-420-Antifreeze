@@ -1,9 +1,9 @@
 from schedule import schedule
-import modConflict
-import modCourse
-import modFaculty
-import modLab
-import modRoom
+from modifyConfig import modConflict
+from modifyConfig import modCourse
+from modifyConfig import modFaculty
+from modifyConfig import modLab
+from modifyConfig import modRoom
 
 
 def printConfigMain():
@@ -27,15 +27,15 @@ def modConfig(sched):
     printModConfig()
     userCommand = input()
     if(userCommand == "1"):
-        modConflict.modConflict()
+        modConflict.modConflict(sched)
     elif(userCommand == "2"):
-        modCourse.modCourse()
+        modCourse.modCourse(sched)
     elif(userCommand == "3"):
-        modFaculty.modFaculty()
+        modFaculty.modFaculty(sched)
     elif(userCommand == "4"):
-        modLab.modLab()
+        modLab.modLab(sched)
     elif(userCommand == "5"):
-        modRoom.modRoom()
+        modRoom.modRoom(sched)
     elif(userCommand == "r"):
         return
         
@@ -48,8 +48,10 @@ def config(sched):
             fileName = input()
             sched.loadFile(fileName)
         elif(userCommand == "2"):
-            modConfig()
+            modConfig(sched)
         elif(userCommand == "3"):
             sched.saveFile()
         elif(userCommand == "r"):
             return
+
+

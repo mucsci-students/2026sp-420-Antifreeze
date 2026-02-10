@@ -3,7 +3,7 @@
     #Parameters: course_id (the course to add conflict to), conflicting_course_id (the course that conflicts)
     #Example usage: add_conflict("CMSC 140", "CMSC 161")
     # Note: This adds the conflict to the specified course. For bidirectional conflicts, call twice.
-    def add_conflict(self, course_id: str, conflicting_course_id: str):
+def add_conflict(self, course_id: str, conflicting_course_id: str):
         
         # Reference to courses list inside database
         courses = self.config.config.courses
@@ -31,7 +31,7 @@
     #Removes a conflict between two courses
     #Parameters: course_id (the course to remove conflict from), conflicting_course_id (the conflicting course to remove)
     #Example usage: delete_conflict("CMSC 140", "CMSC 161")
-    def delete_conflict(self, course_id: str, conflicting_course_id: str):
+def delete_conflict(self, course_id: str, conflicting_course_id: str):
         
         #Reference to courses list inside database
         courses = self.config.config.courses
@@ -59,7 +59,7 @@
     #Modifies an existing conflict by replacing the conflicting course
     #Parameters: course_id, old_conflicting_course_id, new_conflicting_course_id
     #Example usage: modify_conflict("CMSC 140", "CMSC 161", "CMSC 162")
-    def modify_conflict(self, course_id: str, old_conflicting_course_id: str, new_conflicting_course_id: str):
+def modify_conflict(self, course_id: str, old_conflicting_course_id: str, new_conflicting_course_id: str):
         
         #Reference to courses list inside database
         courses = self.config.config.courses
@@ -91,7 +91,7 @@
 
    
     #Add/Remove/Modify Conflict tests
-    def run_conflict_tests(self):
+def run_conflict_tests(self):
         print("\n" + "="*60)
         print("CONFLICT TESTS")
         print("="*60 + "\n")
