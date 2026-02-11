@@ -1,0 +1,3 @@
+
+def modCourse(sched):
+    return

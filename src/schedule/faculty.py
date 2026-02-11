@@ -17,11 +17,11 @@ class faculty():
     #Parameters: Configuration file, scheduler, name of faculty, maximum credits, maximum days, minimum credits, unique course
                 #limit, times, course preferences, room preferences, lab preferences, mandatory days
     #Example usage: addFaculty(example.json, )
-    def addFaculty(self, config, scheduler, name: str, maximumCredits: int, maximumDays: int, minimumCredits: int,
+    def addFaculty(self, config, name: str, maximumCredits: int, maximumDays: int, minimumCredits: int,
                    uniqueCourseLimit: int, times: dict, coursePreferences: dict, roomPreferences: dict,
                    labPreferences: dict, mandatoryDays: set):
         #Reference to faculty list inside database
-        faculty = self.config.faculty
+        faculty = config.faculty
 
         #Checking for duplicate faculty name
         if name in faculty:
@@ -37,17 +37,17 @@ class faculty():
     #Parameters: Configuration file, scheduler, name of faculty, maximum credits, maximum days, minimum credits, unique course
                 #limit, times, course preferences, room preferences, lab preferences, mandatory days
     #Example usage: addFaculty(example.json, )
-    def modifyFaculty(self, config, scheduler, name: str, maximumCredits: int, maximumDays: int, minimumCredits: int,
+    def modifyFaculty(self, config, name: str, maximumCredits: int, maximumDays: int, minimumCredits: int,
                    uniqueCourseLimit: int, times: dict, coursePreferences: dict, roomPreferences: dict,
                    labPreferences: dict, mandatoryDays: set):
         #Reference to faculty list inside database
-        faculty = self.config.faculty
+        faculty = config.faculty
 
         #Checking to see if faculty exists under provided name
         for name in faculty:
             if faculty.name == name:
-                self.deleteFaculty(name)
-                self.addCourse(name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
+                self.deleteFaculty(name, config)
+                self.addFaculty(config, name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
                                 times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
                 print(f"Faculty member '{name}' modified successfully")
             else:
@@ -57,10 +57,10 @@ class faculty():
     #Delete an existing faculty from the configuration json
     #Parameters: Configuration file, name of faculty
     #Example usage: deleteFaculty(example.json, "Hogg")
-    def deleteFaculty(self, config, scheduler, name: str):
+    def deleteFaculty(self, config, name: str):
         
         #Reference to faculty list inside database
-        faculty = self.config.config.faculty
+        faculty = config.faculty
 
         #Checking to see if faculty exists under provided name
         for name in faculty:

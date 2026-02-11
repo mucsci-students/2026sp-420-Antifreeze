@@ -9,13 +9,7 @@ class conflict():
 
 
     #initialize conflict subclass
-    def __init__(self, config: str = None):
-        if config:
-            self.config = load_config_from_file(config)
-        else:
-            self.config = None
-
-
+    def __init__(self):
         return
 
   #Add Conflict
@@ -23,7 +17,7 @@ class conflict():
     #Parameters: courseID (the course to add conflict to), conflictingCourseID (the course that conflicts)
     #Example usage: addConflict("CMSC 140", "CMSC 161")
     # Note: This adds the conflict to the specified course. For bidirectional conflicts, call twice.
-    def addConflict(self, courseID: str, conflictingCourseID: str):
+    def addConflict(self, config: str, courseID: str, conflictingCourseID: str):
         
         # Reference to courses list inside database
         courses = self.config.config.courses
@@ -51,7 +45,7 @@ class conflict():
     #Removes a conflict between two courses
     #Parameters: courseID (the course to remove conflict from), conflictingCourseID (the conflicting course to remove)
     #Example usage: deleteConflict("CMSC 140", "CMSC 161")
-    def deleteConflict(self, courseID: str, conflictingCourseID: str):
+    def deleteConflict(self, config: str, courseID: str, conflictingCourseID: str):
         
         #Reference to courses list inside database
         courses = self.config.config.courses
@@ -79,7 +73,7 @@ class conflict():
     #Modifies an existing conflict by replacing the conflicting course
     #Parameters: courseID, oldConflictingCourseID, newConflictingCourseID
     #Example usage: modifyConflict("CMSC 140", "CMSC 161", "CMSC 162")
-    def modifyConflict(self, courseID: str, oldConflictingCourseID: str, newConflictingCourseID: str):
+    def modifyConflict(self, config: str, courseID: str, oldConflictingCourseID: str, newConflictingCourseID: str):
         
         #Reference to courses list inside database
         courses = self.config.config.courses
@@ -108,6 +102,7 @@ class conflict():
         
         if not courseFound:
             print(f"Course '{courseID}' not found — no changes made.")
+
 
    
     #Add/Remove/Modify Conflict tests

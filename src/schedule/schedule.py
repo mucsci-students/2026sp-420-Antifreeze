@@ -12,14 +12,15 @@ import room
 
 class schedule:
     def __init__(self):
-        self.config = None
-        self.configLoaded = False
-        self.scheduler = None
         self.schedConflict = conflict.conflict()
         self.schedCourse = course.course()
         self.schedFaculty = faculty.faculty()
         self.schedLab = lab.lab()
         self.schedRoom = room.room()
+        self.config = self.createEmptyConfig()
+        self.configLoaded = False
+        scheduler = Scheduler(self.config)
+
 
     #--------------#
     #FILE MANAGEMENT
@@ -33,7 +34,6 @@ class schedule:
                 print(e)
                 return
         configLoaded = True
-        scheduler = Scheduler(config)
 
 
     #TODO Implement feature
@@ -67,3 +67,5 @@ class schedule:
             "optimizer_flags": []
         }
         return emptyConfig   
+        configLoaded = True
+        
