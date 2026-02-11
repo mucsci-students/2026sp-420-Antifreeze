@@ -5,10 +5,10 @@ from scheduler import (
 )
 from scheduler.config import CombinedConfig
 
-# TODO - create subclass details
+
 class faculty():
 
-    #TODO - initialize conflict subclass
+    #initialize conflict subclass
     def __init__(self):
         return
 

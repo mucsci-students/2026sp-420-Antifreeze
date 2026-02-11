@@ -4,7 +4,7 @@ from scheduler import (
 )
 from scheduler.config import CombinedConfig
 
-# create subclass details
+
 class lab():
 
     #initialize lab subclass
