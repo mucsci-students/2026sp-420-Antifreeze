@@ -17,27 +17,6 @@ class faculty():
     #TODO - initialize conflict subclass
     def __init__(self):
         return
-    
-    #Test Add Faculty
-    #A temporary test to check if addFaculty works
-    def testAddFaculty(self, config, name: Faculty, maximumCredits: int, maximumDays: int, minimumCredits: int,
-                       uniqueCourseLimit: int, times: dict[Day, list[TimeRange]], coursePreferences: dict[Course, Preference],
-                       roomPreferences: dict[Room, Preference], labPreferences: dict[Lab, Preference], 
-                       mandatoryDays: set[Day]) -> bool:
-        
-        #Boolean test
-        test = True
-
-        #Some of the parameters that are being tested against
-        courses = [c.upper() for c in config.courses]
-        rooms = [r.upper() for r in config.rooms]
-        labs = [l.upper() for l in config.rooms]
-
-        #Testing parameters
-        if type(times) != dict[Day, list[TimeRange]]:
-            test = False
-            print("Wrong input for times.")
-        return test
 
     #Add Faculty
     #Adds a new faculty to the configuration json
@@ -48,11 +27,11 @@ class faculty():
                    uniqueCourseLimit: int, times: dict[Day, list[TimeRange]], coursePreferences: dict[Course, Preference],
                    roomPreferences: dict[Room, Preference], labPreferences: dict[Lab, Preference], mandatoryDays: set[Day]):
         #Reference to faculty list inside database
-        faculty = config.faculty
+        faculty = config.config.faculty
 
         #Test if parameters are correct
-        test = self.testAddFaculty(name, config, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
-                                   times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
+        #test = self.testAddFaculty(name, config, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
+                                  # times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
 
         #Checking for duplicate faculty name
         if name in faculty:
@@ -72,13 +51,13 @@ class faculty():
                       uniqueCourseLimit: int, times: dict[Day, list[TimeRange]], coursePreferences: dict[Course, Preference],
                       roomPreferences: dict[Room, Preference], labPreferences: dict[Lab, Preference], mandatoryDays: set[Day]):
         #Reference to faculty list inside database
-        faculty = config.faculty
+        faculty = config.config.faculty
 
         #Checking to see if faculty exists under provided name
         for name in faculty:
             if faculty.name == name:
                 self.deleteFaculty(name)
-                self.addCourse(name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
+                self.addFaculty(name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
                                 times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
                 print(f"Faculty member '{name}' modified successfully")
             else:
@@ -91,7 +70,7 @@ class faculty():
     def deleteFaculty(self, config, name: Faculty):
         
         #Reference to faculty list inside database
-        faculty = config.faculty
+        faculty = config.config.faculty
 
         #Checking to see if faculty exists under provided name
         for name in faculty:
