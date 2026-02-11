@@ -1,3 +1,17 @@
+from scheduler import (
+    Scheduler,
+    load_config_from_file,
+    FacultyConfig,
+    Faculty,
+    Day,
+    TimeRange,
+    Course,
+    Preference,
+    Room,
+    Lab
+)
+from scheduler.config import CombinedConfig
+
 def existingItems(self, id:str, rms:list[str], lbs:list[str],con: list[str], fac:list[str]) ->bool:
         #variable being passed
         test = True

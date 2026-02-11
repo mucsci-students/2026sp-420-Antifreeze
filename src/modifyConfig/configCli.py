@@ -1,12 +1,9 @@
-<<<<<<< HEAD
-=======
 from schedule import schedule
->>>>>>> add-delete-modify-Course
-import modConflict
-import modCourse
-import modFaculty
-import modLab
-import modRoom
+from modifyConfig import modConflict
+from modifyConfig import modCourse
+from modifyConfig import modFaculty
+from modifyConfig import modLab
+from modifyConfig import modRoom
 from schedule import schedule
 
 def printConfigMain():
@@ -52,7 +49,7 @@ def config(sched):
             fileName = input()
             sched.loadFile(fileName)
         elif(userCommand == "2"):
-            print()
+            confLoop(sched)
         elif(userCommand == "3"):
             sched.saveFile()
         elif(userCommand.lower() == "r"):

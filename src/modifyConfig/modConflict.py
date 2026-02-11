@@ -14,7 +14,7 @@ def modConflictMain(sched):
         elif(userCommand == "2"):
             modConflict(sched)
         elif(userCommand == "3"):
-            delConflict()
+            delConflict(sched)
         elif(userCommand.lower() == "r"):
             return
 
