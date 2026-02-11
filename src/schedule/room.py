@@ -8,17 +8,11 @@ from scheduler.config import CombinedConfig
 class room():
 
     #initialize conflict subclass
-    def __init__(self, config: str = None):
-        if config:
-            self.config = load_config_from_file(config)
-        else:
-            self.config = None
-
-
+    def __init__(self):
         return
 
 
-    def addRoom(self, roomName: str):
+    def addRoom(self, config: str, roomName: str):
 
         #Reference to rooms list in database
         rooms = self.config.config.rooms
@@ -38,7 +32,7 @@ class room():
         print(f"Room '{roomName}' added successfully.")
 
     #TODO Implement feature
-    def deleteRoom(self, roomName: str):
+    def deleteRoom(self, config: str, roomName: str):
 
         #Reference to rooms list in database
         rooms = self.config.config.rooms
@@ -58,7 +52,7 @@ class room():
         print(f"Room '{roomName}' deleted successfully.")
 
     #TODO Implement feature
-    def modifyRoom(self, oldName: str, newName: str):
+    def modifyRoom(self, config: str, oldName: str, newName: str):
 
         #Reference to rooms list in database
         rooms = self.config.config.rooms
