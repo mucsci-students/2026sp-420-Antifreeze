@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+from schedule import schedule
+>>>>>>> add-delete-modify-Course
 import modConflict
 import modCourse
 import modFaculty
