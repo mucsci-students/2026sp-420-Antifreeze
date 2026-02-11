@@ -23,7 +23,6 @@ class faculty():
     #Parameters: Configuration file, scheduler, name of faculty, maximum credits, maximum days, minimum credits, unique course
                 #limit, times, course preferences, room preferences, lab preferences, mandatory days
     #Example usage: addFaculty(example.json, )
-<<<<<<< HEAD
     def addFaculty(self, config, name: Faculty, maximumCredits: int, maximumDays: int, minimumCredits: int,
                    uniqueCourseLimit: int, times: dict[Day, list[TimeRange]], coursePreferences: dict[Course, Preference],
                    roomPreferences: dict[Room, Preference], labPreferences: dict[Lab, Preference], mandatoryDays: set[Day]):
@@ -33,13 +32,6 @@ class faculty():
         #Test if parameters are correct
         #test = self.testAddFaculty(name, config, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
                                   # times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
-=======
-    def addFaculty(self, config, name: str, maximumCredits: int, maximumDays: int, minimumCredits: int,
-                   uniqueCourseLimit: int, times: dict, coursePreferences: dict, roomPreferences: dict,
-                   labPreferences: dict, mandatoryDays: set):
-        #Reference to faculty list inside database
-        faculty = config.faculty
->>>>>>> finished-cli
 
         #Checking for duplicate faculty name
         if name in faculty:
@@ -55,30 +47,17 @@ class faculty():
     #Parameters: Configuration file, scheduler, name of faculty, maximum credits, maximum days, minimum credits, unique course
                 #limit, times, course preferences, room preferences, lab preferences, mandatory days
     #Example usage: addFaculty(example.json, )
-<<<<<<< HEAD
     def modifyFaculty(self, config, name: Faculty, maximumCredits: int, maximumDays: int, minimumCredits: int,
                       uniqueCourseLimit: int, times: dict[Day, list[TimeRange]], coursePreferences: dict[Course, Preference],
                       roomPreferences: dict[Room, Preference], labPreferences: dict[Lab, Preference], mandatoryDays: set[Day]):
         #Reference to faculty list inside database
         faculty = config.config.faculty
-=======
-    def modifyFaculty(self, config, name: str, maximumCredits: int, maximumDays: int, minimumCredits: int,
-                   uniqueCourseLimit: int, times: dict, coursePreferences: dict, roomPreferences: dict,
-                   labPreferences: dict, mandatoryDays: set):
-        #Reference to faculty list inside database
-        faculty = config.faculty
->>>>>>> finished-cli
 
         #Checking to see if faculty exists under provided name
         for name in faculty:
             if faculty.name == name:
-<<<<<<< HEAD
                 self.deleteFaculty(name)
                 self.addFaculty(name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
-=======
-                self.deleteFaculty(name, config)
-                self.addFaculty(config, name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
->>>>>>> finished-cli
                                 times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
                 print(f"Faculty member '{name}' modified successfully")
             else:
@@ -88,17 +67,10 @@ class faculty():
     #Delete an existing faculty from the configuration json
     #Parameters: Configuration file, name of faculty
     #Example usage: deleteFaculty(example.json, "Hogg")
-<<<<<<< HEAD
     def deleteFaculty(self, config, name: Faculty):
         
         #Reference to faculty list inside database
         faculty = config.config.faculty
-=======
-    def deleteFaculty(self, config, name: str):
-        
-        #Reference to faculty list inside database
-        faculty = config.faculty
->>>>>>> finished-cli
 
         #Checking to see if faculty exists under provided name
         for name in faculty:
