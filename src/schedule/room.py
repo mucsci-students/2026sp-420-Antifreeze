@@ -11,7 +11,10 @@ class room():
     def __init__(self):
         return
 
-
+    #Add Room
+    #Adds a room to the configuration JSON
+    #Parameters: Configuration file, Room name
+    #Example usage: addRoom(example.json, "Roddy 144")
     def addRoom(self, config: str, roomName: str):
 
         #Reference to rooms list in database
@@ -31,7 +34,10 @@ class room():
         #CLI outputs room added successfully
         print(f"Room '{roomName}' added successfully.")
 
-    #TODO Implement feature
+    #Delete Room
+    #Deletes a room from the configuration JSON
+    #Parameters: Configuration file, Room name
+    #Example usage: deleteRoom(example.json, "Roddy 136")
     def deleteRoom(self, config: str, roomName: str):
 
         #Reference to rooms list in database
@@ -51,7 +57,10 @@ class room():
         #CLI outputs room deleted successfully
         print(f"Room '{roomName}' deleted successfully.")
 
-    #TODO Implement feature
+    #Modify Lab
+    #Modifies a room from the configuration JSON
+    #Parameters: Configuration file, old room name, new room name
+    #Example usage: modifyRoom(example.json, "Roddy 140", "Roddy 141")
     def modifyRoom(self, config: str, oldName: str, newName: str):
 
         #Reference to rooms list in database
