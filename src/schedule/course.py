@@ -10,8 +10,7 @@ from scheduler import (
     Room,
     Lab
 )
-from scheduler.config import CombinedConfig
-
+from scheduler.config import CourseConfig
 def existingItems(self, id:str, rms:list[str], lbs:list[str],con: list[str], fac:list[str]) ->bool:
         #variable being passed
         test = True

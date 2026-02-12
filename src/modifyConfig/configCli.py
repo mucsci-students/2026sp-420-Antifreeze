@@ -4,7 +4,7 @@ from modifyConfig import modCourse
 from modifyConfig import modFaculty
 from modifyConfig import modLab
 from modifyConfig import modRoom
-from schedule import schedule
+
 
 def printConfigMain():
     print("Press the key associated with the command you would like to issue, then press enter.")
