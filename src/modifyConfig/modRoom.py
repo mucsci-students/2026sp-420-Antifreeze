@@ -5,7 +5,7 @@ def printModRoomMenu():
     print("3: Remove Room")
     print("r: return to main\n==> ",end="")
 
-def modLabMain(sched):
+def modRoomMain(sched):
     while(True):
         printModRoomMenu()
         userCommand = input()
@@ -34,7 +34,7 @@ def addRoom(sched):
     while(True):
         print("press r and page through prompts to return to main")
         
-        print("Enter lab name to add\n==> ",end="")
+        print("Enter Room name to add\n==> ",end="")
         name = input()
         
         if (name.lower() == "r"):
@@ -57,4 +57,4 @@ def modRoom(sched):
         
         if any(str(x).lower() == "r" for x in fields):
             return
-        sched.Room.modifyRoom(sched.config, oldName, newName)
+        sched.room.modifyRoom(sched.config, oldName, newName)

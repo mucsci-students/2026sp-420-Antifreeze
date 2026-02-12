@@ -18,7 +18,7 @@ class lab():
     def addLab(self, config: str, lab_name: str):
 
         #Reference to labs list inside database
-        labs = self.config.config.labs
+        labs = config.config.labs
 
         #Checking for duplicate lab
         if lab_name in labs:
@@ -37,7 +37,7 @@ class lab():
     def deleteLab(self, config: str, lab_name: str):
 
         #Reference to labs list inside database
-        labs = self.config.config.labs
+        labs = config.config.labs
 
         if lab_name not in labs:
             print("Lab not found — nothing deleted.")
@@ -55,7 +55,7 @@ class lab():
 
 
         #Reference to labs list inside database
-        labs = self.config.config.labs
+        labs = config.config.labs
 
         if old_name not in labs:
             print("Original lab not found — no changes made.")

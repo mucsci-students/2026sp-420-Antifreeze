@@ -12,13 +12,14 @@ from schedule import room
 
 class schedule:
     def __init__(self):
-        self.schedConflict = conflict.conflict()
-        # self.schedCourse = course.course()
-        self.schedFaculty = faculty.faculty()
-        self.schedLab = lab.lab()
-        self.schedRoom = room.room()
+        self.conflict = conflict.conflict()
+        # self.course = course.course()
+        self.faculty = faculty.faculty()
+        self.lab = lab.lab()
+        self.room = room.room()
         self.config = self.createEmptyConfig()
         self.configLoaded = False
+        self.loadFile("2026sp-420-Antifreeze\\src\\example.json")
         # scheduler = Scheduler(self.config)
 
 

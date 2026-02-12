@@ -20,12 +20,12 @@ class conflict():
     def addConflict(self, config: str, courseID: str, conflictingCourseID: str):
         
         # Reference to courses list inside database
-        courses = self.config.config.courses
+        courses = config.config.courses
         
         # Find the course to add conflict to
         courseFound = False
         for course in courses:
-            if course.courseID == courseID:
+            if course.course_id == courseID:
                 courseFound = True
                 
                 # Check if conflict already exists
@@ -48,12 +48,12 @@ class conflict():
     def deleteConflict(self, config: str, courseID: str, conflictingCourseID: str):
         
         #Reference to courses list inside database
-        courses = self.config.config.courses
+        courses = config.config.courses
         
         #Find the course to remove conflict from
         courseFound = False
         for course in courses:
-            if course.courseID == courseID:
+            if course.course_id == courseID:
                 courseFound = True
                 
                 # Check if conflict exists
@@ -76,12 +76,12 @@ class conflict():
     def modifyConflict(self, config: str, courseID: str, oldConflictingCourseID: str, newConflictingCourseID: str):
         
         #Reference to courses list inside database
-        courses = self.config.config.courses
+        courses = config.config.courses
         
         #Find the course to modify conflict in
         courseFound = False
         for course in courses:
-            if course.courseID == courseID:
+            if course.course_id == courseID:
                 courseFound = True
                 
                 #Check if old conflict exists

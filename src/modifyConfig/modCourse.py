@@ -6,7 +6,7 @@ def printModCourseMenu():
     print("3: Remove Course")
     print("r: return to main\n==> ",end="")
 
-def ModCourseMenuMain(sched):
+def modCourseMain(sched):
     while(True):
         printModCourseMenu()
         userCommand = input()
@@ -28,7 +28,7 @@ def delCourse(sched):
         
         if (name.lower() == "r"):
             return
-        sched.Course.deleteCourse(sched.config, name)
+        sched.course.deleteCourse(sched.config, name)
 
 
 def addCourse(sched):
@@ -59,7 +59,7 @@ def addCourse(sched):
 
         if any(str(x).lower() == "r" for x in fields):
             return
-        sched.Course.addCourse(name, credits, rooms, labs, conflicts, faculty)
+        sched.course.addCourse(name, credits, rooms, labs, conflicts, faculty)
 
 
 def modCourse(sched):
@@ -90,4 +90,4 @@ def modCourse(sched):
 
         if any(str(x).lower() == "r" for x in fields):
             return
-        sched.Course.modifyCourse(name, credits, rooms, labs, conflicts, faculty)
+        sched.course.modifyCourse(name, credits, rooms, labs, conflicts, faculty)

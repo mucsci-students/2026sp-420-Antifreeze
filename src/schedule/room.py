@@ -15,7 +15,7 @@ class room():
     def addRoom(self, config: str, roomName: str):
 
         #Reference to rooms list in database
-        rooms = self.config.config.rooms
+        rooms = config.config.rooms
 
         #Checking for empty input or duplicate room
         if roomName == "":
@@ -35,7 +35,7 @@ class room():
     def deleteRoom(self, config: str, roomName: str):
 
         #Reference to rooms list in database
-        rooms = self.config.config.rooms
+        rooms = config.config.rooms
 
         #Checking for empty input or nonexistent room
         if roomName == "":
@@ -55,7 +55,7 @@ class room():
     def modifyRoom(self, config: str, oldName: str, newName: str):
 
         #Reference to rooms list in database
-        rooms = self.config.config.rooms
+        rooms = config.config.rooms
 
         #Checking for empty inputs, nonexistent rooms, or duplicate rooms
         if oldName == "":
