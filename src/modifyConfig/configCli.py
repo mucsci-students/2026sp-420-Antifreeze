@@ -1,10 +1,9 @@
-from schedule import schedule
 import modConflict
 import modCourse
 import modFaculty
 import modLab
 import modRoom
-
+from schedule import schedule
 
 def printConfigMain():
     print("Press the key associated with the command you would like to issue, then press enter.")
@@ -12,7 +11,7 @@ def printConfigMain():
     print("2: Modify Config")
     print("3: Save Config")
     print("r: return to main\n==> ",end="")
-
+    
 def printModConfig():
     print("Press the key associated with the command you would like to issue, then press enter.")
     print("1: Conflict Config")
@@ -22,23 +21,24 @@ def printModConfig():
     print("5: Room Config")
     print("r: return to main\n==> ",end="")
 
+def confLoop(sched):
+    while(True):
+        printModConfig()
+        userCommand = input()
+        if userCommand == "1":
+            modConflict.modConflictMain(sched)
+        elif userCommand == "2":
+            modCourse.modCourseMain(sched)
+        elif userCommand == "3":
+            modFaculty.modFacultyMain(sched)
+        elif userCommand == "4":
+            modLab.modLabMain(sched)
+        elif userCommand == "5":
+            modRoom.modRoomMain(sched)
+        elif userCommand.lower() == "r":
+            return
 
-def modConfig(sched):
-    printModConfig()
-    userCommand = input()
-    if(userCommand == "1"):
-        modConflict.modConflict()
-    elif(userCommand == "2"):
-        modCourse.modCourse()
-    elif(userCommand == "3"):
-        modFaculty.modFaculty()
-    elif(userCommand == "4"):
-        modLab.modLab()
-    elif(userCommand == "5"):
-        modRoom.modRoom()
-    elif(userCommand == "r"):
-        return
-        
+
 def config(sched):
     while(True):
         printConfigMain()
@@ -48,8 +48,8 @@ def config(sched):
             fileName = input()
             sched.loadFile(fileName)
         elif(userCommand == "2"):
-            modConfig()
+            print()
         elif(userCommand == "3"):
             sched.saveFile()
-        elif(userCommand == "r"):
-            return
+        elif(userCommand.lower() == "r"):
+            break

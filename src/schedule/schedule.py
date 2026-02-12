@@ -2,7 +2,6 @@ from scheduler import (
     Scheduler,
     load_config_from_file,
 )
-<<<<<<< HEAD
 
 
 from scheduler.config import CombinedConfig
@@ -15,15 +14,16 @@ class schedule:
         self.config = None
         self.configLoaded = False
         self.scheduler = None
-=======
-from scheduler.config import CombinedConfig
+        self.schedConflict = conflict.conflict()
+        self.schedCourse = course.course()
+        self.schedFaculty = faculty.faculty()
+        self.schedLab = lab.lab()
+        self.schedRoom = room.room()
+        self.config = self.createEmptyConfig()
+        self.configLoaded = False
+        scheduler = Scheduler(self.config)
 
-class schedule:
-    def __init__(self):
-        config = ""
-        configLoaded = False
-        scheduler = ""
->>>>>>> 63ef6f3f998d41519536a0bd150f707bc5f2f7eb
+
         
     #TODO - wrap schedule into callable class
     #--------------#
@@ -31,22 +31,14 @@ class schedule:
     #TODO Implement feature
     def loadFile(self, fileName):
         try:
-<<<<<<< HEAD
             self.config = load_config_from_file(CombinedConfig, fileName)
-=======
-            config = load_config_from_file(CombinedConfig, fileName)
->>>>>>> 63ef6f3f998d41519536a0bd150f707bc5f2f7eb
         except Exception as e:
             if(e):
                 print("Could not load file, try again")
                 print(e)
                 return
         configLoaded = True
-<<<<<<< HEAD
         scheduler = Scheduler(self.config)
-=======
-        scheduler = Scheduler(config)
->>>>>>> 63ef6f3f998d41519536a0bd150f707bc5f2f7eb
 
 
     #TODO Implement feature
@@ -57,10 +49,31 @@ class schedule:
     def printFile(self):
         return
 
-
-    #--------------#
-    #LABS
-<<<<<<< HEAD
+    #Creates an empty config file
+    def createEmptyConfig():
+        emptyConfig = {
+            "config": {
+                "rooms": [],
+                "labs": [],
+                "courses": [],
+                "faculty": []
+            },
+            "time_slot_config": {
+                "times": {
+                    "MON": [],
+                    "TUE": [],
+                    "WED": [],
+                    "THU": [],
+                    "FRI": []
+                },
+                "classes": []
+            },
+            "limit": 100,
+            "optimizer_flags": []
+        }
+        return emptyConfig   
+        configLoaded = True
+        
 
     #Add Lab
     #Adds a lab to the configuration json
@@ -414,49 +427,6 @@ class schedule:
         print("CONFLICT TESTS COMPLETED")
         print("="*60 + "\n")
 
-=======
-    #TODO Implement feature
-    def addLab(self):
-        # Manuel was here
-        return
-
-    #TODO Implement feature
-    def deleteLab(self):
-        return
-
-    #TODO Implement feature
-    def modifyLab(self):
-        return
-
-
-    #--------------#
-    #ROOMS
-    #TODO Implement feature
-    def addRoom(self):
-        return
-
-    #TODO Implement feature
-    def deleteRoom(self):
-        return
-
-    #TODO Implement feature
-    def modifyRoom(self):
-        return
-
-    #--------------#
-    #CONFLICT
-    #TODO Implement feature
-    def addConflict(self):
-        return
-
-    #TODO Implement feature
-    def deleteConflict(self):
-        return
-
-    #TODO Implement feature
-    def modifyConflict(self):
-        return
->>>>>>> 63ef6f3f998d41519536a0bd150f707bc5f2f7eb
 
     #--------------#
     #FACULTY
@@ -497,3 +467,4 @@ class schedule:
     #TODO Implement feature
     def displaySchedule(self):
         return
+

@@ -5,13 +5,11 @@ def printMain():
     print("1: Load/Modify/Save config")
     print("2: Run/Print Scheduler")
     print("q: exit program\n==> ",end="")
-
+    
 
     
 def endProg():
     quit()
-    
-
             
 def runScheduler():
     return
@@ -20,7 +18,7 @@ def cli(sched):
     while(True):
         printMain()
         userCommand = input()
-        if(userCommand == "q"):
+        if(userCommand.lower() == "q"):
             endProg()
         elif(userCommand == "1"):
             configCli.config(sched)

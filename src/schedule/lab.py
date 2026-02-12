@@ -1,8 +1,21 @@
-#Add Lab
+from scheduler import (
+    Scheduler,
+    load_config_from_file,
+)
+from scheduler.config import CombinedConfig
+
+
+class lab():
+
+    #initialize lab subclass
+    def __init__(self):
+        return
+
+     #Add Lab
     #Adds a lab to the configuration json
     #Parameters: Configuration file, Lab to add
     #Example usage: add_lab(example.json, Windows)
-    def add_lab(self, lab_name: str):
+    def addLab(self, config: str, lab_name: str):
 
         #Reference to labs list inside database
         labs = self.config.config.labs
@@ -21,7 +34,7 @@
     #Deletes a lab from the configuration JSON
     #Parameters: Configuration file, Lab to delete
     #Example usage: delete_lab(example.json, Linux)
-    def delete_lab(self, lab_name: str):
+    def deleteLab(self, config: str, lab_name: str):
 
         #Reference to labs list inside database
         labs = self.config.config.labs
@@ -38,7 +51,7 @@
     #Modifies a lab from the configuration JSON
     #Parameters: Configuration file, old name for lab, new name for lab
     #Example usage: modify_lab(example.json, Linux, Linux_0)
-    def modify_lab(self, old_name: str, new_name: str):
+    def modifyLab(self, config: str, old_name: str, new_name: str):
 
 
         #Reference to labs list inside database
@@ -59,7 +72,7 @@
         print(f"Lab renamed from '{old_name}' to '{new_name}'.") 
     
     #Add/Remove/Delete Lab tests
-    def run_tests(self):
+    def runTests(self):
         source_file = "example.json"
         test_file = "example_test.json"
         self.loadFile("example.json")
@@ -80,3 +93,9 @@
         self.delete_lab("Linux")
         print("After delete:", self.config.config.labs)
     
+
+
+
+
+
+   
