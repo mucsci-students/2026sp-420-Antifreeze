@@ -30,7 +30,7 @@ def existingItems(self,config, id:str, rms:list[str], lbs:list[str],con: list[st
         for name in fac:
              if name.upper() not in facName:
                   test = False
-                  print(f"the Room '{rm}' does not exist in the database\n")
+                  print(f"the Room '{name}' does not exist in the database\n")
 
 
         for rm in rms:
