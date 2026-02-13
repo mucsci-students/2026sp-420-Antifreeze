@@ -35,6 +35,8 @@ class schedule:
                 print(e)
                 return
         configLoaded = True
+
+
     #TODO Implement feature
     def saveFile(self):
         return
