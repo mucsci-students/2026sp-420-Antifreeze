@@ -6,7 +6,7 @@ def printModFacultyMenu():
     print("3: Remove faculty")
     print("r: return to main\n==> ",end="")
 
-def ModFacultyMenuMain(sched):
+def ModFacultyMain(sched):
     while(True):
         printModFacultyMenu()
         userCommand = input()

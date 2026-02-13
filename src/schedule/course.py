@@ -1,6 +1,14 @@
 from scheduler import (
     Scheduler,
     load_config_from_file,
+    FacultyConfig,
+    Faculty,
+    Day,
+    TimeRange,
+    Course,
+    Preference,
+    Room,
+    Lab
 )
 from scheduler.config import CourseConfig
 

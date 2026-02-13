@@ -1,11 +1,11 @@
 import cli
-from schedule import schedule
+from schedule import schedule as sch
 
 
 
 #TODO
 def main():
-    sched = schedule()
+    sched = sch.schedule()
     cli.cli(sched)
 
 main()

@@ -3,11 +3,11 @@ from scheduler import (
     load_config_from_file,
 )
 
-
-from scheduler.config import CombinedConfig
-import json
-from pathlib import Path
-import shutil
+from schedule import conflict
+from schedule import course
+from schedule import faculty
+from schedule import lab
+from schedule import room
 
 class schedule:
     def __init__(self):
@@ -15,13 +15,13 @@ class schedule:
         self.configLoaded = False
         self.scheduler = None
         self.schedConflict = conflict.conflict()
-        self.schedCourse = course.course()
+        # self.schedCourse = course.course()
         self.schedFaculty = faculty.faculty()
         self.schedLab = lab.lab()
         self.schedRoom = room.room()
         self.config = self.createEmptyConfig()
         self.configLoaded = False
-        scheduler = Scheduler(self.config)
+        # scheduler = Scheduler(self.config)
 
 
         
