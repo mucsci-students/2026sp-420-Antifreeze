@@ -13,28 +13,28 @@ from schedule import room
 class schedule:
     def __init__(self):
         self.conflict = conflict.conflict()
-        # self.course = course.course()
+        self.course = course.course()
         self.faculty = faculty.faculty()
         self.lab = lab.lab()
         self.room = room.room()
-        self.config = None  # Don't create empty config yet
+        self.config = self.createEmptyConfig()
         self.configLoaded = False
+        self.loadFile("2026sp-420-Antifreeze\\src\\example.json")
+        scheduler = Scheduler(self.config)
 
 
     #--------------#
     #FILE MANAGEMENT
+    #TODO Implement feature
     def loadFile(self, fileName):
         try:
             self.config = load_config_from_file(CombinedConfig, fileName)
-            self.configLoaded = True
-            print(f"Successfully loaded: {fileName}\n")
         except Exception as e:
-            print("Could not load file, try again")
-            print(e)
-            self.configLoaded = False
-            return
-
-
+            if(e):
+                print("Could not load file, try again")
+                print(e)
+                return
+        configLoaded = True
     #TODO Implement feature
     def saveFile(self):
         return
