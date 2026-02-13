@@ -1,9 +1,8 @@
-from schedule import schedule
-from modifyConfig import modConflict
-from modifyConfig import modCourse
-from modifyConfig import modFaculty
-from modifyConfig import modLab
-from modifyConfig import modRoom
+import modConflict
+import modCourse
+import modFaculty
+import modLab
+import modRoom
 from schedule import schedule
 
 def printConfigMain():
@@ -49,7 +48,7 @@ def config(sched):
             fileName = input()
             sched.loadFile(fileName)
         elif(userCommand == "2"):
-            confLoop(sched)
+            print()
         elif(userCommand == "3"):
             sched.saveFile()
         elif(userCommand.lower() == "r"):

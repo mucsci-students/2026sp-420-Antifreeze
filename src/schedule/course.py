@@ -12,27 +12,25 @@ from scheduler import (
 )
 from scheduler.config import CourseConfig
 
+# create subclass details
+class course():
 
-# Existing Item
-# Tests to see if params passed exist in the config
-# params: Connfig with data, course_id, list of rooms, list of labs, list fo conflicts, list of faculty
-def existingItems(self,config, id:str, rms:list[str], lbs:list[str],con: list[str], fac:list[str]) ->bool:
+    # initialize conflict subclass
+    def __init__(self):
+        return
+
+# existing Item
+# Function tests if the values passed exist in the greater config
+# Params: config to parse, list of rooms given, list of labs given, list of conflicts given, list of fac given
+    def existingItems(self,config, id:str, rms:list[str], lbs:list[str],con: list[str], fac:list[str]) ->bool:
         #variable being passed
         test = True
         # lists being tested against
         courses = config.config.courses
         labs = [l.upper() for l in config.config.labs]
         rooms = [r.upper() for r in config.config.rooms]
-        facName =[f.name.upper() for f in config.config.faculty]
-        
        
         #tests and error detection 
-        for name in fac:
-             if name.upper() not in facName:
-                  test = False
-                  print(f"the Room '{name}' does not exist in the database\n")
-
-
         for rm in rms:
             if rm.upper() not in rooms:
                 test = False
@@ -58,47 +56,48 @@ def existingItems(self,config, id:str, rms:list[str], lbs:list[str],con: list[st
                 print("course already exists")
                 
         return test
-# add Courses
-# Adds a Course to Config
-#Params: data to parse in config,course_id, list of room names, list of lab names, list of conflicts, list of faculty
-def addCourse(self,config,id: str, creds: int, rms: list[str], lbs: list[str], con: list[str], fac: list[str]):
+        # add Courses
+        # Adds a Course to Config
+        #Params: config to parse, course_id, list of room names, list of lab names, list of conflicts, list of faculty
+    def addCourse(self, config, id: str, creds: int, rms: list[str], lbs: list[str], con: list[str], fac: list[str]):
         # calls existingItems to see if all values are able to be used.
-        tests = existingItems(id,config,rms,lbs,con,fac)
-        
-        
-         # if all values are good then we can finally add test to config   
+        tests = self.existingItems(id,config,rms,lbs,con,fac)
+                
+                
+                # if all values are good then we can finally add test to config   
         if tests is True :
-            addition = CourseConfig( course_id= str(id), credits= int(creds), room= rms, lab= lbs, conflicts= con,faculty= fac)
-            config.config.courses.append(addition)
-        
+           addition = CourseConfig( course_id= str(id), credits= int(creds), room= rms, lab= lbs, conflicts= con,faculty= fac)
+           config.config.courses.append(addition)
+                
 
-# Delete Course
-# Deletes a course already in the Config
-# Params: id of course
-def deleteCourse(self,config, id: str):
+        # Delete Course
+        # Deletes a course already in the Config
+        # Params:config to parse, id of course
+    def deleteCourse(self, config, id: str):
         courses = config.config.courses
         for course in courses:
-            if course.course_id.upper() == id.upper():
+          if course.course_id.upper() == id.upper():
                 config.config.courses.remove(course)
                 print('deleted')
                 return
         print("course DOES NOT already exists")
+                
+                
+
+        # Modifys Course
+        # Modifys a Course already present in configs 
+        #Params:config to parse, course_id, list of room names, list of lab names, list of conflicts, list of faculty
+    def modifyCourse(self, config, id: str, creds: int, rms: list[str], lbs: list[str], con: list[str], fac: list[str]):
+                
+         courses = config.config.courses
+
+         for course in courses:
+          if course.course_id.upper() == id.upper():
+            self.deleteCourse(id)
+            self.addCourse(id,creds,rms,lbs,con,fac)
+            return
+         print("dont have it.")
         
         
 
-# Modifys Course
-# Modifys a Course already present in configs 
-#Params: course_id, list of room names, list of lab names, list of conflicts, list of faculty
-def modifyCourse(self,config,id: str, creds: int, rms: list[str], lbs: list[str], con: list[str], fac: list[str]):
-        
-        courses = config.config.courses
-
-        for course in courses:
-            if course.course_id.upper() == id.upper():
-                self.deleteCourse(id)
-                self.addCourse(id,creds,rms,lbs,con,fac)
-                return
-        print("dont have it.")
-    
-    
 
