@@ -36,13 +36,13 @@ class course():
             for name in fac:
                 if name.upper() not in facName:
                     test = False
-                    print(f"the Room '{name}' does not exist in the database\n")
+                    print(f"the person '{name}' does not exist in the database\n")
 
 
             for rm in rms:
                 if rm.upper() not in rooms:
                     test = False
-                    print(f"the Room '{rm}' does not exist in the database\n")
+                    print(f"the room '{rm}' does not exist in the database\n")
                 
                 
                 
