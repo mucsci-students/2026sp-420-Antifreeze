@@ -1,8 +1,8 @@
-import modConflict
-import modCourse
-import modFaculty
-import modLab
-import modRoom
+from modifyConfig import modConflict
+from modifyConfig import modCourse
+from modifyConfig import modFaculty
+from modifyConfig import modLab
+from modifyConfig import modRoom
 from schedule import schedule
 
 def printConfigMain():
