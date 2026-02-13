@@ -37,8 +37,10 @@ class faculty():
         if name in faculty:
             print("Faculty already exists - no change made.")
         
-        newMember = FacultyConfig(name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
-                                   times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
+        newMember = FacultyConfig(name = name, maximum_credits = maximumCredits, maximum_days = maximumDays, 
+                                  minimum_credits = minimumCredits, unique_course_limit = uniqueCourseLimit, 
+                                  times = times, course_preferences = coursePreferences, room_preferences = roomPreferences, 
+                                  lab_preferences = labPreferences, mandatory_days = mandatoryDays)
         faculty.append(newMember)
         print(f"Faculty member '{name}' added successfully")
     
@@ -57,7 +59,7 @@ class faculty():
         for name in faculty:
             if faculty.name == name:
                 self.deleteFaculty(name)
-                self.addFaculty(name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
+                self.addFaculty(config, name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
                                 times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
                 print(f"Faculty member '{name}' modified successfully")
             else:

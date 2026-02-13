@@ -19,7 +19,7 @@ class schedule:
         self.room = room.room()
         self.config = self.createEmptyConfig()
         self.configLoaded = False
-        self.loadFile("2026sp-420-Antifreeze\\src\\example.json")
+        self.loadFile(".\\src\\example.json")
         # scheduler = Scheduler(self.config)
 
 

@@ -49,20 +49,69 @@ def addFaculty(sched):
         print("Enter unique course limit\n==> ",end="")        
         uniqueCourseLimit = input()
 
-        print("Enter times\n==> ",end="")        
-        times = input()
+        # ----- TIMES ----- #
+        print("Enter time for MON\n==> ",end="")        
+        timeMon = input()
 
-        print("Enter course preferences\n==> ",end="")        
-        coursePreferences = input()
+        print("Enter time for TUE\n==> ",end="")        
+        timeTue = input()
 
-        print("Enter room preferences\n==> ",end="")        
-        roomPreferences = input()
+        print("Enter time for WED\n==> ",end="")        
+        timeWed = input()
 
-        print("Enter lab preferences\n==> ",end="")        
-        labPreferences = input()
+        print("Enter time for THU\n==> ",end="")        
+        timeThu = input()
 
-        print("Enter mandatory days\n==> ",end="")        
-        mandatoryDays = input()
+        print("Enter time for FRI\n==> ",end="")        
+        timeFri = input()
+
+        times = {"MON": [timeMon], "TUE": [timeTue], "WED": [timeWed], "THU": [timeThu], "FRI": [timeFri]}
+
+        # ----- COURSE PREFERENCES ----- #
+        print("Enter number of courses preferred\n==> ",end="")   
+        numCourses = int(input())
+
+        coursePreferences = {}
+        while (numCourses > 0):
+            print("Enter course preference\n==> ",end="")
+            course = input()
+            print("Enter weight preference\n==> ",end="")
+            courseWeight = input()
+            coursePreferences.update({course: courseWeight})
+            numCourses -= 1
+
+        # ----- ROOM PREFERENCES ----- #
+        print("Enter number of rooms preferred\n==> ",end="")   
+        numRooms = int(input())
+
+        roomPreferences = {}
+        while (numRooms > 0):
+            print("Enter room preference\n==> ",end="")
+            room = input()
+            print("Enter weight preference\n==> ",end="")
+            roomWeight = input()
+            roomPreferences.update({room: roomWeight})
+            numRooms -= 1
+
+        # ----- LAB PREFERENCES ----- #
+        print("Enter number of labs preferred\n==> ",end="")   
+        numLabs = int(input())
+
+        labPreferences = {}
+        while (numLabs > 0):
+            print("Enter lab preference\n==> ",end="")
+            lab = input()
+            print("Enter weight preference\n==> ",end="")
+            labWeight = input()
+            labPreferences.update({lab: labWeight})
+            numLabs -= 1
+
+        # ----- MANDATORY DAYS ----- #
+        print("Enter mandatory days (MON, TUE, WED, THU, FRI)\n==> ",end="")
+        daysInput = input()
+        if (daysInput == ""):
+            mandatoryDays = []
+        mandatoryDays = daysInput.split(", ")
         
         fields = [
             name, maximumCredits, maximumDays, minimumCredits,
@@ -72,7 +121,8 @@ def addFaculty(sched):
 
         if any(str(x).lower() == "r" for x in fields):
             return
-        sched.faculty.addFaculty(sched.config, name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit, times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
+        sched.faculty.addFaculty(sched.config, name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit, 
+                                 times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
 
 
 def modFaculty(sched):
@@ -93,20 +143,69 @@ def modFaculty(sched):
         print("Enter new unique course limit\n==> ",end="")        
         uniqueCourseLimit = input()
 
-        print("Enter new times\n==> ",end="")        
-        times = input()
+        # ----- TIMES ----- #
+        print("Enter new time for MON\n==> ",end="")        
+        timeMon = input()
 
-        print("Enter new course preferences\n==> ",end="")        
-        coursePreferences = input()
+        print("Enter new time for TUE\n==> ",end="")        
+        timeTue = input()
 
-        print("Enter new room preferences\n==> ",end="")        
-        roomPreferences = input()
+        print("Enter new time for WED\n==> ",end="")        
+        timeWed = input()
 
-        print("Enter new lab preferences\n==> ",end="")        
-        labPreferences = input()
+        print("Enter new time for THU\n==> ",end="")        
+        timeThu = input()
 
-        print("Enter new mandatory days\n==> ",end="")        
-        mandatoryDays = input()
+        print("Enter new time for FRI\n==> ",end="")        
+        timeFri = input()
+
+        times = {"MON": [timeMon], "TUE": [timeTue], "WED": [timeWed], "THU": [timeThu], "FRI": [timeFri]}
+
+        # ----- COURSE PREFERENCES ----- #
+        print("Enter number of courses preferred\n==> ",end="")   
+        numCourses = int(input())
+
+        coursePreferences = {}
+        while (numCourses > 0):
+            print("Enter new course preference\n==> ",end="")
+            course = input()
+            print("Enter new weight preference\n==> ",end="")
+            courseWeight = input()
+            coursePreferences.update({course: courseWeight})
+            numCourses -= 1
+
+        # ----- ROOM PREFERENCES ----- #
+        print("Enter number of rooms preferred\n==> ",end="")   
+        numRooms = int(input())
+
+        roomPreferences = {}
+        while (numRooms > 0):
+            print("Enter new room preference\n==> ",end="")
+            room = input()
+            print("Enter new weight preference\n==> ",end="")
+            roomWeight = input()
+            roomPreferences.update({room: roomWeight})
+            numRooms -= 1
+
+        # ----- LAB PREFERENCES ----- #
+        print("Enter number of labs preferred\n==> ",end="")   
+        numLabs = int(input())
+
+        labPreferences = {}
+        while (numLabs > 0):
+            print("Enter new lab preference\n==> ",end="")
+            lab = input()
+            print("Enter new weight preference\n==> ",end="")
+            labWeight = input()
+            labPreferences.update({lab: labWeight})
+            numLabs -= 1
+
+        # ----- MANDATORY DAYS ----- #
+        print("Enter new mandatory days (MON, TUE, WED, THU, FRI)\n==> ",end="")
+        daysInput = input()
+        if (daysInput == ""):
+            mandatoryDays = []
+        mandatoryDays = daysInput.split(", ")
         
         fields = [
             name, maximumCredits, maximumDays, minimumCredits,
@@ -116,5 +215,6 @@ def modFaculty(sched):
 
         if any(str(x).lower() == "r" for x in fields):
             return
-        sched.faculty.modifyFaculty(sched.config, name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit, times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
+        sched.faculty.modifyFaculty(sched.config, name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit, 
+                                    times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
         
