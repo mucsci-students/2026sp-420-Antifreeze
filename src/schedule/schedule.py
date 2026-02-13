@@ -2,7 +2,7 @@ from scheduler import (
     Scheduler,
     load_config_from_file,
 )
-from scheduler.config import CombinedConfig, CourseConfig
+from scheduler.config import CombinedConfig
 
 from schedule import conflict
 from schedule import course
@@ -13,7 +13,7 @@ from schedule import room
 class schedule:
     def __init__(self):
         self.conflict = conflict.conflict()
-        # self.course = course.course()
+        self.course = course.course()
         self.faculty = faculty.faculty()
         self.lab = lab.lab()
         self.room = room.room()
