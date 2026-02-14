@@ -30,7 +30,8 @@ class Schedule():
         self.faculty = faculty()
         self.lab = lab()
         self.room = room()
-        self.config = self.createEmptyConfig()
+        # This relitive path may not work for all.
+        self.config = self.loadConfig("2026sp-420-Antifreeze\\src\\schedule\\empty.json")
         self.result = []
 
     #--------------#
@@ -59,27 +60,13 @@ class Schedule():
         return
     #Print Config
     #flags are set of things yoy want to show, if empty show all of config
-    def printConfig(self,flags):
-        ops = {"indent" : 2}
-
-        if flags:
-            ops["include"] = set(flags)
-
-        printable = self.config.model_dump_json(**ops)
-        print(printable)
+    def printConfig(self):
+        self.conflict.printConflicts(self.config)
+        self.course.printCourses(self.config)
+        self.faculty.printFaculty(self.config)
+        self.lab.printLabs(self.config)
+        self.room.printRooms(self.config)
         return
-    
-    def createEmptyConfig(self):
-        emptyConfig =CombinedConfig( rooms=[str], 
-                             labs=[str],
-                            courses=[CourseConfig],
-                            faculty=[FacultyConfig],
-                            time_slot_config=[TimeSlotConfig],
-                            limit=int,
-                            optimizer_flags=[OptimizerFlags]
-        )       
-        return emptyConfig
-        
 
 
     def runScheduler(self):
