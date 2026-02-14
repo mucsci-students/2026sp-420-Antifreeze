@@ -1,9 +1,12 @@
+from modifyConfig.utilsCLI import prompt, endProg
+
 def printModRoomMenu():
-    print("Press the key associated with the command you would like to issue, then press enter.")
+    print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Add Room")
     print("2: Modify Room")
     print("3: Remove Room")
-    print("r: return to main\n==> ",end="")
+    print("r: return to main")
+    print("q: exit program\n==> ",end="")
 
 def modRoomMain(sched):
     while(True):
@@ -17,44 +20,61 @@ def modRoomMain(sched):
             delRoom(sched)
         elif(userCommand.lower() == "r"):
             return
+        elif(userCommand.lower() == "q"):
+            endProg()
+        else:
+            print("Invalid command, try again.")
 
 def delRoom(sched):
-    while(True):
-            print("press r and page through prompts to return to main")
-            
-            print("Enter Room name to delete\n==> ",end="")
-            name = input()
-            
-            if (name.lower() == "r"):
-                return
-            sched.room.deleteRoom(sched.config, name)
+    try:
+        while True:
+            print("press r and enter at any time to return to main\n")
+
+            name = prompt("Enter Room name to delete\n==> ")
+
+            sched.room.deleteRoom(
+                sched.config,
+                name
+            )
+
+    except KeyboardInterrupt:
+        print("\nReturning to room menu...")
+        return
+
 
 
 def addRoom(sched):
-    while(True):
-        print("press r and page through prompts to return to main")
-        
-        print("Enter Room name to add\n==> ",end="")
-        name = input()
-        
-        if (name.lower() == "r"):
-                return
-        sched.room.addRoom(sched.config, name)
+    try:
+        while True:
+            print("press r and enter at any time to return to main\n")
+
+            name = prompt("Enter Room name to add\n==> ")
+
+            sched.room.addRoom(
+                sched.config,
+                name
+            )
+
+    except KeyboardInterrupt:
+        print("\nReturning to room menu...")
+        return
+
         
 
 def modRoom(sched):
-    while(True):
-        print("press r and page through prompts to return to main")
-        
-        print("Enter Room name to change\n==> ",end="")
-        oldName = input()
-        
-        print("Enter new Room name\n==> ",end="")
-        
-        newName = input()
-        
-        fields = [oldName, newName]
-        
-        if any(str(x).lower() == "r" for x in fields):
-            return
-        sched.room.modifyRoom(sched.config, oldName, newName)
+    try:
+        while True:
+            print("press r and enter at any time to return to main\n")
+
+            oldName = prompt("Enter Room name to change\n==> ")
+            newName = prompt("Enter new Room name\n==> ")
+
+            sched.room.modifyRoom(
+                sched.config,
+                oldName,
+                newName
+            )
+
+    except KeyboardInterrupt:
+        print("\nReturning to room menu...")
+        return

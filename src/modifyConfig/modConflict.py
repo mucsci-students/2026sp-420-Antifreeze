@@ -1,9 +1,12 @@
+from modifyConfig.utilsCLI import prompt, endProg
+
 def printModConflictMenu():
-    print("Press the key associated with the command you would like to issue, then press enter.")
+    print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Add conflict")
     print("2: Modify conflict")
     print("3: Remove conflict")
-    print("r: return to main\n==> ",end="")
+    print("r: return to main")
+    print("q: exit program\n==> ",end="")
 
 def modConflictMain(sched):
     while(True):
@@ -17,64 +20,69 @@ def modConflictMain(sched):
             delConflict(sched)
         elif(userCommand.lower() == "r"):
             return
+        elif(userCommand.lower() == "q"):
+            endProg()
+        else:
+            print("Invalid command, try again.")
 
 def delConflict(sched):
-    while(True):
-        print("press r and page through prompts to return to main")
-        
-        print("Enter CourseID to remove conflict for\n==> ",end="")
-        courseID = input()
-    
-        print("Enter conflicting course ID\n==> ",end="")
-        conflictingCourseID = input()
-        
-        fields = [
-            courseID, conflictingCourseID
-        ]
-        if any(str(x).lower() == "r" for x in fields):
-            return
-        
-        sched.conflict.deleteConflict(sched.config, courseID, conflictingCourseID)
+    try:
+        while True:
+            print("press r and enter at any time to return to main\n")
+
+            courseID = prompt("Enter CourseID to remove conflict for\n==> ")
+            conflictingCourseID = prompt("Enter conflicting course ID\n==> ")
+
+            sched.conflict.deleteConflict(
+                sched.config,
+                courseID,
+                conflictingCourseID
+            )
+
+    except KeyboardInterrupt:
+        print("\nReturning to conflict menu...")
+        return
+
+
 
 
 
 def addConflict(sched):
-    while(True):
-        print("press r and page through prompts to return to main")
-        
-        print("Enter CourseID to add conflict to\n==> ",end="")
-        courseID = input()
-        
-        print("Enter conflicting course ID\n==> ",end="")
-        conflictingCourseID = input()
-        
-        fields = [
-            courseID, conflictingCourseID
-        ]
-        if any(str(x).lower() == "r" for x in fields):
-            return
-        
-        sched.conflict.addConflict(sched.config, courseID, conflictingCourseID)
+    try:
+        while True:
+            print("press r and enter at any time to return to main\n")
+
+            courseID = prompt("Enter CourseID to add conflict to\n==> ")
+            conflictingCourseID = prompt("Enter conflicting course ID\n==> ")
+
+            sched.conflict.addConflict(
+                sched.config,
+                courseID,
+                conflictingCourseID
+            )
+
+    except KeyboardInterrupt:
+        print("\nReturning to conflict menu...")
+        return
+
         
     
 def modConflict(sched):
-    while(True):
-        print("press r and page through prompts to return to main")
-        
-        print("Enter CourseID to modify\n==> ",end="")
-        courseID = input()
-        
-        print("Enter old conflicting course ID\n==> ",end="")
-        oldConfCourseID = input()
-            
-        print("Enter new conflicting course ID\n==> ",end="")
-        newConfCourseID = input()
-        
-        fields = [
-            courseID, oldConfCourseID, newConfCourseID
-        ]
+    try:
+        while True:
+            print("press r and enter at any time to return to main\n")
 
-        if any(str(x).lower() == "r" for x in fields):
-            return
-     
-        sched.conflict.modifyConflict(sched.config, courseID, oldConfCourseID, newConfCourseID)        
+            courseID = prompt("Enter CourseID to modify\n==> ")
+            oldConfCourseID = prompt("Enter old conflicting course ID\n==> ")
+            newConfCourseID = prompt("Enter new conflicting course ID\n==> ")
+
+            sched.conflict.modifyConflict(
+                sched.config,
+                courseID,
+                oldConfCourseID,
+                newConfCourseID
+            )
+
+    except KeyboardInterrupt:
+        print("\nReturning to conflict menu...")
+        return

@@ -1,10 +1,12 @@
+from modifyConfig.utilsCLI import prompt, endProg
 
 def printModLabMenu():
-    print("Press the key associated with the command you would like to issue, then press enter.")
+    print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Add Lab")
     print("2: Modify Lab")
     print("3: Remove Lab")
-    print("r: return to main\n==> ",end="")
+    print("r: return to main")
+    print("q: exit program\n==> ",end="")
 
 def modLabMain(sched):
     while(True):
@@ -18,43 +20,57 @@ def modLabMain(sched):
             delLab(sched)
         elif(userCommand.lower() == "r"):
             return
+        elif(userCommand.lower() == "q"):
+            endProg()
+        else:
+            print("Invalid command, try again.")
 
 def delLab(sched):
-    while(True):
-            print("press r and page through prompts to return to main")
-            
-            print("Enter Lab name to delete\n==> ",end="")
-            name = input()
-            
-            if (name.lower() == "r"):
-                return
-            sched.lab.deleteLab(sched.config, name)
+    try:
+        while True:
+            print("press r and enter at any time to return to main\n")
 
+            name = prompt("Enter Lab name to delete\n==> ")
+
+            sched.lab.deleteLab(
+                sched.config,
+                name
+            )
+
+    except KeyboardInterrupt:
+        print("\nReturning to lab menu...")
+        return
 
 def addLab(sched):
-    while(True):
-        print("press r and page through prompts to return to main")
-        
-        print("Enter lab name to add\n==> ",end="")
-        name = input()
-        
-        if (name.lower() == "r"):
-                return
-        sched.lab.addLab(sched.config, name)
-    
+    try:
+        while True:
+            print("press r and enter at any time to return to main\n")
+
+            name = prompt("Enter lab name to add\n==> ")
+
+            sched.lab.addLab(
+                sched.config,
+                name
+            )
+
+    except KeyboardInterrupt:
+        print("\nReturning to lab menu...")
+        return
+
 def modLab(sched):
-    while(True):
-        print("press r and page through prompts to return to main")
-        
-        print("Enter Lab name to change\n==> ",end="")
-        oldName = input()
-        
-        print("Enter new lab name\n==> ",end="")
-        
-        newName = input()
-        
-        fields = [oldName, newName]
-        
-        if any(str(x).lower() == "r" for x in fields):
-            return
-        sched.lab.modifyLab(sched.config, oldName, newName)
+    try:
+        while True:
+            print("press r and enter at any time to return to main\n")
+
+            oldName = prompt("Enter Lab name to change\n==> ")
+            newName = prompt("Enter new lab name\n==> ")
+
+            sched.lab.modifyLab(
+                sched.config,
+                oldName,
+                newName
+            )
+
+    except KeyboardInterrupt:
+        print("\nReturning to lab menu...")
+        return

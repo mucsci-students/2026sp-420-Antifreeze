@@ -10,7 +10,7 @@ from scheduler import (
     Room,
     Lab
 )
-from scheduler.config import CourseConfig
+from scheduler.config import CombinedConfig, CourseConfig
 
 
 class course():
@@ -22,11 +22,11 @@ class course():
     # Existing Item
     # Tests to see if params passed exist in the config
     # params: Config with data, course_id, list of rooms, list of labs, list fo conflicts, list of faculty
-    def existingItems(self,config, id:str, rms:list[str], lbs:list[str],con: list[str], fac:list[str]) ->bool:
+    def existingItems(self,config:str, id:str, rms:list[str], lbs:list[str],con: list[str], fac:list[str]) ->bool:
             #variable being passed
             test = True
             # lists being tested against
-            courses = config.config.courses
+            courses = [c.course_id.upper() for c in config.config.courses]
             labs = [l.upper() for l in config.config.labs]
             rooms = [r.upper() for r in config.config.rooms]
             facName =[f.name.upper() for f in config.config.faculty]
@@ -59,7 +59,7 @@ class course():
                     
         
             for course in courses:
-                if course.course_id.upper() == id.upper():
+                if course == id.upper():
                     test = False
                     print("course already exists")
             # Returns bool
@@ -68,9 +68,9 @@ class course():
     # add Courses
     # Adds a Course to Config
     #Params: data to parse in config,course_id, list of room names, list of lab names, list of conflicts, list of faculty
-    def addCourse(self,config,id: str, creds: int, rms: list[str], lbs: list[str], con: list[str], fac: list[str]):
+    def addCourse(self,config: str,id: str, creds: int, rms: list[str], lbs: list[str], con: list[str], fac: list[str]):
             # calls existingItems to see if all values are able to be used.
-            tests = self.existingItems(id,config,rms,lbs,con,fac)
+            tests = self.existingItems(config,id,rms,lbs,con,fac)
             
             
             # if all values are good then we can finally add test to config   
@@ -102,8 +102,8 @@ class course():
 
             for course in courses:
                 if course.course_id.upper() == id.upper():
-                    self.deleteCourse(id)
-                    self.addCourse(id,creds,rms,lbs,con,fac)
+                    self.deleteCourse(config=config, id=id)
+                    self.addCourse(config=config,id=id,creds=creds,rms=rms,lbs=lbs,con=con,fac=fac)
                     return
             print("dont have it.")
         

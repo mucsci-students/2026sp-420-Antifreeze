@@ -4,23 +4,28 @@ from modifyConfig import modCourse
 from modifyConfig import modFaculty
 from modifyConfig import modLab
 from modifyConfig import modRoom
+from modifyConfig.utilsCLI import endProg
 
 
 def printConfigMain():
-    print("Press the key associated with the command you would like to issue, then press enter.")
+    print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Load Config")
     print("2: Modify Config")
-    print("3: Save Config")
-    print("r: return to main\n==> ",end="")
+    print("3: Print Config")
+    print("4: Save Config")
+    print("r: return to main")
+    print("q: exit program\n==> ",end="")
+
     
 def printModConfig():
-    print("Press the key associated with the command you would like to issue, then press enter.")
+    print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Conflict Config")
     print("2: Course Config")
     print("3: Faculty Config")
     print("4: Lab Config")
     print("5: Room Config")
-    print("r: return to main\n==> ",end="")
+    print("r: return to main")
+    print("q: exit program\n==> ",end="")
 
 def confLoop(sched):
     while(True):
@@ -38,6 +43,10 @@ def confLoop(sched):
             modRoom.modRoomMain(sched)
         elif userCommand.lower() == "r":
             return
+        elif userCommand.lower() == "q":
+            endProg()
+        else:
+            print("Invalid command, try again.")
 
 
 def config(sched):
@@ -47,10 +56,14 @@ def config(sched):
         if(userCommand == "1"):
             print ("Type the name of the file you would like to load from, including extension\n==> ",end="")
             fileName = input()
-            sched.loadFile(fileName)
+            sched.loadConfig(fileName)
         elif(userCommand == "2"):
             confLoop(sched)
         elif(userCommand == "3"):
-            sched.saveFile()
+            sched.printConfig()
+        elif(userCommand == "4"):
+            sched.saveConfig()
         elif(userCommand.lower() == "r"):
             break
+        elif(userCommand.lower() == "q"):
+            endProg()

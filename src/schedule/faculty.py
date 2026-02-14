@@ -37,8 +37,8 @@ class faculty():
         if name in faculty:
             print("Faculty already exists - no change made.")
         
-        newMember = FacultyConfig(name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
-                                   times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
+        newMember = FacultyConfig(name=name, maximum_credits=maximumCredits, maximum_days=maximumDays, minimum_credits=minimumCredits, unique_course_limit=uniqueCourseLimit,
+                      times=times, course_preferences=coursePreferences, room_preferences=roomPreferences, lab_preferences=labPreferences, mandatory_days=mandatoryDays)
         faculty.append(newMember)
         print(f"Faculty member '{name}' added successfully")
     
@@ -51,18 +51,21 @@ class faculty():
                       uniqueCourseLimit: int, times: dict[Day, list[TimeRange]], coursePreferences: dict[Course, Preference],
                       roomPreferences: dict[Room, Preference], labPreferences: dict[Lab, Preference], mandatoryDays: set[Day]):
         #Reference to faculty list inside database
-        faculty = config.config.faculty
+        fac = config.config.faculty
 
         #Checking to see if faculty exists under provided name
-        for name in faculty:
-            if faculty.name == name:
-                self.deleteFaculty(name)
-                self.addFaculty(name, maximumCredits, maximumDays, minimumCredits, uniqueCourseLimit,
-                                times, coursePreferences, roomPreferences, labPreferences, mandatoryDays)
-                print(f"Faculty member '{name}' modified successfully")
-            else:
-                print("No such faculty member exists.")
+        for prof in fac:
+            if prof.name == name:
+                self.deleteFaculty(config, name)
+                self.addFaculty(config=config, name=name, maximumCredits=maximumCredits, maximumDays=maximumDays, minimumCredits=minimumCredits, uniqueCourseLimit=uniqueCourseLimit,
+                                times=times, coursePreferences=coursePreferences, roomPreferences=roomPreferences, labPreferences=labPreferences, mandatoryDays=mandatoryDays)
+                return
+
+                 
+        print("No such faculty member exists.")
+        return
     
+
     #Delete Faculty
     #Delete an existing faculty from the configuration json
     #Parameters: Configuration file, name of faculty
@@ -73,9 +76,9 @@ class faculty():
         faculty = config.config.faculty
 
         #Checking to see if faculty exists under provided name
-        for name in faculty:
-            if faculty.name == name:
-                faculty.remove(name)
+        for prof in faculty:
+            if prof.name == name:
+                faculty.remove(prof)
                 print(f"Faculty member '{name}' deleted successfully")
-            else:
-                print("No such faculty member exists.")
+                return
+        print("No such faculty member exists.")

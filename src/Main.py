@@ -5,7 +5,7 @@ from schedule import schedule as sch
 
 #TODO
 def main():
-    sched = sch.schedule()
+    sched = sch.Schedule()
     cli.cli(sched)
 
 main()
