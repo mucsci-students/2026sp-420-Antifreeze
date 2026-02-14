@@ -4,22 +4,24 @@ from scheduler import (
 )
 from scheduler.config import CombinedConfig
 
-from schedule import conflict
-from schedule import course
-from schedule import faculty
-from schedule import lab
-from schedule import room
+from schedule.conflict import conflict
+from schedule.course import course
+from schedule.faculty import faculty
+from schedule.lab import lab
+from schedule.room import room
 
-class schedule:
+
+
+class Schedule():
     def __init__(self):
-        self.conflict = conflict.conflict()
-        self.course = course.course()
-        self.faculty = faculty.faculty()
-        self.lab = lab.lab()
-        self.room = room.room()
+        self.conflict = conflict()
+        self.course = course()
+        self.faculty = faculty()
+        self.lab = lab()
+        self.room = room()
         self.config = self.createEmptyConfig()
         self.configLoaded = False
-        self.loadFile("2026sp-420-Antifreeze\\src\\example.json")
+        self.loadFile("src\example.json")
         # scheduler = Scheduler(self.config)
 
 
@@ -41,8 +43,10 @@ class schedule:
     def saveFile(self):
         return
 
-    #TODO Implement feature
+    #Prints config in json format.
     def printFile(self):
+        printable = self.config.model_dump_json(indent=2)
+        print(printable)
         return
 
     #Creates an empty config file
@@ -70,3 +74,4 @@ class schedule:
         return emptyConfig   
         configLoaded = True
         
+    
