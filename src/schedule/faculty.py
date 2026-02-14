@@ -82,3 +82,9 @@ class faculty():
                 print(f"Faculty member '{name}' deleted successfully")
                 return
         print("No such faculty member exists.")
+
+    def printFaculty(self, config):
+        faculty = config.config.faculty
+        print("\nFaculty:")
+        for prof in faculty:
+            print(f"Name: {prof.name}, \n\tMax Credits: {prof.maximum_credits}, \n\tMax Days: {prof.maximum_days}, \n\tMin Credits: {prof.minimum_credits}, \n\tUnique Course Limit: {prof.unique_course_limit}, \n\tTimes: {prof.times}, \n\tCourse Preferences: {prof.course_preferences}, \n\tRoom Preferences: {prof.room_preferences}, \n\tLab Preferences: {prof.lab_preferences}, \n\tMandatory Days: {prof.mandatory_days}") 

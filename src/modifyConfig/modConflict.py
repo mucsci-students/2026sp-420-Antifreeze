@@ -5,6 +5,7 @@ def printModConflictMenu():
     print("1: Add conflict")
     print("2: Modify conflict")
     print("3: Remove conflict")
+    print("4: Print conflicts")
     print("r: return to main")
     print("q: exit program\n==> ",end="")
 
@@ -14,10 +15,12 @@ def modConflictMain(sched):
         userCommand = input()
         if(userCommand == "1"):
             addConflict(sched)
-        elif(userCommand == "2"):
+        elif(userCommand == "2"):   
             modConflict(sched)
         elif(userCommand == "3"):
             delConflict(sched)
+        elif(userCommand == "4"):
+            sched.conflict.printConflicts(sched.config)
         elif(userCommand.lower() == "r"):
             return
         elif(userCommand.lower() == "q"):
@@ -82,6 +85,7 @@ def modConflict(sched):
                 oldConfCourseID,
                 newConfCourseID
             )
+
 
     except KeyboardInterrupt:
         print("\nReturning to conflict menu...")

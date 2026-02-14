@@ -93,7 +93,11 @@ class lab():
         self.delete_lab("Linux")
         print("After delete:", self.config.config.labs)
     
-
+    def printLabs(self, config: str):
+        labs = config.config.labs
+        print("\nLabs:")
+        for lab in labs:            
+            print(f"Name: {lab}")   
 
 
 

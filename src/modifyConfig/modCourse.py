@@ -5,6 +5,7 @@ def printModCourseMenu():
     print("1: Add Course")
     print("2: Modify Course")
     print("3: Remove Course")
+    print("4: Print courses")
     print("r: return to main")
     print("q: exit program\n==> ",end="")
 
@@ -18,6 +19,8 @@ def modCourseMain(sched):
             modCourse(sched)
         elif(userCommand == "3"):
             delCourse(sched)
+        elif(userCommand == "4"):
+            sched.course.printCourses(sched.config) 
         elif(userCommand.lower() == "r"):
             return
         elif(userCommand.lower() == "q"):   

@@ -5,6 +5,7 @@ def printModRoomMenu():
     print("1: Add Room")
     print("2: Modify Room")
     print("3: Remove Room")
+    print("4: Print rooms")
     print("r: return to main")
     print("q: exit program\n==> ",end="")
 
@@ -18,6 +19,8 @@ def modRoomMain(sched):
             modRoom(sched)
         elif(userCommand == "3"):
             delRoom(sched)
+        elif(userCommand == "4"):
+            sched.room.printRooms(sched.config)
         elif(userCommand.lower() == "r"):
             return
         elif(userCommand.lower() == "q"):

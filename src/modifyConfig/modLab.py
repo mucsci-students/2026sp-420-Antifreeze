@@ -5,6 +5,7 @@ def printModLabMenu():
     print("1: Add Lab")
     print("2: Modify Lab")
     print("3: Remove Lab")
+    print("4: Print labs")
     print("r: return to main")
     print("q: exit program\n==> ",end="")
 
@@ -18,6 +19,8 @@ def modLabMain(sched):
             modLab(sched)
         elif(userCommand == "3"):
             delLab(sched)
+        elif(userCommand == "4"):
+            sched.lab.printLabs(sched.config)   
         elif(userCommand.lower() == "r"):
             return
         elif(userCommand.lower() == "q"):

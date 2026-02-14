@@ -53,8 +53,11 @@ class Schedule():
         return
 
     def printConfig(self):
-        printable = self.config.model_dump_json(indent=2)
-        print(printable)
+        self.conflict.printConflicts(self.config)
+        self.course.printCourses(self.config)
+        self.faculty.printFaculty(self.config)
+        self.lab.printLabs(self.config)
+        self.room.printRooms(self.config)
         return
     
     def createEmptyConfig(self):

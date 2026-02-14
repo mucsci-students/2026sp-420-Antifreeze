@@ -9,6 +9,7 @@ def printModFacultyMenu():
     print("1: Add faculty")
     print("2: Modify faculty")
     print("3: Remove faculty")
+    print("4: Print faculty")
     print("r: return to main")
     print("q: exit program\n==> ",end="")
 
@@ -22,6 +23,8 @@ def modFacultyMain(sched):
             modFaculty(sched)
         elif(userCommand == "3"):
             delFaculty(sched)
+        elif(userCommand == "4"):
+            sched.faculty.printFaculty(sched.config)    
         elif(userCommand.lower() == "r"):
             return
         elif(userCommand.lower() == "q"):

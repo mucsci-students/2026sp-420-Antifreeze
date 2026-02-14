@@ -108,5 +108,9 @@ class course():
             print("dont have it.")
         
         
-
-
+    def printCourses(self, config: str):
+        courses = config.config.courses 
+        print("\nCourses:")
+        for course in courses:            
+            print(f"Course ID: {course.course_id}, \n\tCredits: {course.credits}, \n\tRooms: {course.room}, \n\tLabs: {course.lab}, \n\tConflicts: {course.conflicts}, \n\tFaculty: {course.faculty}")
+    

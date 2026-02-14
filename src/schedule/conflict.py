@@ -104,7 +104,14 @@ class conflict():
             print(f"Course '{courseID}' not found — no changes made.")
 
 
+    def printConflicts(self, config: str):
+        courses = config.config.courses
+        print("\nCourse Conflicts:")
+        for course in courses:            
+            print(f"Course ID: {course.course_id}, \n\tConflicts: {course.conflicts}")
    
+
+
     #Add/Remove/Modify Conflict tests
     def runConflictTests(self):
         print("\n" + "="*60)

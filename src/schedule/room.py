@@ -78,6 +78,11 @@ class room():
         #CLI outputs room modified successfully
         print(f"Room renamed from '{oldName}' to '{newName}' successfully.") 
     
+    def printRooms(self, config: str):
+        rooms = config.config.rooms 
+        print("\nRooms:")
+        for room in rooms:            
+            print(f"Name: {room}")
     #Add/Delete/Modify Room tests
     def runTests(self):
         self.loadFile("example.json")
