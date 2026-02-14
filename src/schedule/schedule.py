@@ -2,7 +2,7 @@ from fileinput import filename
 import json
 from sched import scheduler
 import sched
-from tqdm import tqdm
+from modifyConfig.utilsCLI import prompt
 from scheduler import (
     Scheduler,
     load_config_from_file,
@@ -80,38 +80,83 @@ class Schedule():
         }
         return emptyConfig   
         
-    
+
+
     def runScheduler(self):
+
+        limit = int(prompt("How many schedules to generate?\n==> "))
+
+        while True:
+            fmt = prompt("Output format? (csv/json)\n==> ").lower()
+            if fmt in {"csv", "json"}:
+                break
+            print("Please enter 'csv' or 'json'.")
+
+        outfile = prompt("Output file name, including extensions\n==> ")
+
+        while True:
+            opt = prompt("Optimize schedules? (y/n)\n==> ").lower()
+            if opt in {"y", "n"}:
+                optimize = (opt == "y")
+                break
+            print("Please enter 'y' or 'n'.")
+        if opt == "y":
+            self.config.optimizer_flags = [
+                "faculty_course",
+                "faculty_room",
+                "faculty_lab",
+                "same_room",
+                "same_lab",
+                "pack_rooms"
+            ]
+        else:
+            self.config.optimizer_flags = []
+        print("Running scheduler, this may take a moment...\n")
         sched = Scheduler(self.config)
-        print("Running scheduler, this may take a moment...")
+
+        self.result = []
         for model in sched.get_models():
             self.result.append(model)
-            break
-        print("Schedule found!")
+            if len(self.result) >= limit:
+                break
+            print
 
-    def printSchedule(self):
         if not self.result:
-            print("No valid schedule found.")
+            print("No valid schedules found.")
             return
 
-        for course in self.result[0]:
-            print(course.as_csv())
+        model = self.result[0]
 
-    def saveSchedule(self):
-        if not self.result:
-            print("No valid schedule found, run the scheduler first1.")
-            return
-        print("Enter the path of the file you would like to save to, including extension\n==> ",end="")
-        filename = input()
-        if filename.endswith(".csv"):
+        if fmt == "csv":
             try:
-                with open(filename, "w") as f:
-                    for finSched in self.result:
-                        for course in finSched:         
-                            f.write(course.as_csv() + "\n")
-                print("Schedule saved successfully.")
+                with open(outfile, "w") as f:
+                    i = 1
+                    for model in self.result:
+                        f.write(f"Schedule {i}:\n")
+                        for sch in model:
+                            f.write(sch.as_csv() + "\n\n")
+                        i += 1
+                        f.write("\n")
+
             except Exception as e:
                 print("Could not save file, try again")
                 print(e)
-        else:  
-            print("Invalid file type, please save as .csv")
+        else:
+            try:
+                with open(outfile, "w") as f:
+                    for model in self.result:
+                        for course in model:
+                            json.dump([course.model_dump()], f, indent=4)
+            except Exception as e:
+                print("Could not save file, try again")
+                print(e)
+        print("Schedule generated and saved.")
+
+
+    def printSchedule(self):
+            if not self.result:
+                print("No valid schedule found, please run the scheduler first.")
+                return
+
+            for course in self.result[0]:
+                print(course.as_csv())
