@@ -1,5 +1,9 @@
 from modifyConfig.utilsCLI import prompt, endProg
 
+import re
+
+TIME_RANGE_RE = re.compile(r"^\d{2}:\d{2}-\d{2}:\d{2}$")
+
 def printModFacultyMenu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Add faculty")
@@ -62,6 +66,9 @@ def addFaculty(sched):
                     slot = prompt(f"{day} slot\n==> ")
                     if slot == "d":
                         break
+                    if not TIME_RANGE_RE.match(slot):
+                        print("Invalid time format. Use HH:MM-HH:MM")
+                        continue
                     slots.append(slot)
                     print(f"Current {day} slots: {slots}")
                 times[day] = slots
@@ -143,6 +150,9 @@ def modFaculty(sched):
                     slot = prompt(f"{day} slot\n==> ")
                     if slot == "d":
                         break
+                    if not TIME_RANGE_RE.match(slot):
+                        print("Invalid time format. Use HH:MM-HH:MM")
+                        continue
                     slots.append(slot)
                     print(f"Current {day} slots: {slots}")
                 times[day] = slots

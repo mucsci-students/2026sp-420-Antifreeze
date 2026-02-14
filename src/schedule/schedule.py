@@ -1,6 +1,7 @@
 from fileinput import filename
 import json
 from sched import scheduler
+import sched
 from modifyConfig.utilsCLI import prompt
 from scheduler import (
     Scheduler,
@@ -79,14 +80,7 @@ class Schedule():
         )       
         return emptyConfig
         
-    
-    def runScheduler(self):
-        sched = Scheduler(self.config)
-        print("Running scheduler, this may take a moment...")
-        for model in sched.get_models():
-            self.result.append(model)
-            break
-        print("Schedule found!")
+
 
     def runScheduler(self):
 
@@ -161,7 +155,7 @@ class Schedule():
 
     #Displays the schedule in a human-readable format    
     def printSchedule(self):
-        if not self.configLoaded or self.config is None:
+        if self.config is None or not self.config.config.courses:
             print("No configuration loaded. Please load a file first.")
             return
         
@@ -313,3 +307,4 @@ class Schedule():
         flagsStr = ", ".join(self.config.optimizer_flags) if self.config.optimizer_flags else "None"
         print(f"Flags: {flagsStr}")
         print("="*125 + "\n")
+
