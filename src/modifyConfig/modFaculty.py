@@ -54,12 +54,39 @@ def addFaculty(sched):
         while True:
             print("press r and enter at any time to return to main\n")
 
-            name = prompt("Enter Faculty name to add\n==> ")
+            while True:
+                name = prompt("Enter faculty name to add\n==> ")
+                if (name != ""):
+                    break
+                print("Invalid input for faculty name, try again.")
+            
+            while True:
+                maximumCredits = prompt("Enter maximum credits\n==> ")
+                if maximumCredits and maximumCredits.isnumeric():
+                    maximumCredits = int(maximumCredits)
+                    break
+                print("Invalid input for maximum credits, try again.")
 
-            maximumCredits = int(prompt("Enter maximum credits\n==> "))
-            minimumCredits = int(prompt("Enter minimum credits\n==> "))
-            uniqueCourseLimit = int(prompt("Enter unique course limit\n==> "))
-            maximumDays = int(prompt("Enter maximum days\n==> "))
+            while True:
+                minimumCredits = prompt("Enter minimum credits\n==> ")
+                if minimumCredits and minimumCredits.isnumeric():
+                    minimumCredits = int(minimumCredits)
+                    break
+                print("Invalid input for minimum credits, try again.")
+
+            while True:
+                uniqueCourseLimit = prompt("Enter unique course limit\n==> ")
+                if uniqueCourseLimit and uniqueCourseLimit.isnumeric():
+                    uniqueCourseLimit = int(uniqueCourseLimit)
+                    break
+                print("Invalid input for unique course limit, try again.")
+
+            while True:
+                maximumDays = prompt("Enter maximum days\n==> ")
+                if maximumDays and maximumDays.isnumeric():
+                    maximumDays = int(maximumDays)
+                    break
+                print("Invalid input for maximum days, try again.")
 
             times = {}
             for day in ["MON", "TUE", "WED", "THU", "FRI"]:
@@ -81,7 +108,12 @@ def addFaculty(sched):
                 course = prompt("Enter course preference (or 'd')\n==> ")
                 if course == "d":
                     break
-                weight = int(prompt(f"Enter weight for {course}\n==> "))
+                while True:
+                    weight = prompt(f"Enter weight for {course}\n==> ")
+                    if weight and weight.isnumeric():
+                        weight = int(weight)
+                        break
+                    print("Invalid input for weight, try again.")
                 coursePreferences[course] = weight
                 print(f"Current Course Preferences: {coursePreferences}")
 
@@ -90,7 +122,12 @@ def addFaculty(sched):
                 room = prompt("Enter room preference (or 'd')\n==> ")
                 if room == "d":
                     break
-                weight = int(prompt(f"Enter weight for {room}\n==> "))
+                while True:
+                    weight = prompt(f"Enter weight for {room}\n==> ")
+                    if weight and weight.isnumeric():
+                        weight = int(weight)
+                        break
+                    print("Invalid input for weight, try again.")
                 roomPreferences[room] = weight
                 print(f"Current Room Preferences: {roomPreferences}")
 
@@ -99,7 +136,12 @@ def addFaculty(sched):
                 lab = prompt("Enter lab preference (or 'd')\n==> ")
                 if lab == "d":
                     break
-                weight = int(prompt(f"Enter weight for {lab}\n==> "))
+                while True:
+                    weight = prompt(f"Enter weight for {lab}\n==> ")
+                    if weight and weight.isnumeric():
+                        weight = int(weight)
+                        break
+                    print("Invalid input for weight, try again.")
                 labPreferences[lab] = weight
                 print(f"Current Lab Preferences: {labPreferences}")
             
@@ -116,16 +158,17 @@ def addFaculty(sched):
                     print("Invalid day, try again.")
             
             sched.faculty.addFaculty(
-                config=sched.config,
-                name=name,
-                maximumCredits=maximumCredits,
-                maximumDays=maximumDays,
-                minimumCredits=minimumCredits,
-                uniqueCourseLimit=uniqueCourseLimit,
-                times=times,
-                coursePreferences=coursePreferences,
-                roomPreferences=roomPreferences,
-                labPreferences=labPreferences, mandatoryDays=mandatoryDays
+                config = sched.config,
+                name = name,
+                maximumCredits = maximumCredits,
+                maximumDays = maximumDays,
+                minimumCredits = minimumCredits,
+                uniqueCourseLimit = uniqueCourseLimit,
+                times = times,
+                coursePreferences = coursePreferences,
+                roomPreferences = roomPreferences,
+                labPreferences = labPreferences,
+                mandatoryDays = mandatoryDays
             )
 
     except KeyboardInterrupt:
@@ -137,17 +180,43 @@ def modFaculty(sched):
         while True:
             print("press r and enter at any time to return to main\n")
 
-            name = prompt("Enter Faculty name to modify\n==> ")
+            while True:
+                name = prompt("Enter faculty name to modify\n==> ")
+                if (name != ""):
+                    break
+                print("Invalid input for faculty name, try again.")
+            
+            while True:
+                maximumCredits = prompt("Enter new maximum credits\n==> ")
+                if maximumCredits and maximumCredits.isnumeric():
+                    maximumCredits = int(maximumCredits)
+                    break
+                print("Invalid input for maximum credits, try again.")
 
-            maximumCredits = int(prompt("Enter new maximum credits\n==> "))
-            minimumCredits = int(prompt("Enter new minimum credits\n==> "))
-            uniqueCourseLimit = int(prompt("Enter new unique course limit\n==> "))
-            maximumDays = int(prompt("Enter new maximum days\n==> "))
+            while True:
+                minimumCredits = prompt("Enter new minimum credits\n==> ")
+                if minimumCredits and minimumCredits.isnumeric():
+                    minimumCredits = int(minimumCredits)
+                    break
+                print("Invalid input for minimum credits, try again.")
 
-            # TIMES (per day)
+            while True:
+                uniqueCourseLimit = prompt("Enter new unique course limit\n==> ")
+                if uniqueCourseLimit and uniqueCourseLimit.isnumeric():
+                    uniqueCourseLimit = int(uniqueCourseLimit)
+                    break
+                print("Invalid input for unique course limit, try again.")
+
+            while True:
+                maximumDays = prompt("Enter new maximum days\n==> ")
+                if maximumDays and maximumDays.isnumeric():
+                    maximumDays = int(maximumDays)
+                    break
+                print("Invalid input for maximum days, try again.")
+
             times = {}
             for day in ["MON", "TUE", "WED", "THU", "FRI"]:
-                print(f"\nEnter time slots for {day} (send 'd' when finished)")
+                print(f"\nEnter new time slots for {day} (send 'd' when finished)")
                 slots = []
                 while True:
                     slot = prompt(f"{day} slot\n==> ")
@@ -160,24 +229,17 @@ def modFaculty(sched):
                     print(f"Current {day} slots: {slots}")
                 times[day] = slots
 
-            mandatoryDays = []
-            days = {"MON", "TUE", "WED", "THU", "FRI"}
-            while True:
-                day = prompt("Enter mandatory day (MON/TUE/WED/THU/FRI) or 'd'\n==> ")
-                if day == "d":
-                    break
-                if day.upper() in days:
-                    mandatoryDays.append(day.upper())
-                    print(f"Current Mandatory Days: {mandatoryDays}")
-                else:
-                    print("Invalid day, try again.")
-
             coursePreferences = {}
             while True:
-                course = prompt("Enter course preference (or 'd')\n==> ")
+                course = prompt("Enter new course preference (or 'd')\n==> ")
                 if course == "d":
                     break
-                weight = int(prompt(f"Enter weight for {course}\n==> "))
+                while True:
+                    weight = prompt(f"Enter weight for {course}\n==> ")
+                    if weight and weight.isnumeric():
+                        weight = int(weight)
+                        break
+                    print("Invalid input for weight, try again.")
                 coursePreferences[course] = weight
                 print(f"Current Course Preferences: {coursePreferences}")
 
@@ -186,7 +248,12 @@ def modFaculty(sched):
                 room = prompt("Enter room preference (or 'd')\n==> ")
                 if room == "d":
                     break
-                weight = int(prompt(f"Enter weight for {room}\n==> "))
+                while True:
+                    weight = prompt(f"Enter weight for {room}\n==> ")
+                    if weight and weight.isnumeric():
+                        weight = int(weight)
+                        break
+                    print("Invalid input for weight, try again.")
                 roomPreferences[room] = weight
                 print(f"Current Room Preferences: {roomPreferences}")
 
@@ -195,25 +262,41 @@ def modFaculty(sched):
                 lab = prompt("Enter lab preference (or 'd')\n==> ")
                 if lab == "d":
                     break
-                weight = int(prompt(f"Enter weight for {lab}\n==> "))
+                while True:
+                    weight = prompt(f"Enter weight for {lab}\n==> ")
+                    if weight and weight.isnumeric():
+                        weight = int(weight)
+                        break
+                    print("Invalid input for weight, try again.")
                 labPreferences[lab] = weight
                 print(f"Current Lab Preferences: {labPreferences}")
 
+            mandatoryDays = []
+            days = {"MON", "TUE", "WED", "THU", "FRI"}
+            while True:
+                day = prompt("Enter new mandatory day (MON/TUE/WED/THU/FRI) or 'd'\n==> ")
+                if day == "d":
+                    break
+                if day.upper() in days:
+                    mandatoryDays.append(day.upper())
+                    print(f"Current Mandatory Days: {mandatoryDays}")
+                else:
+                    print("Invalid day, try again.")
+
             sched.faculty.modifyFaculty(
-                sched.config,
-                name,
-                maximumCredits,
-                maximumDays,
-                minimumCredits,
-                uniqueCourseLimit,
-                times,
-                coursePreferences,
-                roomPreferences,
-                labPreferences,
-                mandatoryDays
+                config = sched.config,
+                name = name,
+                maximumCredits = maximumCredits,
+                maximumDays = maximumDays,
+                minimumCredits = minimumCredits,
+                uniqueCourseLimit = uniqueCourseLimit,
+                times = times,
+                coursePreferences = coursePreferences,
+                roomPreferences = roomPreferences,
+                labPreferences = labPreferences,
+                mandatoryDays = mandatoryDays
             )
 
     except KeyboardInterrupt:
         print("\nReturning to faculty menu...")
         return
-
