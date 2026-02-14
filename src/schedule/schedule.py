@@ -57,7 +57,6 @@ class Schedule():
         print(printable)
         return
     
-    #Creates an empty config file
     def createEmptyConfig(self):
         emptyConfig = {
             "config": {
