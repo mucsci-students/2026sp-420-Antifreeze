@@ -30,53 +30,63 @@ def modRoomMain(sched):
 
 def delRoom(sched):
     try:
-        while True:
-            print("press r and enter at any time to return to main\n")
+        print("press r and enter at any time to return to main\n")
 
-            name = prompt("Enter Room name to delete\n==> ")
+        name = prompt("Enter Room name to delete\n==> ")
+        
+        # Validate immediately
+        if not sched.room.validateEntry(sched.config, name, "delete"):
+            return
 
-            sched.room.deleteRoom(
-                sched.config,
-                name
-            )
+        sched.room.deleteRoom(
+            sched.config,
+            name
+        )
 
     except KeyboardInterrupt:
         print("\nReturning to room menu...")
         return
-
-
 
 def addRoom(sched):
     try:
-        while True:
-            print("press r and enter at any time to return to main\n")
+        print("press r and enter at any time to return to main\n")
 
-            name = prompt("Enter Room name to add\n==> ")
+        name = prompt("Enter Room name to add\n==> ")
+        
+        # Validate immediately
+        if not sched.room.validateEntry(sched.config, name, "add"):
+            return
 
-            sched.room.addRoom(
-                sched.config,
-                name
-            )
+        sched.room.addRoom(
+            sched.config,
+            name
+        )
 
     except KeyboardInterrupt:
         print("\nReturning to room menu...")
         return
 
-        
-
 def modRoom(sched):
     try:
-        while True:
-            print("press r and enter at any time to return to main\n")
+        print("press r and enter at any time to return to main\n")
 
-            oldName = prompt("Enter Room name to change\n==> ")
-            newName = prompt("Enter new Room name\n==> ")
+        oldName = prompt("Enter Room name to change\n==> ")
+        
+        # Validate old name immediately
+        if not sched.room.validateEntry(sched.config, oldName, "modify"):
+            return
+        
+        newName = prompt("Enter new Room name\n==> ")
+        
+        # Validate new name doesn't already exist
+        if not sched.room.validateEntry(sched.config, newName, "add"):
+            return
 
-            sched.room.modifyRoom(
-                sched.config,
-                oldName,
-                newName
-            )
+        sched.room.modifyRoom(
+            sched.config,
+            oldName,
+            newName
+        )
 
     except KeyboardInterrupt:
         print("\nReturning to room menu...")

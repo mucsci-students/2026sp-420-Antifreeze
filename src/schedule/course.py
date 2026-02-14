@@ -19,6 +19,32 @@ class course():
     def __init__(self):
         return
     
+    def validateEntry(self, config: str, courseID: str, operation: str) -> bool:
+        """
+        Validates course entry based on operation type.
+        
+        Parameters:
+        - config: Configuration object
+        - courseID: ID of the course to validate
+        - operation: 'add', 'modify', or 'delete'
+        
+        Returns:
+        - True if validation passes, False otherwise
+        """
+        courses = [c.course_id.upper() for c in config.config.courses]
+        
+        if operation == "add":
+            if courseID.upper() in courses:
+                print(f"Error: Course '{courseID}' already exists — returning to menu.")
+                return False
+        
+        elif operation in ["modify", "delete"]:
+            if courseID.upper() not in courses:
+                print(f"Error: Course '{courseID}' does not exist — returning to menu.")
+                return False
+        
+        return True
+    
     # Existing Item
     # Tests to see if params passed exist in the config
     # params: Config with data, course_id, list of rooms, list of labs, list fo conflicts, list of faculty
@@ -87,7 +113,7 @@ class course():
             for course in courses:
                 if course.course_id.upper() == id.upper():
                     config.config.courses.remove(course)
-                    print('deleted')
+                    print('Deleted data')
                     return
             print("course DOES NOT already exists")
             
@@ -104,6 +130,7 @@ class course():
                 if course.course_id.upper() == id.upper():
                     self.deleteCourse(config=config, id=id)
                     self.addCourse(config=config,id=id,creds=creds,rms=rms,lbs=lbs,con=con,fac=fac)
+                    print("Modified successfully. ")
                     return
             print("dont have it.")
         
@@ -113,4 +140,3 @@ class course():
         print("\nCourses:")
         for course in courses:            
             print(f"Course ID: {course.course_id}, \n\tCredits: {course.credits}, \n\tRooms: {course.room}, \n\tLabs: {course.lab}, \n\tConflicts: {course.conflicts}, \n\tFaculty: {course.faculty}")
-    

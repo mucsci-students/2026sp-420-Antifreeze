@@ -30,62 +30,84 @@ def modConflictMain(sched):
 
 def delConflict(sched):
     try:
-        while True:
-            print("press r and enter at any time to return to main\n")
+        print("press r and enter at any time to return to main\n")
 
-            courseID = prompt("Enter CourseID to remove conflict for\n==> ")
-            conflictingCourseID = prompt("Enter conflicting course ID\n==> ")
+        courseID = prompt("Enter CourseID to remove conflict for\n==> ")
+        
+        # Validate course exists immediately
+        if not sched.conflict.validateEntry(sched.config, courseID, "delete"):
+            return
+        
+        conflictingCourseID = prompt("Enter conflicting course ID\n==> ")
+        
+        # Validate conflict exists immediately
+        if not sched.conflict.validateEntry(sched.config, courseID, "delete", conflictingCourseID):
+            return
 
-            sched.conflict.deleteConflict(
-                sched.config,
-                courseID,
-                conflictingCourseID
-            )
+        sched.conflict.deleteConflict(
+            sched.config,
+            courseID,
+            conflictingCourseID
+        )
 
     except KeyboardInterrupt:
         print("\nReturning to conflict menu...")
         return
-
-
-
-
 
 def addConflict(sched):
     try:
-        while True:
-            print("press r and enter at any time to return to main\n")
+        print("press r and enter at any time to return to main\n")
 
-            courseID = prompt("Enter CourseID to add conflict to\n==> ")
-            conflictingCourseID = prompt("Enter conflicting course ID\n==> ")
+        courseID = prompt("Enter CourseID to add conflict to\n==> ")
+        
+        # Validate course exists immediately
+        if not sched.conflict.validateEntry(sched.config, courseID, "add"):
+            return
+        
+        conflictingCourseID = prompt("Enter conflicting course ID\n==> ")
+        
+        # Validate conflict can be added immediately
+        if not sched.conflict.validateEntry(sched.config, courseID, "add", conflictingCourseID):
+            return
 
-            sched.conflict.addConflict(
-                sched.config,
-                courseID,
-                conflictingCourseID
-            )
+        sched.conflict.addConflict(
+            sched.config,
+            courseID,
+            conflictingCourseID
+        )
 
     except KeyboardInterrupt:
         print("\nReturning to conflict menu...")
         return
 
-        
-    
 def modConflict(sched):
     try:
-        while True:
-            print("press r and enter at any time to return to main\n")
+        print("press r and enter at any time to return to main\n")
 
-            courseID = prompt("Enter CourseID to modify\n==> ")
-            oldConfCourseID = prompt("Enter old conflicting course ID\n==> ")
-            newConfCourseID = prompt("Enter new conflicting course ID\n==> ")
+        courseID = prompt("Enter CourseID to modify\n==> ")
+        
+        # Validate course exists immediately
+        if not sched.conflict.validateEntry(sched.config, courseID, "modify"):
+            return
+        
+        oldConfCourseID = prompt("Enter old conflicting course ID\n==> ")
+        
+        # Validate old conflict exists immediately
+        if not sched.conflict.validateEntry(sched.config, courseID, "modify", oldConfCourseID):
+            return
+        
+        newConfCourseID = prompt("Enter new conflicting course ID\n==> ")
+        
+        # Validate new conflict can be added immediately
+        if not sched.conflict.validateEntry(sched.config, courseID, "add", newConfCourseID):
+            return
 
-            sched.conflict.modifyConflict(
-                sched.config,
-                courseID,
-                oldConfCourseID,
-                newConfCourseID
-            )
-
+        sched.conflict.modifyConflict(
+            sched.config,
+            courseID,
+            oldConfCourseID,
+            newConfCourseID
+        )
 
     except KeyboardInterrupt:
         print("\nReturning to conflict menu...")
