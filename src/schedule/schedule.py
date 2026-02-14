@@ -155,7 +155,7 @@ class Schedule():
 
     #Displays the schedule in a human-readable format    
     def printSchedule(self):
-        if not self.configLoaded or self.config is None:
+        if self.config is None or not self.config.config.courses:
             print("No configuration loaded. Please load a file first.")
             return
         
