@@ -91,3 +91,41 @@ class faculty():
         print("\nFaculty:")
         for prof in faculty:
             print(f"Name: {prof.name}, \n\tMax Credits: {prof.maximum_credits}, \n\tMax Days: {prof.maximum_days}, \n\tMin Credits: {prof.minimum_credits}, \n\tUnique Course Limit: {prof.unique_course_limit}, \n\tTimes: {prof.times}, \n\tCourse Preferences: {prof.course_preferences}, \n\tRoom Preferences: {prof.room_preferences}, \n\tLab Preferences: {prof.lab_preferences}, \n\tMandatory Days: {prof.mandatory_days}") 
+
+
+    def validateEntry(self, config: str, facultyName: str, operation: str) -> bool:
+    
+        #Validates faculty entry based on operation type.
+        
+        #Parameters:
+        # config: Configuration object
+        # facultyName: Name of the faculty to validate
+        # operation: 'add', 'modify', or 'delete'
+        
+        #Returns true if validation passes, False otherwise
+    
+        faculty_list = config.config.faculty
+        
+        # Check for empty input
+        if facultyName == "":
+            print("Error: Faculty name cannot be empty — returning to menu.")
+            return False
+        
+        # Check if faculty exists
+        facultyExists = False
+        for fac in faculty_list:
+            if fac.name.upper() == facultyName.upper():
+                facultyExists = True
+                break
+        
+        if operation == "add":
+            if facultyExists:
+                print(f"Error: Faculty '{facultyName}' already exists — returning to menu.")
+                return False
+        
+        elif operation in ["modify", "delete"]:
+            if not facultyExists:
+                print(f"Error: Faculty '{facultyName}' does not exist — returning to menu.")
+                return False
+        
+        return True
