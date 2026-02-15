@@ -1,79 +1,81 @@
-from schedule import schedule
-from modifyConfig import modConflict
-from modifyConfig import modCourse
-from modifyConfig import modFaculty
-from modifyConfig import modLab
-from modifyConfig import modRoom
-from modifyConfig.utilsCLI import endProg
+from modifyConfig.utilsCLI import prompt, endProg
+from modifyConfig import modLab, modRoom, modCourse, modConflict, modFaculty
 
-#printConfigMain
-#Displays the main configuration menu options to the user
-def printConfigMain():
+def printConfigMenu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
-    print("1: Load Config")
-    print("2: Modify Config")
-    print("3: Print Config")
-    print("4: Save Config")
+    print("1: Load config")
+    print("2: Modify config")
+    print("3: Save config")
+    print("4: Print config")
     print("r: return to main")
     print("q: exit program\n==> ",end="")
 
-#printModConfig
-#Displays the configuration modification menu options to the user
-def printModConfig():
+def printModConfigMenu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
-    print("1: Conflict Config")
-    print("2: Course Config")
-    print("3: Faculty Config")
-    print("4: Lab Config")
-    print("5: Room Config")
-    print("r: return to main")
+    print("1: Modify Labs")
+    print("2: Modify Rooms")
+    print("3: Modify Courses")
+    print("4: Modify Conflicts")
+    print("5: Modify Faculty")
+    print("r: return to config menu")
     print("q: exit program\n==> ",end="")
 
+#Check if Config is Loaded
+#Validates that a configuration file has been loaded before modifying/saving/printing
+#Returns True if config is loaded, False otherwise
+def isConfigLoaded(sched):
+    if sched.config is None or not hasattr(sched.config, 'config'):
+        print("Error: No configuration loaded. Please load a config file first — returning to config menu.")
+        return False
+    return True
 
-#confLoop
-#Main control loop for configuration modification operations
-#Routes user input to conflict, course, faculty, lab, or room modification
-#Parameters: Scheduler object
 def confLoop(sched):
     while(True):
-        printModConfig()
+        printModConfigMenu()
         userCommand = input()
-        if userCommand == "1":
-            modConflict.modConflictMain(sched)
-        elif userCommand == "2":
-            modCourse.modCourseMain(sched)
-        elif userCommand == "3":
-            modFaculty.modFacultyMain(sched)
-        elif userCommand == "4":
+        if(userCommand == "1"):
             modLab.modLabMain(sched)
-        elif userCommand == "5":
+        elif(userCommand == "2"):
             modRoom.modRoomMain(sched)
-        elif userCommand.lower() == "r":
+        elif(userCommand == "3"):
+            modCourse.modCourseMain(sched)
+        elif(userCommand == "4"):
+            modConflict.modConflictMain(sched)
+        elif(userCommand == "5"):
+            modFaculty.modFacultyMain(sched)
+        elif(userCommand.lower() == "r"):
             return
-        elif userCommand.lower() == "q":
+        elif(userCommand.lower() == "q"):
             endProg()
         else:
             print("Invalid command, try again.")
 
-#config
-#Main control loop for configuration operations
-#Routes user input to load, modify, print, or save configuration
-#Parameters: Scheduler object
 def config(sched):
     while(True):
-        printConfigMain()
+        printConfigMenu()
         userCommand = input()
         if(userCommand == "1"):
-            print ("Type the name of the file you would like to load from, including extension\n==> ",end="")
+            print("Enter the path of the file you would like to load, including extension\n==> ",end="")
             fileName = input()
             sched.loadConfig(fileName)
         elif(userCommand == "2"):
+            # Validate config is loaded before modifying
+            if not isConfigLoaded(sched):
+                continue
             confLoop(sched)
         elif(userCommand == "3"):
-            sched.printConfig()
-        elif(userCommand == "4"):
+            # Validate config is loaded before saving
+            if not isConfigLoaded(sched):
+                continue
             sched.saveConfig()
+        elif(userCommand == "4"):
+            # Validate config is loaded before printing
+            if not isConfigLoaded(sched):
+                continue
+            sched.printConfig()
         elif(userCommand.lower() == "r"):
-            break
+            return
         elif(userCommand.lower() == "q"):
             endProg()
+        else:
+            print("Invalid command, try again.")

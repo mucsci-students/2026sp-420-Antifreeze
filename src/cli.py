@@ -18,6 +18,15 @@ def printRunSchedulerMenu():
     print("2: Print Schedule")
     print("r: return to main")
     print("q: exit program\n==> ",end="")
+
+#Check if Config is Loaded
+#Validates that a configuration file has been loaded before running scheduler
+#Returns True if config is loaded, False otherwise
+def isConfigLoaded(sched):
+    if sched.config is None or not sched.config.config.courses:
+        print("Error: No configuration loaded. Please load a config file first — returning to main menu.")
+        return False
+    return True
             
 #Run Scheduler Menu
 #Handles user interaction for running and printing schedules
@@ -28,8 +37,14 @@ def runScheduler(sched):
         printRunSchedulerMenu()
         userCommand = input()
         if userCommand == "1":
+            # Validate config is loaded before running scheduler
+            if not isConfigLoaded(sched):
+                return
             sched.runScheduler()
         elif userCommand == "2":
+            # Validate config is loaded before printing schedule
+            if not isConfigLoaded(sched):
+                return
             sched.printSchedule()
         elif userCommand.lower() == "r":
             return 
@@ -50,4 +65,3 @@ def cli(sched):
             configCli.config(sched)
         elif(userCommand == "2"):
             runScheduler(sched)
-        

@@ -84,13 +84,9 @@ class faculty():
         print("No such faculty member exists.")
 
     #Print Faculty
-<<<<<<< HEAD
     #Prints all faculty members currently stored in the configuration
     #Displays faculty attributes including credit limits, day limits, time availability,
     #course preferences, room preferences, lab preferences, and mandatory days
-=======
-    #Print the faculty config from the configuration json
->>>>>>> f18d85d7aabaf5bea8fe0bcd9815c7fd6fd7c1c4
     #Parameters: Configuration file
     def printFaculty(self, config):
         faculty = config.config.faculty
