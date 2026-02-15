@@ -8,148 +8,26 @@
   "time_slot_config": {
    "times": {
       "MON": [
-        {"start": "08:00", "spacing": 60, "end": "19:00"}
-      ],
+         {"start": "00:00", "spacing": 99, "end": "23:59"}],
       "TUE": [
-        {"start": "08:00", "spacing": 60, "end": "12:00"},
-        {"start": "13:10", "spacing": 60, "end": "17:10"},
-        {"start": "17:10", "spacing": 30, "end": "19:40"}
-      ],
+         {"start": "00:00", "spacing": 99, "end": "23:59"}],
       "WED": [
-        {"start": "08:00", "spacing": 60, "end": "19:00"}
-      ],
-      "THU": [
-        {"start": "08:00", "spacing": 60, "end": "12:00"},
-        {"start": "13:10", "spacing": 60, "end": "17:10"},
-        {"start": "17:10", "spacing": 30, "end": "19:40"}
-      ],
+         {"start": "00:00", "spacing": 99, "end": "23:59"}],
+      "THU": [ 
+        {"start": "00:00", "spacing": 99, "end": "23:59"}],
       "FRI": [
-        {"start": "08:00", "spacing": 60, "end": "17:00"}
-      ]
+        {"start": "00:00", "spacing": 99, "end": "23:59"}]
     },
     "classes": [
       {
-        "credits": 3,
+        "credits": 1,
         "meetings": [
-          {"day": "MON", "duration": 50},
-          {"day": "WED", "duration": 50},
-          {"day": "FRI", "duration": 50}
+          {"day": "MON", "duration": 99},
+          {"day": "TUE", "duration": 99},
+          {"day": "WED", "duration": 99},
+          {"day": "THU", "duration": 99},
+          {"day": "FRI", "duration": 99}
         ]
-      },
-      {
-        "credits": 3,
-        "meetings": [
-          {"day": "TUE", "duration": 75},
-          {"day": "THU", "duration": 75}
-        ]
-      },
-      {
-        "credits": 4,
-        "meetings": [
-          {"day": "MON", "duration": 110, "lab": true},
-          {"day": "WED", "duration": 110}
-        ],
-        "start_time": "16:00"
-      },
-      {
-        "credits": 4,
-        "meetings": [
-          {"day": "MON", "duration": 110, "lab": true},
-          {"day": "FRI", "duration": 110}
-        ],
-        "disabled": true
-      },
-      {
-        "credits": 4,
-        "meetings": [
-          {"day": "TUE", "duration": 110, "lab": true},
-          {"day": "THU", "duration": 110}
-        ]
-      },
-      {
-        "credits": 4,
-        "meetings": [
-          {"day": "TUE", "duration": 110},
-          {"day": "THU", "duration": 110, "lab": true}
-        ]
-      },
-      {
-        "credits": 4,
-        "meetings": [
-          {"day": "MON", "duration": 50},
-          {"day": "TUE", "duration": 110, "lab": true},
-          {"day": "FRI", "duration": 50}
-        ]
-      },
-      {
-        "credits": 4,
-        "meetings": [
-          {"day": "MON", "duration": 50},
-          {"day": "WED", "duration": 110, "lab": true},
-          {"day": "FRI", "duration": 50}
-        ]
-      },
-      {
-        "credits": 4,
-        "meetings": [
-          {"day": "MON", "duration": 50},
-          {"day": "THU", "duration": 110, "lab": true},
-          {"day": "FRI", "duration": 50}
-        ]
-      },
-      {
-        "credits": 4,
-        "meetings": [
-          {"day": "MON", "duration": 110, "lab": true},
-          {"day": "TUE", "duration": 50},
-          {"day": "FRI", "duration": 50}
-        ],
-        "disabled": true
-      },
-      {
-        "credits": 4,
-        "meetings": [
-          {"day": "MON", "duration": 110, "lab": true},
-          {"day": "WED", "duration": 50},
-          {"day": "FRI", "duration": 50}
-        ],
-        "disabled": true
-      },
-      {
-        "credits": 4,
-        "meetings": [
-          {"day": "MON", "duration": 110, "lab": true},
-          {"day": "THU", "duration": 50},
-          {"day": "FRI", "duration": 50}
-        ],
-        "disabled": true
-      },
-      {
-        "credits": 4,
-        "meetings": [
-          {"day": "MON", "duration": 50},
-          {"day": "TUE", "duration": 50},
-          {"day": "FRI", "duration": 110, "lab": true}
-        ],
-        "disabled": true
-      },
-      {
-        "credits": 4,
-        "meetings": [
-          {"day": "MON", "duration": 50},
-          {"day": "WED", "duration": 50},
-          {"day": "FRI", "duration": 110, "lab": true}
-        ],
-        "disabled": true
-      },
-      {
-        "credits": 4,
-        "meetings": [
-          {"day": "MON", "duration": 50},
-          {"day": "THU", "duration": 50},
-          {"day": "FRI", "duration": 110, "lab": true}
-        ],
-        "disabled": true
       }
     ]
   },
