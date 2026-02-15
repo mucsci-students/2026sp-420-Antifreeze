@@ -41,15 +41,18 @@ def modLabMain(sched):
 #Parameters: Scheduler object
 def delLab(sched):
     try:
-        while True:
-            print("press r and enter at any time to return to main\n")
+        print("press r and enter at any time to return to main\n")
 
-            name = prompt("Enter Lab name to delete\n==> ")
+        name = prompt("Enter Lab name to delete\n==> ")
+        
+        # Validate immediately
+        if not sched.lab.validateEntry(sched.config, name, "delete"):
+            return
 
-            sched.lab.deleteLab(
-                sched.config,
-                name
-            )
+        sched.lab.deleteLab(
+            sched.config,
+            name
+        )
 
     except KeyboardInterrupt:
         print("\nReturning to lab menu...")
@@ -61,15 +64,18 @@ def delLab(sched):
 #Parameters: Scheduler object
 def addLab(sched):
     try:
-        while True:
-            print("press r and enter at any time to return to main\n")
+        print("press r and enter at any time to return to main\n")
 
-            name = prompt("Enter lab name to add\n==> ")
+        name = prompt("Enter lab name to add\n==> ")
+        
+        # Validate immediately
+        if not sched.lab.validateEntry(sched.config, name, "add"):
+            return
 
-            sched.lab.addLab(
-                sched.config,
-                name
-            )
+        sched.lab.addLab(
+            sched.config,
+            name
+        )
 
     except KeyboardInterrupt:
         print("\nReturning to lab menu...")
@@ -81,17 +87,25 @@ def addLab(sched):
 #Parameters: Scheduler object
 def modLab(sched):
     try:
-        while True:
-            print("press r and enter at any time to return to main\n")
+        print("press r and enter at any time to return to main\n")
 
-            oldName = prompt("Enter Lab name to change\n==> ")
-            newName = prompt("Enter new lab name\n==> ")
+        oldName = prompt("Enter Lab name to change\n==> ")
+        
+        # Validate old name immediately
+        if not sched.lab.validateEntry(sched.config, oldName, "modify"):
+            return
+        
+        newName = prompt("Enter new lab name\n==> ")
+        
+        # Validate new name doesn't already exist
+        if not sched.lab.validateEntry(sched.config, newName, "add"):
+            return
 
-            sched.lab.modifyLab(
-                sched.config,
-                oldName,
-                newName
-            )
+        sched.lab.modifyLab(
+            sched.config,
+            oldName,
+            newName
+        )
 
     except KeyboardInterrupt:
         print("\nReturning to lab menu...")

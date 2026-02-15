@@ -11,7 +11,38 @@ class lab():
     def __init__(self):
         return
 
-     #Add Lab
+    def validateEntry(self, config: str, labName: str, operation: str) -> bool:
+        """
+        Validates lab entry based on operation type.
+        
+        Parameters:
+        - config: Configuration object
+        - labName: Name of the lab to validate
+        - operation: 'add', 'modify', or 'delete'
+        
+        Returns:
+        - True if validation passes, False otherwise
+        """
+        labs = config.config.labs
+        
+        # Check for empty input
+        if labName == "":
+            print("Error: Lab must have a name — returning to menu.")
+            return False
+        
+        if operation == "add":
+            if labName in labs:
+                print(f"Error: Lab '{labName}' already exists — returning to menu.")
+                return False
+        
+        elif operation in ["modify", "delete"]:
+            if labName not in labs:
+                print(f"Error: Lab '{labName}' does not exist — returning to menu.")
+                return False
+        
+        return True
+
+    #Add Lab
     #Adds a lab to the configuration json
     #Parameters: Configuration file, Lab to add
     #Example usage: add_lab(example.json, Windows)
@@ -53,7 +84,6 @@ class lab():
     #Example usage: modify_lab(example.json, Linux, Linux_0)
     def modifyLab(self, config: str, old_name: str, new_name: str):
 
-
         #Reference to labs list inside database
         labs = config.config.labs
 
@@ -71,27 +101,7 @@ class lab():
 
         print(f"Lab renamed from '{old_name}' to '{new_name}'.") 
     
-    #Add/Remove/Delete Lab tests
-    def runTests(self):
-        source_file = "example.json"
-        test_file = "example_test.json"
-        self.loadFile("example.json")
 
-       
-        s = self
-
-        self.loadFile("example.json")
-
-        print("Initial labs:", self.config.config.labs)
-
-        self.add_lab("Windows")
-        print("After add:", self.config.config.labs)
-
-        self.modify_lab("Mac", "MacOS")
-        print("After modify:", self.config.config.labs)
-
-        self.delete_lab("Linux")
-        print("After delete:", self.config.config.labs)
     
     #Print Labs
     #Prints all labs currently stored in the configuration
@@ -101,9 +111,4 @@ class lab():
         labs = config.config.labs
         print("\nLabs:")
         for lab in labs:            
-            print(f"Name: {lab}")   
-
-
-
-
-   
+            print(f"Name: {lab}")
