@@ -1,5 +1,5 @@
 from modifyConfig.utilsCLI import prompt, endProg
-from modifyConfig import modLab, modRoom, modCourse, modConflict, modFaculty
+from modifyConfig import modLab, modRoom, modCourse, modConflict, modFaculty, modTimeSlot
 
 def printConfigMenu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
@@ -17,6 +17,7 @@ def printModConfigMenu():
     print("3: Modify Courses")
     print("4: Modify Conflicts")
     print("5: Modify Faculty")
+    print("6: Modify Time Slot")
     print("r: return to config menu")
     print("q: exit program\n==> ",end="")
 
@@ -42,6 +43,8 @@ def confLoop(sched):
             modConflict.modConflictMain(sched)
         elif(userCommand == "5"):
             modFaculty.modFacultyMain(sched)
+        elif(userCommand == "6"):
+            modTimeSlot.modTimeSlot(sched)
         elif(userCommand.lower() == "r"):
             return
         elif(userCommand.lower() == "q"):
