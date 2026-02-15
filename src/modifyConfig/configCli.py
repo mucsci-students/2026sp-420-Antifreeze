@@ -6,7 +6,8 @@ from modifyConfig import modLab
 from modifyConfig import modRoom
 from modifyConfig.utilsCLI import endProg
 
-
+#printConfigMain
+#Displays the main configuration menu options to the user
 def printConfigMain():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Load Config")
@@ -16,7 +17,8 @@ def printConfigMain():
     print("r: return to main")
     print("q: exit program\n==> ",end="")
 
-    
+#printModConfig
+#Displays the configuration modification menu options to the user
 def printModConfig():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Conflict Config")
@@ -27,6 +29,11 @@ def printModConfig():
     print("r: return to main")
     print("q: exit program\n==> ",end="")
 
+
+#confLoop
+#Main control loop for configuration modification operations
+#Routes user input to conflict, course, faculty, lab, or room modification
+#Parameters: Scheduler object
 def confLoop(sched):
     while(True):
         printModConfig()
@@ -48,7 +55,10 @@ def confLoop(sched):
         else:
             print("Invalid command, try again.")
 
-
+#config
+#Main control loop for configuration operations
+#Routes user input to load, modify, print, or save configuration
+#Parameters: Scheduler object
 def config(sched):
     while(True):
         printConfigMain()

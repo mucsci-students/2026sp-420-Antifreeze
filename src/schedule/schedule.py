@@ -24,6 +24,9 @@ from schedule.room import room
 
 
 class Schedule():
+    #Initialize Schedule
+    #Initializes all scheduling submodules and creates an empty configuration
+    #Sets up conflict, course, faculty, lab, and room handlers
     def __init__(self):
         self.conflict = conflict()
         self.course = course()
@@ -36,6 +39,11 @@ class Schedule():
 
     #--------------#
     #FILE MANAGEMENT
+
+    #Load Configuration
+    #Loads a configuration file into the scheduler
+    #Replaces the current configuration with the loaded file
+    #Parameters: Configuration file path
     def loadConfig(self, fileName):
         try:
             self.config = load_config_from_file(CombinedConfig, fileName)
@@ -46,7 +54,8 @@ class Schedule():
                 print(e)
                 return
 
-
+    #Save Configuration
+    #Saves the current configuration to a file
     def saveConfig(self):
         print("Enter the path of the file you would like to save to, including extension\n==> ",end="")
         fileName = input()
@@ -58,8 +67,9 @@ class Schedule():
             print("Could not save file, try again")
             print(e)
         return
-    #Print Config
-    #flags are set of things yoy want to show, if empty show all of config
+
+    #Print Configuration
+    #Prints the current configuration in a human-readable format
     def printConfig(self):
         self.conflict.printConflicts(self.config)
         self.course.printCourses(self.config)
@@ -68,8 +78,12 @@ class Schedule():
         self.room.printRooms(self.config)
         return
 
-
+    #Run Scheduler
+    #Executes the scheduling engine using the current configuration
+    #Prompts the user for generation limits, output format, and optimization options
+    #Generates schedules and writes results to a file
     def runScheduler(self):
+
 
         limit = int(prompt("How many schedules to generate?\n==> "))
 
@@ -140,7 +154,11 @@ class Schedule():
         print("Schedule generated and saved.")
 
 
-    #Displays the schedule in a human-readable format    
+       #Print Schedule
+    
+    #Displays the current schedule in a human-readable, formatted layout
+    #Prints courses, faculty assignments, classes, time slots, and misc settings
+    #Requires a loaded configuration   
     def printSchedule(self):
         if self.config is None or not self.config.config.courses:
             print("No configuration loaded. Please load a file first.")

@@ -4,15 +4,66 @@ from scheduler import (
 )
 from scheduler.config import CombinedConfig
 
-# TODO - create subclass details
 class conflict():
-
 
     #initialize conflict subclass
     def __init__(self):
         return
 
-  #Add Conflict
+    def validateEntry(self, config: str, courseID: str, operation: str, conflictingCourseID: str = None) -> bool:
+        """
+        Validates conflict entry based on operation type.
+        
+        Parameters:
+        - config: Configuration object
+        - courseID: ID of the course
+        - operation: 'add', 'modify', or 'delete'
+        - conflictingCourseID: ID of the conflicting course (optional)
+        
+        Returns:
+        - True if validation passes, False otherwise
+        """
+        courses = config.config.courses
+        
+        # Check if main course exists
+        courseFound = False
+        targetCourse = None
+        for course in courses:
+            if course.course_id == courseID:
+                courseFound = True
+                targetCourse = course
+                break
+        
+        if not courseFound:
+            print(f"Error: Course '{courseID}' not found — returning to menu.")
+            return False
+        
+        # For operations that need a conflicting course
+        if conflictingCourseID:
+            # Check if conflicting course exists in system
+            conflictingCourseExists = False
+            for course in courses:
+                if course.course_id == conflictingCourseID:
+                    conflictingCourseExists = True
+                    break
+            
+            if not conflictingCourseExists:
+                print(f"Error: Conflicting course '{conflictingCourseID}' not found — returning to menu.")
+                return False
+            
+            if operation == "add":
+                if conflictingCourseID in targetCourse.conflicts:
+                    print(f"Error: Conflict already exists between '{courseID}' and '{conflictingCourseID}' — returning to menu.")
+                    return False
+            
+            elif operation in ["modify", "delete"]:
+                if conflictingCourseID not in targetCourse.conflicts:
+                    print(f"Error: Conflict not found between '{courseID}' and '{conflictingCourseID}' — returning to menu.")
+                    return False
+        
+        return True
+
+    #Add Conflict
     #Adds a conflict between two courses
     #Parameters: courseID (the course to add conflict to), conflictingCourseID (the course that conflicts)
     #Example usage: addConflict("CMSC 140", "CMSC 161")
@@ -103,57 +154,12 @@ class conflict():
         if not courseFound:
             print(f"Course '{courseID}' not found — no changes made.")
 
-
-   
-    #Add/Remove/Modify Conflict tests
-    def runConflictTests(self):
-        print("\n" + "="*60)
-        print("CONFLICT TESTS")
-        print("="*60 + "\n")
-        
-        self.loadFile("example.json")
-        
-        # Display initial conflicts for a specific course
-        print("Initial conflicts for CMSC 140:")
-        for course in self.config.config.courses:
-            if course.courseID == "CMSC 140":
-                print(f"  {course.conflicts}")
-                break
-        
-        print("\n--- Test 1: Add a new conflict ---")
-        self.addConflict("CMSC 140", "CMSC 330")
-        for course in self.config.config.courses:
-            if course.courseID == "CMSC 140":
-                print(f"Updated conflicts: {course.conflicts}")
-                break
-        
-        print("\n--- Test 2: Try to add duplicate conflict ---")
-        self.addConflict("CMSC 140", "CMSC 161")  # Already exists
-        
-        print("\n--- Test 3: Modify an existing conflict ---")
-        self.modifyConflict("CMSC 140", "CMSC 161", "CMSC 340")
-        for course in self.config.config.courses:
-            if course.courseID == "CMSC 140":
-                print(f"Updated conflicts: {course.conflicts}")
-                break
-        
-        print("\n--- Test 4: Try to modify non-existent conflict ---")
-        self.modifyConflict("CMSC 140", "CMSC 999", "CMSC 340")
-        
-        print("\n--- Test 5: Delete a conflict ---")
-        self.deleteConflict("CMSC 140", "CMSC 162")
-        for course in self.config.config.courses:
-            if course.courseID == "CMSC 140":
-                print(f"Updated conflicts: {course.conflicts}")
-                break
-        
-        print("\n--- Test 6: Try to delete non-existent conflict ---")
-        self.deleteConflict("CMSC 140", "CMSC 999")
-        
-        print("\n--- Test 7: Try to add conflict to non-existent course ---")
-        self.addConflict("CMSC 999", "CMSC 140")
-        
-        print("\n" + "="*60)
-        print("CONFLICT TESTS COMPLETED")
-        print("="*60 + "\n")
-    
+    #Print Conflicts
+    #Prints all course conflicts currently stored in the configuration
+    #Displays each course ID along with its associated conflict list
+    #Parameters: Configuration file
+    def printConflicts(self, config: str):
+        courses = config.config.courses
+        print("\nCourse Conflicts:")
+        for course in courses:            
+            print(f"Course ID: {course.course_id}, \n\tConflicts: {course.conflicts}")
