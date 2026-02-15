@@ -24,8 +24,7 @@ def printRunSchedulerMenu():
 #Returns True if config is loaded, False otherwise
 def isConfigLoaded(sched):
     if sched.config is None or not sched.config.config.courses:
-        print("Error: No configuration loaded. Please load a config file first — returning to main menu.")
-        return False
+        sched.loadConfig("2026sp-420-Antifreeze\\src\\schedule\\empty.json")
     return True
             
 #Run Scheduler Menu

@@ -25,8 +25,7 @@ def printModConfigMenu():
 #Returns True if config is loaded, False otherwise
 def isConfigLoaded(sched):
     if sched.config is None or not hasattr(sched.config, 'config'):
-        print("Error: No configuration loaded. Please load a config file first — returning to config menu.")
-        return False
+        sched.loadConfig("2026sp-420-Antifreeze\\src\\schedule\\empty.json")
     return True
 
 def confLoop(sched):
@@ -57,6 +56,7 @@ def config(sched):
         if(userCommand == "1"):
             print("Enter the path of the file you would like to load, including extension\n==> ",end="")
             fileName = input()
+            print(repr(fileName))
             sched.loadConfig(fileName)
         elif(userCommand == "2"):
             # Validate config is loaded before modifying
