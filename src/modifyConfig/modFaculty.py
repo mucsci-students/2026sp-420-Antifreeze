@@ -3,6 +3,78 @@ from modifyConfig.utilsCLI import prompt, endProg
 import re
 
 TIME_RANGE_RE = re.compile(r"^\d{2}:\d{2}-\d{2}:\d{2}$")
+
+#Validates that a time slot is in valid format and has valid time values.
+def validate_time_slot(slot):
+
+    if not TIME_RANGE_RE.match(slot):
+        return False, "Invalid format. Use HH:MM-HH:MM"
+    
+    #Parse the times
+    try:
+        start_time, end_time = slot.split('-')
+        start_hour, start_min = map(int, start_time.split(':'))
+        end_hour, end_min = map(int, end_time.split(':'))
+        
+        #Validate hours (0-23)
+        if not (0 <= start_hour <= 23):
+            return False, f"Start hour {start_hour:02d} must be between 00-23"
+        if not (0 <= end_hour <= 23):
+            return False, f"End hour {end_hour:02d} must be between 00-23"
+        
+        #Validate minutes (0-59)
+        if not (0 <= start_min <= 59):
+            return False, f"Start minute {start_min:02d} must be between 00-59"
+        if not (0 <= end_min <= 59):
+            return False, f"End minute {end_min:02d} must be between 00-59"
+        
+        #Validate that end time is after start time
+        start_total_mins = start_hour * 60 + start_min
+        end_total_mins = end_hour * 60 + end_min
+        if end_total_mins <= start_total_mins:
+            return False, f"End time ({end_hour:02d}:{end_min:02d}) must be after start time ({start_hour:02d}:{start_min:02d})"
+        
+        return True, None
+        
+    except (ValueError, IndexError):
+        return False, "Invalid time format"
+
+#Checks if a new time slot overlaps with any existing time slots
+def check_time_overlap(new_slot, existing_slots):
+    """
+    Checks if a new time slot overlaps with any existing time slots.
+    Parameters:
+    - new_slot: Time slot string in format HH:MM-HH:MM
+    - existing_slots: List of existing time slot strings
+    Returns:
+    - (True, None) if no overlap
+    - (False, overlapping_slot) if overlap detected
+    """
+    if not existing_slots:
+        return True, None
+    
+    # Parse new slot
+    new_start_time, new_end_time = new_slot.split('-')
+    new_start_hour, new_start_min = map(int, new_start_time.split(':'))
+    new_end_hour, new_end_min = map(int, new_end_time.split(':'))
+    new_start_total = new_start_hour * 60 + new_start_min
+    new_end_total = new_end_hour * 60 + new_end_min
+    
+    # Check against each existing slot
+    for existing_slot in existing_slots:
+        exist_start_time, exist_end_time = existing_slot.split('-')
+        exist_start_hour, exist_start_min = map(int, exist_start_time.split(':'))
+        exist_end_hour, exist_end_min = map(int, exist_end_time.split(':'))
+        exist_start_total = exist_start_hour * 60 + exist_start_min
+        exist_end_total = exist_end_hour * 60 + exist_end_min
+        
+        # Check for overlap
+        # Overlap occurs if: new_start < exist_end AND new_end > exist_start
+        if new_start_total < exist_end_total and new_end_total > exist_start_total:
+            return False, existing_slot
+    
+    return True, None
+
 #printModFacultyMenu
 #Displays the faculty modification menu options to the user
 def printModFacultyMenu():
@@ -148,6 +220,12 @@ def addFaculty(sched):
                 #Check for duplicate time slot
                 if slot in slots:
                     print(f"Error: Time slot '{slot}' already added for {day}. Please try again.")
+                    continue
+                
+                #Check for overlapping time slots
+                no_overlap, overlapping_slot = check_time_overlap(slot, slots)
+                if not no_overlap:
+                    print(f"Error: Time slot '{slot}' overlaps with existing slot '{overlapping_slot}'. Please try again.")
                     continue
                 
                 slots.append(slot)
@@ -341,6 +419,12 @@ def modFaculty(sched):
                     print(f"Error: Time slot '{slot}' already added for {day}. Please try again.")
                     continue
                 
+                #Check for overlapping time slots
+                no_overlap, overlapping_slot = check_time_overlap(slot, slots)
+                if not no_overlap:
+                    print(f"Error: Time slot '{slot}' overlaps with existing slot '{overlapping_slot}'. Please try again.")
+                    continue
+                
                 slots.append(slot)
                 print(f"Current {day} slots: {slots}")
             times[day] = slots
@@ -440,38 +524,3 @@ def modFaculty(sched):
     except KeyboardInterrupt:
         print("\nReturning to faculty menu...")
         return
-    
-#Validates that a time slot is in valid format and has valid time values.
-def validate_time_slot(slot):
-
-    if not TIME_RANGE_RE.match(slot):
-        return False, "Invalid format. Use HH:MM-HH:MM"
-    
-    #Parse the times
-    try:
-        start_time, end_time = slot.split('-')
-        start_hour, start_min = map(int, start_time.split(':'))
-        end_hour, end_min = map(int, end_time.split(':'))
-        
-        #Validate hours (0-23)
-        if not (0 <= start_hour <= 23):
-            return False, f"Start hour {start_hour:02d} must be between 00-23"
-        if not (0 <= end_hour <= 23):
-            return False, f"End hour {end_hour:02d} must be between 00-23"
-        
-        #Validate minutes (0-59)
-        if not (0 <= start_min <= 59):
-            return False, f"Start minute {start_min:02d} must be between 00-59"
-        if not (0 <= end_min <= 59):
-            return False, f"End minute {end_min:02d} must be between 00-59"
-        
-        #Validate that end time is after start time
-        start_total_mins = start_hour * 60 + start_min
-        end_total_mins = end_hour * 60 + end_min
-        if end_total_mins <= start_total_mins:
-            return False, f"End time ({end_hour:02d}:{end_min:02d}) must be after start time ({start_hour:02d}:{start_min:02d})"
-        
-        return True, None
-        
-    except (ValueError, IndexError):
-        return False, "Invalid time format"
