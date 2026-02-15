@@ -8,25 +8,25 @@
   "time_slot_config": {
    "times": {
       "MON": [
-         {"start": "08:00", "spacing": 50, "end": "16:00"}],
+         {"start": "00:00", "spacing": 99, "end": "23:59"}],
       "TUE": [
-         {"start": "08:00", "spacing": 50, "end": "16:00"}],
+         {"start": "00:00", "spacing": 99, "end": "23:59"}],
       "WED": [
-         {"start": "08:00", "spacing": 50, "end": "16:00"}],
+         {"start": "00:00", "spacing": 99, "end": "23:59"}],
       "THU": [ 
-        {"start": "08:00", "spacing": 50, "end": "16:00"}],
+        {"start": "00:00", "spacing": 99, "end": "23:59"}],
       "FRI": [
-        {"start": "08:00", "spacing": 50, "end": "16:00"}]
+        {"start": "00:00", "spacing": 99, "end": "23:59"}]
     },
     "classes": [
       {
         "credits": 1,
         "meetings": [
-          {"day": "MON", "duration": 50},
-          {"day": "TUE", "duration": 50},
-          {"day": "WED", "duration": 50},
-          {"day": "THU", "duration": 50},
-          {"day": "FRI", "duration": 50}
+          {"day": "MON", "duration": 99},
+          {"day": "TUE", "duration": 99},
+          {"day": "WED", "duration": 99},
+          {"day": "THU", "duration": 99},
+          {"day": "FRI", "duration": 99}
         ]
       }
     ]
