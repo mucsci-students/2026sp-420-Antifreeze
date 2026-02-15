@@ -6,9 +6,15 @@ from modifyConfig.utilsCLI import prompt
 from scheduler import (
     Scheduler,
     load_config_from_file,
+    CourseConfig,
+    CombinedConfig,
+    FacultyConfig,
+    TimeSlotConfig,
+    OptimizerFlags
+    
 )
 
-from scheduler.config import CombinedConfig
+
 from schedule.conflict import conflict
 from schedule.course import course
 from schedule.faculty import faculty
@@ -27,7 +33,8 @@ class Schedule():
         self.faculty = faculty()
         self.lab = lab()
         self.room = room()
-        self.config = self.createEmptyConfig()
+        # This relitive path may not work for all.
+        self.config = self.loadConfig("2026sp-420-Antifreeze\\src\\schedule\\empty.json")
         self.result = []
 
     #--------------#
@@ -70,33 +77,6 @@ class Schedule():
         self.lab.printLabs(self.config)
         self.room.printRooms(self.config)
         return
-    
-    #Create Empty Configuration
-    #Generates and returns a default empty configuration structure
-    #Used to initialize the scheduler before loading a file
-    def createEmptyConfig(self):
-        emptyConfig = {
-            "config": {
-                "rooms": [],
-                "labs": [],
-                "courses": [],
-                "faculty": []
-            },
-            "time_slot_config": {
-                "times": {
-                    "MON": [],
-                    "TUE": [],
-                    "WED": [],
-                    "THU": [],
-                    "FRI": []
-                },
-                "classes": []
-            },
-            "limit": 100,
-            "optimizer_flags": []
-        }
-        return emptyConfig   
-        
 
     #Run Scheduler
     #Executes the scheduling engine using the current configuration
