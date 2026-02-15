@@ -107,7 +107,11 @@ class course():
                     return
             print("dont have it.")
         
-        
+    #Print Courses
+    #Prints all courses currently stored in the configuration
+    #Displays course details including credits, assigned rooms, labs,
+    #conflicts, and associated faculty
+    #Parameters: Configuration file
     def printCourses(self, config: str):
         courses = config.config.courses 
         print("\nCourses:")

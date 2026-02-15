@@ -1,5 +1,6 @@
 from modifyConfig.utilsCLI import prompt, endProg
-
+#printModCourseMenu
+#Displays the course modification menu options to the user
 def printModCourseMenu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Add Course")
@@ -8,7 +9,10 @@ def printModCourseMenu():
     print("4: Print courses")
     print("r: return to main")
     print("q: exit program\n==> ",end="")
-
+#modCourseMain
+#Main control loop for course modification operations
+#Routes user input to add, modify, delete, or print course actions
+#Parameters: Scheduler object
 def modCourseMain(sched):
     while(True):
         printModCourseMenu()
@@ -28,6 +32,10 @@ def modCourseMain(sched):
         else:
             print("Invalid command, try again.")
 
+#delCourse
+#Removes an existing course from the configuration 
+#Prompts the user for a course ID
+#Parameters: Scheduler object
 def delCourse(sched):
     try:
         while True:
@@ -45,7 +53,10 @@ def delCourse(sched):
         return
 
 
-
+#addCourse
+#Adds a new course to the configuration
+#Prompts the user for course ID, credits, rooms, labs, conflicts, and faculty
+#Parameters: Scheduler object
 def addCourse(sched):
     try:
         print("press r and enter at any time to return to main\n")
@@ -101,6 +112,10 @@ def addCourse(sched):
 
 
 
+#modCourse
+#Replaces an existing course's attributes with new values
+#Prompts the user for course ID, credits, rooms, labs, conflicts, and faculty
+#Parameters: Scheduler object
 
 def modCourse(sched):
     try:

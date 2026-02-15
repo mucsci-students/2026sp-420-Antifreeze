@@ -1,5 +1,7 @@
 from modifyConfig.utilsCLI import prompt, endProg
 
+#Print Modify Conflict Menu
+#Displays the conflict modification menu options to the user
 def printModConflictMenu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Add conflict")
@@ -9,6 +11,11 @@ def printModConflictMenu():
     print("r: return to main")
     print("q: exit program\n==> ",end="")
 
+
+#Modify Conflict Main
+#Main control loop for conflict modification operations
+#Routes user input to add, modify, delete, or print conflict actions
+#Parameters: Scheduler object
 def modConflictMain(sched):
     while(True):
         printModConflictMenu()
@@ -28,6 +35,11 @@ def modConflictMain(sched):
         else:
             print("Invalid command, try again.")
 
+
+#Delete Conflict
+#Removes an existing conflict between two courses
+#Prompts the user for a course ID and conflicting course ID
+#Parameters: Scheduler object
 def delConflict(sched):
     try:
         while True:
@@ -49,7 +61,10 @@ def delConflict(sched):
 
 
 
-
+#Add Conflict
+#Adds a conflict between two courses in the configuration
+#Prompts the user for a course ID and conflicting course ID
+#Parameters: Scheduler object
 def addConflict(sched):
     try:
         while True:
@@ -69,7 +84,10 @@ def addConflict(sched):
         return
 
         
-    
+#Modify Conflict
+#Replaces an existing course conflict with a new conflicting course
+#Prompts the user for a course ID, old conflict, and new conflict
+#Parameters: Scheduler object
 def modConflict(sched):
     try:
         while True:

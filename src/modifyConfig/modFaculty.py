@@ -3,7 +3,8 @@ from modifyConfig.utilsCLI import prompt, endProg
 import re
 
 TIME_RANGE_RE = re.compile(r"^\d{2}:\d{2}-\d{2}:\d{2}$")
-
+#printModFacultyMenu
+#Displays the faculty modification menu options to the user
 def printModFacultyMenu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Add faculty")
@@ -13,6 +14,10 @@ def printModFacultyMenu():
     print("r: return to main")
     print("q: exit program\n==> ",end="")
 
+#modFacultyMain
+#Main control loop for faculty modification operations
+#Routes user input to add, modify, delete, or print faculty actions
+#Parameters: Scheduler object
 def modFacultyMain(sched):
     while(True):
         printModFacultyMenu()
@@ -31,7 +36,10 @@ def modFacultyMain(sched):
             endProg()
         else:
             print("Invalid command, try again.")
-
+#delFaculty
+#Removes an existing faculty from the configuration
+#Prompts the user for a faculty name
+#Parameters: Scheduler object
 def delFaculty(sched):
     try:
         while True:
@@ -48,7 +56,10 @@ def delFaculty(sched):
         print("\nReturning to faculty menu...")
         return
 
-
+#addFaculty
+#Adds a new faculty to the configuration
+#Prompts the user for faculty name, max credits, max days, min credits, unique course limit, times, course preferences, room preferences, lab preferences, and mandatory days
+#Parameters: Scheduler object
 def addFaculty(sched):
     try:
         while True:
@@ -132,6 +143,10 @@ def addFaculty(sched):
         print("\nReturning to faculty menu...")
         return
 
+#modFaculty
+#Replaces an existing faculty's attributes with new values
+#Prompts the user for faculty name, max credits, max days, min credits, unique course limit, times, course preferences, room preferences, lab preferences, and mandatory days
+#Parameters: Scheduler object
 def modFaculty(sched):
     try:
         while True:

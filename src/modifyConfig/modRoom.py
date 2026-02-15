@@ -1,5 +1,7 @@
 from modifyConfig.utilsCLI import prompt, endProg
 
+#printModRoomMenu
+#Displays the room modification menu options to the user
 def printModRoomMenu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Add Room")
@@ -9,6 +11,10 @@ def printModRoomMenu():
     print("r: return to main")
     print("q: exit program\n==> ",end="")
 
+#modRoomMain
+#Main control loop for room modification operations
+#Routes user input to add, modify, delete, or print room actions
+#Parameters: Scheduler object
 def modRoomMain(sched):
     while(True):
         printModRoomMenu()
@@ -28,6 +34,10 @@ def modRoomMain(sched):
         else:
             print("Invalid command, try again.")
 
+#delRoom
+#Removes an existing room from the configuration
+#Prompts the user for a room name
+#Parameters: Scheduler object
 def delRoom(sched):
     try:
         while True:
@@ -45,7 +55,10 @@ def delRoom(sched):
         return
 
 
-
+#addRoom
+#Adds a new room to the configuration
+#Prompts the user for a room name
+#Parameters: Scheduler object
 def addRoom(sched):
     try:
         while True:
@@ -63,7 +76,10 @@ def addRoom(sched):
         return
 
         
-
+#modRoom
+#Replaces an existing room's name with a new name
+#Prompts the user for a room name
+#Parameters: Scheduler object
 def modRoom(sched):
     try:
         while True:

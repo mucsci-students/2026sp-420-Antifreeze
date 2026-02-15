@@ -93,6 +93,10 @@ class lab():
         self.delete_lab("Linux")
         print("After delete:", self.config.config.labs)
     
+    #Print Labs
+    #Prints all labs currently stored in the configuration
+    #Displays the name of each lab
+    #Parameters: Configuration file
     def printLabs(self, config: str):
         labs = config.config.labs
         print("\nLabs:")

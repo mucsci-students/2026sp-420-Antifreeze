@@ -1,4 +1,6 @@
 from modifyConfig.utilsCLI import prompt, endProg
+#printModLabMenu
+#Displays the lab modification menu options to the user
 
 def printModLabMenu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
@@ -9,6 +11,10 @@ def printModLabMenu():
     print("r: return to main")
     print("q: exit program\n==> ",end="")
 
+#modLabMain
+#Main control loop for lab modification operations
+#Routes user input to add, modify, delete, or print lab actions
+#Parameters: Scheduler object
 def modLabMain(sched):
     while(True):
         printModLabMenu()
@@ -28,6 +34,11 @@ def modLabMain(sched):
         else:
             print("Invalid command, try again.")
 
+
+#delLab
+#Removes an existing lab from the configuration
+#Prompts the user for a lab name
+#Parameters: Scheduler object
 def delLab(sched):
     try:
         while True:
@@ -44,6 +55,10 @@ def delLab(sched):
         print("\nReturning to lab menu...")
         return
 
+#addLab
+#Adds a new lab to the configuration
+#Prompts the user for a lab name
+#Parameters: Scheduler object
 def addLab(sched):
     try:
         while True:
@@ -60,6 +75,10 @@ def addLab(sched):
         print("\nReturning to lab menu...")
         return
 
+#modLab
+#Replaces an existing lab's name with a new name
+#Prompts the user for a lab name
+#Parameters: Scheduler object
 def modLab(sched):
     try:
         while True:

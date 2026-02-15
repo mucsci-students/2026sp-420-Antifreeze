@@ -103,7 +103,10 @@ class conflict():
         if not courseFound:
             print(f"Course '{courseID}' not found — no changes made.")
 
-
+    #Print Conflicts
+    #Prints all course conflicts currently stored in the configuration
+    #Displays each course ID along with its associated conflict list
+    #Parameters: Configuration file
     def printConflicts(self, config: str):
         courses = config.config.courses
         print("\nCourse Conflicts:")
