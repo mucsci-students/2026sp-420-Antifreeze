@@ -41,9 +41,7 @@ https://docs.astral.sh/uv/getting-started/installation/. To check your version, 
     - Linux/macOS:
     ```source .venv/bin/activate```
     - Windows:
-    ```.\.venv\Scripts\activate```
+    ```.venv\Scripts\activate```
 5. Run the CLI:
-    - Linux/macOS:
-
-    - Windows:
+    ```uv run ./2026sp-420-Antifreeze/src/Main.py```
     
