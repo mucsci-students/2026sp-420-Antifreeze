@@ -11,14 +11,41 @@ class room():
     def __init__(self):
         return
 
-    #Add Room
-    #Adds a room to the configuration JSON
-    #Parameters: Configuration file, Room name
-    #Example usage: addRoom(example.json, "Roddy 144")
+    def validateEntry(self, config: str, roomName: str, operation: str) -> bool:
+        """
+        Validates room entry based on operation type.
+        
+        Parameters:
+        - config: Configuration object
+        - roomName: Name of the room to validate
+        - operation: 'add', 'modify', or 'delete'
+        
+        Returns:
+        - True if validation passes, False otherwise
+        """
+        rooms = config.config.rooms
+        
+        # Check for empty input
+        if roomName == "":
+            print("Error: Room must have a name — returning to menu.")
+            return False
+        
+        if operation == "add":
+            if roomName in rooms:
+                print(f"Error: Room '{roomName}' already exists — returning to menu.")
+                return False
+        
+        elif operation in ["modify", "delete"]:
+            if roomName not in rooms:
+                print(f"Error: Room '{roomName}' does not exist — returning to menu.")
+                return False
+        
+        return True
+
     def addRoom(self, config: str, roomName: str):
 
         #Reference to rooms list in database
-        rooms = self.config.config.rooms
+        rooms = config.config.rooms
 
         #Checking for empty input or duplicate room
         if roomName == "":
@@ -34,14 +61,10 @@ class room():
         #CLI outputs room added successfully
         print(f"Room '{roomName}' added successfully.")
 
-    #Delete Room
-    #Deletes a room from the configuration JSON
-    #Parameters: Configuration file, Room name
-    #Example usage: deleteRoom(example.json, "Roddy 136")
     def deleteRoom(self, config: str, roomName: str):
 
         #Reference to rooms list in database
-        rooms = self.config.config.rooms
+        rooms = config.config.rooms
 
         #Checking for empty input or nonexistent room
         if roomName == "":
@@ -57,14 +80,10 @@ class room():
         #CLI outputs room deleted successfully
         print(f"Room '{roomName}' deleted successfully.")
 
-    #Modify Lab
-    #Modifies a room from the configuration JSON
-    #Parameters: Configuration file, old room name, new room name
-    #Example usage: modifyRoom(example.json, "Roddy 140", "Roddy 141")
     def modifyRoom(self, config: str, oldName: str, newName: str):
 
         #Reference to rooms list in database
-        rooms = self.config.config.rooms
+        rooms = config.config.rooms
 
         #Checking for empty inputs, nonexistent rooms, or duplicate rooms
         if oldName == "":
@@ -87,56 +106,12 @@ class room():
         #CLI outputs room modified successfully
         print(f"Room renamed from '{oldName}' to '{newName}' successfully.") 
     
-    #Add/Delete/Modify Room tests
-    def runTests(self):
-        self.loadFile("example.json")
-
-        print("Initial rooms:", self.config.config.rooms)
-
-        ###### Adding tests ######
-        #1. Empty string
-        self.addRoom("")
-        print("After add:", self.config.config.rooms)
-
-        #2. Room that exists
-        self.addRoom("Roddy 136")
-        print("After add:", self.config.config.rooms)
-
-        #3. Room that doesn't exist
-        self.addRoom("Roddy 143")
-        print("After add:", self.config.config.rooms)
-
-        ###### Deleting tests ######
-        #1. Empty string
-        self.deleteRoom("")
-        print("After delete:", self.config.config.rooms)
-
-        #2. Room that exists
-        self.deleteRoom("Roddy 136")
-        print("After delete:", self.config.config.rooms)
-
-        #3. Room that doesn't exist
-        self.deleteRoom("Roddy 200")
-        print("After delete:", self.config.config.rooms)
-
-        ###### Modifying tests ######
-        #1. Empty strings
-        self.modifyRoom("", "Roddy 140")
-        print("After modify:", self.config.config.rooms)
-
-        self.modifyRoom("Roddy 140", "")
-        print("After modify:", self.config.config.rooms)
-
-        #2. Room that exists
-        self.modifyRoom("Roddy 140", "Roddy 147")
-        print("After modify:", self.config.config.rooms)
-
-        self.modifyRoom("Roddy 140", "Roddy 340")
-        print("After modify:", self.config.config.rooms)
-
-        self.modifyRoom("Roddy 340", "Roddy 340")
-        print("After modify:", self.config.config.rooms)
-
-        #3. Room that doesn't exist
-        self.modifyRoom("Roddy 300", "Roddy 340")
-        print("After modify:", self.config.config.rooms)
+    #Print Rooms
+    #Prints all rooms currently stored in the configuration
+    #Displays the name of each room
+    #Parameters: Configuration file
+    def printRooms(self, config: str):
+        rooms = config.config.rooms 
+        print("\nRooms:")
+        for room in rooms:            
+            print(f"Name: {room}")

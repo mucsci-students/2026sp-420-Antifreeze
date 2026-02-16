@@ -1,0 +1,36 @@
+{
+  "config": {
+    "rooms": [],
+    "labs": [],
+    "courses": [],
+    "faculty": []
+  },
+  "time_slot_config": {
+   "times": {
+      "MON": [
+         {"start": "00:00", "spacing": 99, "end": "23:59"}],
+      "TUE": [
+         {"start": "00:00", "spacing": 99, "end": "23:59"}],
+      "WED": [
+         {"start": "00:00", "spacing": 99, "end": "23:59"}],
+      "THU": [ 
+        {"start": "00:00", "spacing": 99, "end": "23:59"}],
+      "FRI": [
+        {"start": "00:00", "spacing": 99, "end": "23:59"}]
+    },
+    "classes": [
+      {
+        "credits": 1,
+        "meetings": [
+          {"day": "MON", "duration": 99},
+          {"day": "TUE", "duration": 99},
+          {"day": "WED", "duration": 99},
+          {"day": "THU", "duration": 99},
+          {"day": "FRI", "duration": 99}
+        ]
+      }
+    ]
+  },
+  "limit": 100,
+  "optimizer_flags": []
+}
