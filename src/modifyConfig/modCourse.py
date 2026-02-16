@@ -1,12 +1,19 @@
-
+from modifyConfig.utilsCLI import prompt, endProg
+#printModCourseMenu
+#Displays the course modification menu options to the user
 def printModCourseMenu():
-    print("Press the key associated with the command you would like to issue, then press enter.")
+    print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Add Course")
     print("2: Modify Course")
     print("3: Remove Course")
-    print("r: return to main\n==> ",end="")
-
-def ModCourseMenuMain(sched):
+    print("4: Print courses")
+    print("r: return to main")
+    print("q: exit program\n==> ",end="")
+#modCourseMain
+#Main control loop for course modification operations
+#Routes user input to add, modify, delete, or print course actions
+#Parameters: Scheduler object
+def modCourseMain(sched):
     while(True):
         printModCourseMenu()
         userCommand = input()
@@ -16,78 +23,226 @@ def ModCourseMenuMain(sched):
             modCourse(sched)
         elif(userCommand == "3"):
             delCourse(sched)
+        elif(userCommand == "4"):
+            sched.course.printCourses(sched.config) 
         elif(userCommand.lower() == "r"):
             return
+        elif(userCommand.lower() == "q"):   
+            endProg()
+        else:
+            print("Invalid command, try again.")
 
+#delCourse
+#Removes an existing course from the configuration 
+#Prompts the user for a course ID
+#Parameters: Scheduler object
 def delCourse(sched):
-    while(True):
-        print("press r and page through prompts to return to main")
+    try:
+        print("press r and enter at any time to return to main\n")
+
+        name = prompt("Enter Course name to delete\n==> ")
         
-        print("Enter Course name to delete\n==> ",end="")
-        name = input()
-        
-        if (name.lower() == "r"):
+        # Validate immediately
+        if not sched.course.validateEntry(sched.config, name, "delete"):
             return
-        sched.Course.deleteCourse(sched.config, name)
+
+        sched.course.deleteCourse(
+            sched.config,
+            name
+        )
+
+    except KeyboardInterrupt:
+        print("\nReturning to course menu...")
+        return
 
 
+#addCourse
+#Adds a new course to the configuration
+#Prompts the user for course ID, credits, rooms, labs, conflicts, and faculty
+#Parameters: Scheduler object
 def addCourse(sched):
-    while(True):
-        print("press r and page through prompts to return to main")
-        print("Enter Course ID to add\n==> ",end="")
-        name = input()
+    try:
+        print("press r and enter at any time to return to main\n")
+
+        name = prompt("Enter Course ID\n==> ")
         
-        print("Enter credits\n==> ",end="")        
-        credits = input()
-
-        print("Enter rooms\n==> ",end="")        
-        rooms = input()
-
-        print("Enter labs\n==> ",end="")
-        labs = input()
-
-        print("Enter conflicts\n==> ",end="")        
-        conflicts = input()
-
-        print("Enter faculty\n==> ",end="")        
-        faculty = input()
-        
-        fields = [
-            name, credits, rooms, labs,
-            conflicts, faculty
-        ]
-
-        if any(str(x).lower() == "r" for x in fields):
+        # Validate immediately
+        if not sched.course.validateEntry(sched.config, name, "add"):
             return
-        sched.Course.addCourse(name, credits, rooms, labs, conflicts, faculty)
+        
+        credits = prompt("Enter credits\n==> ")
+        
+        # Validate credits is an integer
+        try:
+            credits_int = int(credits)
+            if credits_int <= 0:
+                print("Error: Credits must be a positive integer — returning to menu.")
+                return
+        except ValueError:
+            print(f"Error: Credits must be an integer, got '{credits}' — returning to menu.")
+            return
 
+        # Get existing rooms, labs, courses, and faculty for validation
+        existing_rooms = [r.upper() for r in sched.config.config.rooms]
+        existing_labs = [l.upper() for l in sched.config.config.labs]
+        existing_courses = [c.course_id.upper() for c in sched.config.config.courses]
+        existing_faculty = [f.name.upper() for f in sched.config.config.faculty]
+
+        rooms = []
+        while True:
+            room = prompt("Enter rooms, one at a time. when finished, send 'd'\n==> ")
+            if room == "d":
+                break
+            # Validate room exists
+            if room.upper() not in existing_rooms:
+                print(f"Error: Room '{room}' does not exist — returning to menu.")
+                return
+            rooms.append(room)
+            print(f"Current Rooms: {rooms}")
+
+        labs = []
+        while True:
+            lab = prompt("Enter labs, one at a time. when finished, send 'd'\n==> ")
+            if lab == "d":
+                break
+            # Validate lab exists
+            if lab.upper() not in existing_labs:
+                print(f"Error: Lab '{lab}' does not exist — returning to menu.")
+                return
+            labs.append(lab)
+            print(f"Current Labs: {labs}")
+
+        conflicts = []
+        while True:
+            conflict = prompt("Enter conflicts, one at a time. when finished, send 'd'\n==> ")
+            if conflict == "d":
+                break
+            # Validate conflict course exists
+            if conflict.upper() not in existing_courses:
+                print(f"Error: Course '{conflict}' does not exist — returning to menu.")
+                return
+            conflicts.append(conflict)
+            print(f"Current Conflicts: {conflicts}")
+
+        faculty = []
+        while True:
+            prof = prompt("Enter faculty, one at a time. when finished, send 'd'\n==> ")
+            if prof == "d":
+                break
+            # Validate faculty exists
+            if prof.upper() not in existing_faculty:
+                print(f"Error: Faculty '{prof}' does not exist — returning to menu.")
+                return
+            faculty.append(prof)
+            print(f"Current Faculty: {faculty}")
+
+        sched.course.addCourse(
+            config=sched.config,
+            id=name,
+            creds=credits_int,
+            rms=rooms,
+            lbs=labs,
+            con=conflicts,
+            fac=faculty
+        )
+
+    except KeyboardInterrupt:
+        print("\nReturning to course menu...")
+        return
+
+
+
+#modCourse
+#Replaces an existing course's attributes with new values
+#Prompts the user for course ID, credits, rooms, labs, conflicts, and faculty
+#Parameters: Scheduler object
 
 def modCourse(sched):
-     while(True):
-        print("press r and page through prompts to return to main")
-        print("Enter Course ID to modify\n==> ",end="")
-        name = input()
+    try:
+        print("press r and enter at any time to return to main\n")
+
+        name = prompt("Enter Course ID to modify\n==> ")
         
-        print("Enter new credits\n==> ",end="")        
-        credits = input()
-
-        print("Enter new rooms\n==> ",end="")        
-        rooms = input()
-
-        print("Enter new labs\n==> ",end="")
-        labs = input()
-
-        print("Enter new conflicts\n==> ",end="")        
-        conflicts = input()
-
-        print("Enter new faculty\n==> ",end="")        
-        faculty = input()
-        
-        fields = [
-            name, credits, rooms, labs,
-            conflicts, faculty
-        ]
-
-        if any(str(x).lower() == "r" for x in fields):
+        # Validate immediately
+        if not sched.course.validateEntry(sched.config, name, "modify"):
             return
-        sched.Course.modifyCourse(name, credits, rooms, labs, conflicts, faculty)
+        
+        credits = prompt("Enter new credits\n==> ")
+        
+        # Validate credits is an integer
+        try:
+            credits_int = int(credits)
+            if credits_int <= 0:
+                print("Error: Credits must be a positive integer — returning to menu.")
+                return
+        except ValueError:
+            print(f"Error: Credits must be an integer, got '{credits}' — returning to menu.")
+            return
+
+        # Get existing rooms, labs, courses, and faculty for validation
+        existing_rooms = [r.upper() for r in sched.config.config.rooms]
+        existing_labs = [l.upper() for l in sched.config.config.labs]
+        existing_courses = [c.course_id.upper() for c in sched.config.config.courses]
+        existing_faculty = [f.name.upper() for f in sched.config.config.faculty]
+
+        rooms = []
+        while True:
+            room = prompt("Enter new rooms, one at a time. when finished, send 'd'\n==> ")
+            if room == "d":
+                break
+            # Validate room exists
+            if room.upper() not in existing_rooms:
+                print(f"Error: Room '{room}' does not exist — returning to menu.")
+                return
+            rooms.append(room)
+            print(f"Current Rooms: {rooms}")
+
+        labs = []
+        while True:
+            lab = prompt("Enter new labs, one at a time. when finished, send 'd'\n==> ")
+            if lab == "d":
+                break
+            # Validate lab exists
+            if lab.upper() not in existing_labs:
+                print(f"Error: Lab '{lab}' does not exist — returning to menu.")
+                return
+            labs.append(lab)
+            print(f"Current Labs: {labs}")
+
+        conflicts = []
+        while True:
+            conflict = prompt("Enter new conflicts, one at a time. when finished, send 'd'\n==> ")
+            if conflict == "d":
+                break
+            # Validate conflict course exists
+            if conflict.upper() not in existing_courses:
+                print(f"Error: Course '{conflict}' does not exist — returning to menu.")
+                return
+            conflicts.append(conflict)
+            print(f"Current Conflicts: {conflicts}")
+
+        faculty = []
+        while True:
+            prof = prompt("Enter new faculty, one at a time. when finished, send 'd'\n==> ")
+            if prof == "d":
+                break
+            # Validate faculty exists
+            if prof.upper() not in existing_faculty:
+                print(f"Error: Faculty '{prof}' does not exist — returning to menu.")
+                return
+            faculty.append(prof)
+            print(f"Current Faculty: {faculty}")
+
+        sched.course.modifyCourse(
+            config=sched.config,
+            id=name,
+            creds=credits_int,
+            rms=rooms,
+            lbs=labs,
+            con=conflicts,
+            fac=faculty
+        )
+
+    except KeyboardInterrupt:
+        print("\nReturning to course menu...")
+        return
