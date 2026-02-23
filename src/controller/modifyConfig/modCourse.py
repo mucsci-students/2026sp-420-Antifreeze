@@ -1,4 +1,4 @@
-from modifyConfig.utilsCLI import prompt, endProg
+from controller.modifyConfig.utilsCLI import prompt, endProg
 #printModCourseMenu
 #Displays the course modification menu options to the user
 def printModCourseMenu():

@@ -1,4 +1,4 @@
-from modifyConfig.utilsCLI import prompt, endProg
+from controller.modifyConfig.utilsCLI import prompt, endProg
 
 def printModRoomMenu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")

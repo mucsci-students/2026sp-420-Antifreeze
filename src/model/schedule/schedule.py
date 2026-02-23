@@ -2,7 +2,7 @@ from fileinput import filename
 import json
 from sched import scheduler
 import sched
-from modifyConfig.utilsCLI import prompt
+from controller.modifyConfig.utilsCLI import prompt
 from scheduler import (
     Scheduler,
     load_config_from_file,
@@ -15,11 +15,11 @@ from scheduler import (
 )
 
 
-from schedule.conflict import conflict
-from schedule.course import course
-from schedule.faculty import faculty
-from schedule.lab import lab
-from schedule.room import room
+from model.schedule.conflict import conflict
+from model.schedule.course import course
+from model.schedule.faculty import faculty
+from model.schedule.lab import lab
+from model.schedule.room import room
 
 
 
