@@ -1,6 +1,6 @@
-from schedule import schedule
-from modifyConfig import configCli
-from modifyConfig.utilsCLI import endProg
+from model.schedule import schedule
+from controller.modifyConfig import configCli
+from controller.modifyConfig.utilsCLI import endProg
 
 #Print Main Menu
 #Displays the main program menu options

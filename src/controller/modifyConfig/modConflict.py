@@ -1,4 +1,4 @@
-from modifyConfig.utilsCLI import prompt, endProg
+from controller.modifyConfig.utilsCLI import prompt, endProg
 
 #Print Modify Conflict Menu
 #Displays the conflict modification menu options to the user

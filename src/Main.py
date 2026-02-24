@@ -1,8 +1,8 @@
 #Program Entry File
 #Initializes the scheduling system and starts the CLI
 
-import cli
-from schedule import schedule as sch
+from controller import cli
+from model.schedule import schedule as sch
 
 
 
