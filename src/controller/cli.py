@@ -1,10 +1,10 @@
 from model.schedule import schedule
 from controller.modifyConfig import configCli
-from controller.modifyConfig.utilsCLI import endProg
+from controller.modifyConfig.utilsCLI import end_prog
 
 #Print Main Menu
 #Displays the main program menu options
-def printMain():
+def print_main():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Load/Modify/Save config")
     print("2: Run/Print Scheduler")
@@ -12,7 +12,7 @@ def printMain():
     
 #Print Run Scheduler Menu
 #Displays the scheduler execution and display options
-def printRunSchedulerMenu():
+def print_run_scheduler_menu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Run Scheduler")
     print("2: Print Schedule")
@@ -22,33 +22,33 @@ def printRunSchedulerMenu():
 #Check if Config is Loaded
 #Validates that a configuration file has been loaded before running scheduler
 #Returns True if config is loaded, False otherwise
-def isConfigLoaded(sched):
+def is_config_loaded(sched):
     if sched.config is None or not sched.config.config.courses:
-        sched.loadConfig("2026sp-420-Antifreeze\\src\\schedule\\empty.json")
+        sched.load_config("2026sp-420-Antifreeze\\src\\schedule\\empty.json")
     return True
             
 #Run Scheduler Menu
 #Handles user interaction for running and printing schedules
 #Routes user input to scheduler execution or schedule display
 #Parameters: Scheduler object
-def runScheduler(sched):
+def run_scheduler(sched):
     while(True):
-        printRunSchedulerMenu()
-        userCommand = input()
-        if userCommand == "1":
+        print_run_scheduler_menu()
+        user_command = input()
+        if user_command == "1":
             # Validate config is loaded before running scheduler
-            if not isConfigLoaded(sched):
+            if not is_config_loaded(sched):
                 return
-            sched.runScheduler()
-        elif userCommand == "2":
+            sched.run_scheduler()
+        elif user_command == "2":
             # Validate config is loaded before printing schedule
-            if not isConfigLoaded(sched):
+            if not is_config_loaded(sched):
                 return
-            sched.printSchedule()
-        elif userCommand.lower() == "r":
+            sched.print_schedule()
+        elif user_command.lower() == "r":
             return 
-        elif userCommand.lower() == "q":
-            endProg()
+        elif user_command.lower() == "q":
+            end_prog()
 
 #Main CLI
 #Primary command-line interface control loop
@@ -56,11 +56,11 @@ def runScheduler(sched):
 #Parameters: Scheduler object
 def cli(sched):
     while(True):
-        printMain()
-        userCommand = input()
-        if(userCommand.lower() == "q"):
-            endProg()
-        elif(userCommand == "1"):
+        print_main()
+        user_command = input()
+        if(user_command.lower() == "q"):
+            end_prog()
+        elif(user_command == "1"):
             configCli.config(sched)
-        elif(userCommand == "2"):
-            runScheduler(sched)
+        elif(user_command == "2"):
+            run_scheduler(sched)
