@@ -1,6 +1,6 @@
-from controller.modifyConfig.utilsCLI import prompt, endProg
+from controller.modifyConfig.utilsCLI import prompt, end_prog
 
-def printModRoomMenu():
+def print_mod_room_menu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Add Room")
     print("2: Modify Room")
@@ -9,36 +9,36 @@ def printModRoomMenu():
     print("r: return to main")
     print("q: exit program\n==> ",end="")
 
-def modRoomMain(sched):
+def mod_room_main(sched):
     while(True):
-        printModRoomMenu()
-        userCommand = input()
-        if(userCommand == "1"):
-            addRoom(sched)
-        elif(userCommand == "2"):
-            modRoom(sched)
-        elif(userCommand == "3"):
-            delRoom(sched)
-        elif(userCommand == "4"):
-            sched.room.printRooms(sched.config)
-        elif(userCommand.lower() == "r"):
+        print_mod_room_menu()
+        user_command = input()
+        if(user_command == "1"):
+            add_room(sched)
+        elif(user_command == "2"):
+            mod_room(sched)
+        elif(user_command == "3"):
+            del_room(sched)
+        elif(user_command == "4"):
+            sched.room.print_rooms(sched.config)
+        elif(user_command.lower() == "r"):
             return
-        elif(userCommand.lower() == "q"):
-            endProg()
+        elif(user_command.lower() == "q"):
+            end_prog()
         else:
             print("Invalid command, try again.")
 
-def delRoom(sched):
+def del_room(sched):
     try:
         print("press r and enter at any time to return to main\n")
 
         name = prompt("Enter Room name to delete\n==> ")
         
         # Validate immediately
-        if not sched.room.validateEntry(sched.config, name, "delete"):
+        if not sched.room.validate_entry(sched.config, name, "delete"):
             return
 
-        sched.room.deleteRoom(
+        sched.room.delete_room(
             sched.config,
             name
         )
@@ -47,17 +47,17 @@ def delRoom(sched):
         print("\nReturning to room menu...")
         return
 
-def addRoom(sched):
+def add_room(sched):
     try:
         print("press r and enter at any time to return to main\n")
 
         name = prompt("Enter Room name to add\n==> ")
         
         # Validate immediately
-        if not sched.room.validateEntry(sched.config, name, "add"):
+        if not sched.room.validate_entry(sched.config, name, "add"):
             return
 
-        sched.room.addRoom(
+        sched.room.add_room(
             sched.config,
             name
         )
@@ -66,26 +66,26 @@ def addRoom(sched):
         print("\nReturning to room menu...")
         return
 
-def modRoom(sched):
+def mod_room(sched):
     try:
         print("press r and enter at any time to return to main\n")
 
-        oldName = prompt("Enter Room name to change\n==> ")
+        old_name = prompt("Enter Room name to change\n==> ")
         
         # Validate old name immediately
-        if not sched.room.validateEntry(sched.config, oldName, "modify"):
+        if not sched.room.validate_entry(sched.config, old_name, "modify"):
             return
         
-        newName = prompt("Enter new Room name\n==> ")
+        new_name = prompt("Enter new Room name\n==> ")
         
         # Validate new name doesn't already exist
-        if not sched.room.validateEntry(sched.config, newName, "add"):
+        if not sched.room.validate_entry(sched.config, new_name, "add"):
             return
 
-        sched.room.modifyRoom(
+        sched.room.modify_room(
             sched.config,
-            oldName,
-            newName
+            old_name,
+            new_name
         )
 
     except KeyboardInterrupt:

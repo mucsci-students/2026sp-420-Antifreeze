@@ -8,5 +8,5 @@ def prompt(msg):
 
 #End Program
 #Immediately exits the program
-def endProg():
+def end_prog():
     quit()

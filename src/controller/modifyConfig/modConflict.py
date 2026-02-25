@@ -1,8 +1,8 @@
-from controller.modifyConfig.utilsCLI import prompt, endProg
+from controller.modifyConfig.utilsCLI import prompt, end_prog
 
 #Print Modify Conflict Menu
 #Displays the conflict modification menu options to the user
-def printModConflictMenu():
+def print_mod_conflict_menu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Add conflict")
     print("2: Modify conflict")
@@ -16,22 +16,22 @@ def printModConflictMenu():
 #Main control loop for conflict modification operations
 #Routes user input to add, modify, delete, or print conflict actions
 #Parameters: Scheduler object
-def modConflictMain(sched):
+def mod_conflict_main(sched):
     while(True):
-        printModConflictMenu()
-        userCommand = input()
-        if(userCommand == "1"):
-            addConflict(sched)
-        elif(userCommand == "2"):   
-            modConflict(sched)
-        elif(userCommand == "3"):
-            delConflict(sched)
-        elif(userCommand == "4"):
-            sched.conflict.printConflicts(sched.config)
-        elif(userCommand.lower() == "r"):
+        print_mod_conflict_menu()
+        user_command = input()
+        if(user_command == "1"):
+            add_conflict(sched)
+        elif(user_command == "2"):   
+            mod_conflict(sched)
+        elif(user_command == "3"):
+            del_conflict(sched)
+        elif(user_command == "4"):
+            sched.conflict.print_conflicts(sched.config)
+        elif(user_command.lower() == "r"):
             return
-        elif(userCommand.lower() == "q"):
-            endProg()
+        elif(user_command.lower() == "q"):
+            end_prog()
         else:
             print("Invalid command, try again.")
 
@@ -40,26 +40,26 @@ def modConflictMain(sched):
 #Removes an existing conflict between two courses
 #Prompts the user for a course ID and conflicting course ID
 #Parameters: Scheduler object
-def delConflict(sched):
+def del_conflict(sched):
     try:
         print("press r and enter at any time to return to main\n")
 
-        courseID = prompt("Enter CourseID to remove conflict for\n==> ")
+        course_id = prompt("Enter CourseID to remove conflict for\n==> ")
         
         # Validate course exists immediately
-        if not sched.conflict.validateEntry(sched.config, courseID, "delete"):
+        if not sched.conflict.validate_entry(sched.config, course_id, "delete"):
             return
         
-        conflictingCourseID = prompt("Enter conflicting course ID\n==> ")
+        conflicting_course_id = prompt("Enter conflicting course ID\n==> ")
         
         # Validate conflict exists immediately
-        if not sched.conflict.validateEntry(sched.config, courseID, "delete", conflictingCourseID):
+        if not sched.conflict.validate_entry(sched.config, course_id, "delete", conflicting_course_id):
             return
 
-        sched.conflict.deleteConflict(
+        sched.conflict.delete_conflict(
             sched.config,
-            courseID,
-            conflictingCourseID
+            course_id,
+            conflicting_course_id
         )
 
     except KeyboardInterrupt:
@@ -73,26 +73,26 @@ def delConflict(sched):
 #Adds a conflict between two courses in the configuration
 #Prompts the user for a course ID and conflicting course ID
 #Parameters: Scheduler object
-def addConflict(sched):
+def add_conflict(sched):
     try:
         print("press r and enter at any time to return to main\n")
 
-        courseID = prompt("Enter CourseID to add conflict to\n==> ")
+        course_id = prompt("Enter CourseID to add conflict to\n==> ")
         
         # Validate course exists immediately
-        if not sched.conflict.validateEntry(sched.config, courseID, "add"):
+        if not sched.conflict.validate_entry(sched.config, course_id, "add"):
             return
         
-        conflictingCourseID = prompt("Enter conflicting course ID\n==> ")
+        conflicting_course_id = prompt("Enter conflicting course ID\n==> ")
         
         # Validate conflict can be added immediately
-        if not sched.conflict.validateEntry(sched.config, courseID, "add", conflictingCourseID):
+        if not sched.conflict.validate_entry(sched.config, course_id, "add", conflicting_course_id):
             return
 
-        sched.conflict.addConflict(
+        sched.conflict.add_conflict(
             sched.config,
-            courseID,
-            conflictingCourseID
+            course_id,
+            conflicting_course_id
         )
 
     except KeyboardInterrupt:
@@ -104,33 +104,33 @@ def addConflict(sched):
 #Replaces an existing course conflict with a new conflicting course
 #Prompts the user for a course ID, old conflict, and new conflict
 #Parameters: Scheduler object
-def modConflict(sched):
+def mod_conflict(sched):
     try:
         print("press r and enter at any time to return to main\n")
 
-        courseID = prompt("Enter CourseID to modify\n==> ")
+        course_id = prompt("Enter CourseID to modify\n==> ")
         
         # Validate course exists immediately
-        if not sched.conflict.validateEntry(sched.config, courseID, "modify"):
+        if not sched.conflict.validate_entry(sched.config, course_id, "modify"):
             return
         
-        oldConfCourseID = prompt("Enter old conflicting course ID\n==> ")
+        old_conf_course_id = prompt("Enter old conflicting course ID\n==> ")
         
         # Validate old conflict exists immediately
-        if not sched.conflict.validateEntry(sched.config, courseID, "modify", oldConfCourseID):
+        if not sched.conflict.validate_entry(sched.config, course_id, "modify", old_conf_course_id):
             return
         
-        newConfCourseID = prompt("Enter new conflicting course ID\n==> ")
+        new_conf_course_id = prompt("Enter new conflicting course ID\n==> ")
         
         # Validate new conflict can be added immediately
-        if not sched.conflict.validateEntry(sched.config, courseID, "add", newConfCourseID):
+        if not sched.conflict.validate_entry(sched.config, course_id, "add", new_conf_course_id):
             return
 
-        sched.conflict.modifyConflict(
+        sched.conflict.modify_conflict(
             sched.config,
-            courseID,
-            oldConfCourseID,
-            newConfCourseID
+            course_id,
+            old_conf_course_id,
+            new_conf_course_id
         )
 
     except KeyboardInterrupt:
