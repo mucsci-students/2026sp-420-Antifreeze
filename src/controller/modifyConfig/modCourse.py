@@ -1,7 +1,7 @@
-from controller.modifyConfig.utilsCLI import prompt, endProg
-#printModCourseMenu
+from controller.modifyConfig.utilsCLI import prompt, end_prog
+#print_mod_course_menu
 #Displays the course modification menu options to the user
-def printModCourseMenu():
+def print_mod_course_menu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Add Course")
     print("2: Modify Course")
@@ -9,44 +9,44 @@ def printModCourseMenu():
     print("4: Print courses")
     print("r: return to main")
     print("q: exit program\n==> ",end="")
-#modCourseMain
+#mod_course_main
 #Main control loop for course modification operations
 #Routes user input to add, modify, delete, or print course actions
 #Parameters: Scheduler object
-def modCourseMain(sched):
+def mod_course_main(sched):
     while(True):
-        printModCourseMenu()
-        userCommand = input()
-        if(userCommand == "1"):
-            addCourse(sched)
-        elif(userCommand == "2"):
-            modCourse(sched)
-        elif(userCommand == "3"):
-            delCourse(sched)
-        elif(userCommand == "4"):
-            sched.course.printCourses(sched.config) 
-        elif(userCommand.lower() == "r"):
+        print_mod_course_menu()
+        user_command = input()
+        if(user_command == "1"):
+            add_course(sched)
+        elif(user_command == "2"):
+            mod_course(sched)
+        elif(user_command == "3"):
+            del_course(sched)
+        elif(user_command == "4"):
+            sched.course.print_courses(sched.config) 
+        elif(user_command.lower() == "r"):
             return
-        elif(userCommand.lower() == "q"):   
-            endProg()
+        elif(user_command.lower() == "q"):   
+            end_prog()
         else:
             print("Invalid command, try again.")
 
-#delCourse
+#del_course
 #Removes an existing course from the configuration 
 #Prompts the user for a course ID
 #Parameters: Scheduler object
-def delCourse(sched):
+def del_course(sched):
     try:
         print("press r and enter at any time to return to main\n")
 
         name = prompt("Enter Course name to delete\n==> ")
         
         # Validate immediately
-        if not sched.course.validateEntry(sched.config, name, "delete"):
+        if not sched.course.validate_entry(sched.config, name, "delete"):
             return
 
-        sched.course.deleteCourse(
+        sched.course.delete_course(
             sched.config,
             name
         )
@@ -56,18 +56,18 @@ def delCourse(sched):
         return
 
 
-#addCourse
+#add_course
 #Adds a new course to the configuration
 #Prompts the user for course ID, credits, rooms, labs, conflicts, and faculty
 #Parameters: Scheduler object
-def addCourse(sched):
+def add_course(sched):
     try:
         print("press r and enter at any time to return to main\n")
 
         name = prompt("Enter Course ID\n==> ")
         
         # Validate immediately
-        if not sched.course.validateEntry(sched.config, name, "add"):
+        if not sched.course.validate_entry(sched.config, name, "add"):
             return
         
         credits = prompt("Enter credits\n==> ")
@@ -136,7 +136,7 @@ def addCourse(sched):
             faculty.append(prof)
             print(f"Current Faculty: {faculty}")
 
-        sched.course.addCourse(
+        sched.course.add_course(
             config=sched.config,
             id=name,
             creds=credits_int,
@@ -152,19 +152,19 @@ def addCourse(sched):
 
 
 
-#modCourse
+#mod_course
 #Replaces an existing course's attributes with new values
 #Prompts the user for course ID, credits, rooms, labs, conflicts, and faculty
 #Parameters: Scheduler object
 
-def modCourse(sched):
+def mod_course(sched):
     try:
         print("press r and enter at any time to return to main\n")
 
         name = prompt("Enter Course ID to modify\n==> ")
         
         # Validate immediately
-        if not sched.course.validateEntry(sched.config, name, "modify"):
+        if not sched.course.validate_entry(sched.config, name, "modify"):
             return
         
         credits = prompt("Enter new credits\n==> ")
@@ -233,7 +233,7 @@ def modCourse(sched):
             faculty.append(prof)
             print(f"Current Faculty: {faculty}")
 
-        sched.course.modifyCourse(
+        sched.course.modify_course(
             config=sched.config,
             id=name,
             creds=credits_int,

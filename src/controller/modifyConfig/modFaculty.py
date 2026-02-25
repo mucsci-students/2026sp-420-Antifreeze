@@ -1,4 +1,4 @@
-from controller.modifyConfig.utilsCLI import prompt, endProg
+from controller.modifyConfig.utilsCLI import prompt, end_prog
 
 import re
 
@@ -75,9 +75,9 @@ def check_time_overlap(new_slot, existing_slots):
     
     return True, None
 
-#printModFacultyMenu
+#print_mod_faculty_menu
 #Displays the faculty modification menu options to the user
-def printModFacultyMenu():
+def print_mod_faculty_menu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")
     print("1: Add faculty")
     print("2: Modify faculty")
@@ -86,43 +86,43 @@ def printModFacultyMenu():
     print("r: return to main")
     print("q: exit program\n==> ",end= "")
 
-#modFacultyMain
+#mod_faculty_main
 #Main control loop for faculty modification operations
 #Routes user input to add, modify, delete, or print faculty actions
 #Parameters: Scheduler object
-def modFacultyMain(sched):
+def mod_faculty_main(sched):
     while(True):
-        printModFacultyMenu()
-        userCommand = input()
-        if(userCommand == "1"):
-            addFaculty(sched)
-        elif(userCommand == "2"):
-            modFaculty(sched)
-        elif(userCommand == "3"):
-            delFaculty(sched)
-        elif(userCommand == "4"):
-            sched.faculty.printFaculty(sched.config)    
-        elif(userCommand.lower() == "r"):
+        print_mod_faculty_menu()
+        user_command = input()
+        if(user_command == "1"):
+            add_faculty(sched)
+        elif(user_command == "2"):
+            mod_faculty(sched)
+        elif(user_command == "3"):
+            del_faculty(sched)
+        elif(user_command == "4"):
+            sched.faculty.print_faculty(sched.config)    
+        elif(user_command.lower() == "r"):
             return
-        elif(userCommand.lower() == "q"):
-            endProg()
+        elif(user_command.lower() == "q"):
+            end_prog()
         else:
             print("Invalid command, try again.")
-#delFaculty
+#del_faculty
 #Removes an existing faculty from the configuration
 #Prompts the user for a faculty name
 #Parameters: Scheduler object
-def delFaculty(sched):
+def del_faculty(sched):
     try:
         print("press r and enter at any time to return to main\n")
 
         name = prompt("Enter Faculty name to delete\n==> ")
         
         #Validate faculty exists immediately - if not, return to menu
-        if not sched.faculty.validateEntry(sched.config, name, "delete"):
+        if not sched.faculty.validate_entry(sched.config, name, "delete"):
             return
 
-        sched.faculty.deleteFaculty(
+        sched.faculty.delete_faculty(
             sched.config,
             name
         )
@@ -131,11 +131,11 @@ def delFaculty(sched):
         print("\nReturning to faculty menu...")
         return
 
-#addFaculty
+#add_faculty
 #Adds a new faculty to the configuration
 #Prompts the user for faculty name, max credits, max days, min credits, unique course limit, times, course preferences, room preferences, lab preferences, and mandatory days
 #Parameters: Scheduler object
-def addFaculty(sched):
+def add_faculty(sched):
     try:
         print("press r and enter at any time to return to main\n")
 
@@ -146,54 +146,54 @@ def addFaculty(sched):
                 continue
             
             #Validate faculty doesn't already exist - if it does, return to menu
-            if not sched.faculty.validateEntry(sched.config, name, "add"):
+            if not sched.faculty.validate_entry(sched.config, name, "add"):
                 return
             break
         
         while True:
-            maximumCredits = prompt("Enter maximum credits\n==> ")
-            if not maximumCredits or not maximumCredits.isnumeric():
-                print(f"Error: Maximum credits must be a positive integer, got '{maximumCredits}'. Please try again.")
+            maximum_credits = prompt("Enter maximum credits\n==> ")
+            if not maximum_credits or not maximum_credits.isnumeric():
+                print(f"Error: Maximum credits must be a positive integer, got '{maximum_credits}'. Please try again.")
                 continue
-            maximumCredits = int(maximumCredits)
-            if maximumCredits <= 0:
+            maximum_credits = int(maximum_credits)
+            if maximum_credits <= 0:
                 print("Error: Maximum credits must be greater than 0. Please try again.")
                 continue
             break
 
         while True:
-            minimumCredits = prompt("Enter minimum credits\n==> ")
-            if not minimumCredits or not minimumCredits.isnumeric():
-                print(f"Error: Minimum credits must be a non-negative integer, got '{minimumCredits}'. Please try again.")
+            minimum_credits = prompt("Enter minimum credits\n==> ")
+            if not minimum_credits or not minimum_credits.isnumeric():
+                print(f"Error: Minimum credits must be a non-negative integer, got '{minimum_credits}'. Please try again.")
                 continue
-            minimumCredits = int(minimumCredits)
-            if minimumCredits < 0:
+            minimum_credits = int(minimum_credits)
+            if minimum_credits < 0:
                 print("Error: Minimum credits cannot be negative. Please try again.")
                 continue
-            if minimumCredits > maximumCredits:
-                print(f"Error: Minimum credits ({minimumCredits}) cannot exceed maximum credits ({maximumCredits}). Please try again.")
+            if minimum_credits > maximum_credits:
+                print(f"Error: Minimum credits ({minimum_credits}) cannot exceed maximum credits ({maximum_credits}). Please try again.")
                 continue
             break
 
         while True:
-            uniqueCourseLimit = prompt("Enter unique course limit\n==> ")
-            if not uniqueCourseLimit or not uniqueCourseLimit.isnumeric():
-                print(f"Error: Unique course limit must be a positive integer, got '{uniqueCourseLimit}'. Please try again.")
+            unique_course_limit = prompt("Enter unique course limit\n==> ")
+            if not unique_course_limit or not unique_course_limit.isnumeric():
+                print(f"Error: Unique course limit must be a positive integer, got '{unique_course_limit}'. Please try again.")
                 continue
-            uniqueCourseLimit = int(uniqueCourseLimit)
-            if uniqueCourseLimit <= 0:
+            unique_course_limit = int(unique_course_limit)
+            if unique_course_limit <= 0:
                 print("Error: Unique course limit must be greater than 0. Please try again.")
                 continue
             break
 
         while True:
-            maximumDays = prompt("Enter maximum days (1-5)\n==> ")
-            if not maximumDays or not maximumDays.isnumeric():
-                print(f"Error: Maximum days must be an integer between 1-5, got '{maximumDays}'. Please try again.")
+            maximum_days = prompt("Enter maximum days (1-5)\n==> ")
+            if not maximum_days or not maximum_days.isnumeric():
+                print(f"Error: Maximum days must be an integer between 1-5, got '{maximum_days}'. Please try again.")
                 continue
-            maximumDays = int(maximumDays)
-            if maximumDays < 1 or maximumDays > 5:
-                print(f"Error: Maximum days must be between 1 and 5, got {maximumDays}. Please try again.")
+            maximum_days = int(maximum_days)
+            if maximum_days < 1 or maximum_days > 5:
+                print(f"Error: Maximum days must be between 1 and 5, got {maximum_days}. Please try again.")
                 continue
             break
 
@@ -232,7 +232,7 @@ def addFaculty(sched):
                 print(f"Current {day} slots: {slots}")
             times[day] = slots
 
-        coursePreferences = {}
+        course_preferences = {}
         while True:
             course = prompt("Enter course preference (or 'd')\n==> ")
             if course == "d":
@@ -250,10 +250,10 @@ def addFaculty(sched):
                 weight = int(weight)
                 break
             
-            coursePreferences[course] = weight
-            print(f"Current Course Preferences: {coursePreferences}")
+            course_preferences[course] = weight
+            print(f"Current Course Preferences: {course_preferences}")
 
-        roomPreferences = {}
+        room_preferences = {}
         while True:
             room = prompt("Enter room preference (or 'd')\n==> ")
             if room == "d":
@@ -271,10 +271,10 @@ def addFaculty(sched):
                 weight = int(weight)
                 break
             
-            roomPreferences[room] = weight
-            print(f"Current Room Preferences: {roomPreferences}")
+            room_preferences[room] = weight
+            print(f"Current Room Preferences: {room_preferences}")
 
-        labPreferences = {}
+        lab_preferences = {}
         while True:
             lab = prompt("Enter lab preference (or 'd')\n==> ")
             if lab == "d":
@@ -292,10 +292,10 @@ def addFaculty(sched):
                 weight = int(weight)
                 break
             
-            labPreferences[lab] = weight
-            print(f"Current Lab Preferences: {labPreferences}")
+            lab_preferences[lab] = weight
+            print(f"Current Lab Preferences: {lab_preferences}")
         
-        mandatoryDays = []
+        mandatory_days = []
         days = {"MON", "TUE", "WED", "THU", "FRI"}
         while True:
             day = prompt("Enter mandatory day (MON/TUE/WED/THU/FRI) or 'd'\n==> ")
@@ -304,35 +304,35 @@ def addFaculty(sched):
             if day.upper() not in days:
                 print(f"Error: Invalid day '{day}'. Must be MON/TUE/WED/THU/FRI. Please try again.")
                 continue
-            if day.upper() not in mandatoryDays:
-                mandatoryDays.append(day.upper())
-                print(f"Current Mandatory Days: {mandatoryDays}")
+            if day.upper() not in mandatory_days:
+                mandatory_days.append(day.upper())
+                print(f"Current Mandatory Days: {mandatory_days}")
             else:
                 print(f"Day {day.upper()} already added.")
         
-        sched.faculty.addFaculty(
+        sched.faculty.add_faculty(
             config = sched.config,
             name = name,
-            maximumCredits = maximumCredits,
-            maximumDays = maximumDays,
-            minimumCredits = minimumCredits,
-            uniqueCourseLimit = uniqueCourseLimit,
+            maximum_credits = maximum_credits,
+            maximum_days = maximum_days,
+            minimum_credits = minimum_credits,
+            unique_course_limit = unique_course_limit,
             times = times,
-            coursePreferences = coursePreferences,
-            roomPreferences = roomPreferences,
-            labPreferences = labPreferences,
-            mandatoryDays = mandatoryDays
+            course_preferences = course_preferences,
+            room_preferences = room_preferences,
+            lab_preferences = lab_preferences,
+            mandatory_days = mandatory_days
         )
 
     except KeyboardInterrupt:
         print("\nReturning to faculty menu...")
         return
 
-#modFaculty
+#mod_faculty
 #Replaces an existing faculty's attributes with new values
 #Prompts the user for faculty name, max credits, max days, min credits, unique course limit, times, course preferences, room preferences, lab preferences, and mandatory days
 #Parameters: Scheduler object
-def modFaculty(sched):
+def mod_faculty(sched):
     try:
         print("press r and enter at any time to return to main\n")
 
@@ -343,54 +343,54 @@ def modFaculty(sched):
                 continue
             
             #Validate faculty exists - if not, return to menu
-            if not sched.faculty.validateEntry(sched.config, name, "modify"):
+            if not sched.faculty.validate_entry(sched.config, name, "modify"):
                 return
             break
         
         while True:
-            maximumCredits = prompt("Enter new maximum credits\n==> ")
-            if not maximumCredits or not maximumCredits.isnumeric():
-                print(f"Error: Maximum credits must be a positive integer, got '{maximumCredits}'. Please try again.")
+            maximum_credits = prompt("Enter new maximum credits\n==> ")
+            if not maximum_credits or not maximum_credits.isnumeric():
+                print(f"Error: Maximum credits must be a positive integer, got '{maximum_credits}'. Please try again.")
                 continue
-            maximumCredits = int(maximumCredits)
-            if maximumCredits <= 0:
+            maximum_credits = int(maximum_credits)
+            if maximum_credits <= 0:
                 print("Error: Maximum credits must be greater than 0. Please try again.")
                 continue
             break
 
         while True:
-            minimumCredits = prompt("Enter new minimum credits\n==> ")
-            if not minimumCredits or not minimumCredits.isnumeric():
-                print(f"Error: Minimum credits must be a non-negative integer, got '{minimumCredits}'. Please try again.")
+            minimum_credits = prompt("Enter new minimum credits\n==> ")
+            if not minimum_credits or not minimum_credits.isnumeric():
+                print(f"Error: Minimum credits must be a non-negative integer, got '{minimum_credits}'. Please try again.")
                 continue
-            minimumCredits = int(minimumCredits)
-            if minimumCredits < 0:
+            minimum_credits = int(minimum_credits)
+            if minimum_credits < 0:
                 print("Error: Minimum credits cannot be negative. Please try again.")
                 continue
-            if minimumCredits > maximumCredits:
-                print(f"Error: Minimum credits ({minimumCredits}) cannot exceed maximum credits ({maximumCredits}). Please try again.")
+            if minimum_credits > maximum_credits:
+                print(f"Error: Minimum credits ({minimum_credits}) cannot exceed maximum credits ({maximum_credits}). Please try again.")
                 continue
             break
 
         while True:
-            uniqueCourseLimit = prompt("Enter new unique course limit\n==> ")
-            if not uniqueCourseLimit or not uniqueCourseLimit.isnumeric():
-                print(f"Error: Unique course limit must be a positive integer, got '{uniqueCourseLimit}'. Please try again.")
+            unique_course_limit = prompt("Enter new unique course limit\n==> ")
+            if not unique_course_limit or not unique_course_limit.isnumeric():
+                print(f"Error: Unique course limit must be a positive integer, got '{unique_course_limit}'. Please try again.")
                 continue
-            uniqueCourseLimit = int(uniqueCourseLimit)
-            if uniqueCourseLimit <= 0:
+            unique_course_limit = int(unique_course_limit)
+            if unique_course_limit <= 0:
                 print("Error: Unique course limit must be greater than 0. Please try again.")
                 continue
             break
 
         while True:
-            maximumDays = prompt("Enter new maximum days (1-5)\n==> ")
-            if not maximumDays or not maximumDays.isnumeric():
-                print(f"Error: Maximum days must be an integer between 1-5, got '{maximumDays}'. Please try again.")
+            maximum_days = prompt("Enter new maximum days (1-5)\n==> ")
+            if not maximum_days or not maximum_days.isnumeric():
+                print(f"Error: Maximum days must be an integer between 1-5, got '{maximum_days}'. Please try again.")
                 continue
-            maximumDays = int(maximumDays)
-            if maximumDays < 1 or maximumDays > 5:
-                print(f"Error: Maximum days must be between 1 and 5, got {maximumDays}. Please try again.")
+            maximum_days = int(maximum_days)
+            if maximum_days < 1 or maximum_days > 5:
+                print(f"Error: Maximum days must be between 1 and 5, got {maximum_days}. Please try again.")
                 continue
             break
 
@@ -429,7 +429,7 @@ def modFaculty(sched):
                 print(f"Current {day} slots: {slots}")
             times[day] = slots
 
-        coursePreferences = {}
+        course_preferences = {}
         while True:
             course = prompt("Enter new course preference (or 'd')\n==> ")
             if course == "d":
@@ -447,10 +447,10 @@ def modFaculty(sched):
                 weight = int(weight)
                 break
             
-            coursePreferences[course] = weight
-            print(f"Current Course Preferences: {coursePreferences}")
+            course_preferences[course] = weight
+            print(f"Current Course Preferences: {course_preferences}")
 
-        roomPreferences = {}
+        room_preferences = {}
         while True:
             room = prompt("Enter room preference (or 'd')\n==> ")
             if room == "d":
@@ -468,10 +468,10 @@ def modFaculty(sched):
                 weight = int(weight)
                 break
             
-            roomPreferences[room] = weight
-            print(f"Current Room Preferences: {roomPreferences}")
+            room_preferences[room] = weight
+            print(f"Current Room Preferences: {room_preferences}")
 
-        labPreferences = {}
+        lab_preferences = {}
         while True:
             lab = prompt("Enter lab preference (or 'd')\n==> ")
             if lab == "d":
@@ -489,10 +489,10 @@ def modFaculty(sched):
                 weight = int(weight)
                 break
             
-            labPreferences[lab] = weight
-            print(f"Current Lab Preferences: {labPreferences}")
+            lab_preferences[lab] = weight
+            print(f"Current Lab Preferences: {lab_preferences}")
 
-        mandatoryDays = []
+        mandatory_days = []
         days = {"MON", "TUE", "WED", "THU", "FRI"}
         while True:
             day = prompt("Enter new mandatory day (MON/TUE/WED/THU/FRI) or 'd'\n==> ")
@@ -501,24 +501,24 @@ def modFaculty(sched):
             if day.upper() not in days:
                 print(f"Error: Invalid day '{day}'. Must be MON/TUE/WED/THU/FRI. Please try again.")
                 continue
-            if day.upper() not in mandatoryDays:
-                mandatoryDays.append(day.upper())
-                print(f"Current Mandatory Days: {mandatoryDays}")
+            if day.upper() not in mandatory_days:
+                mandatory_days.append(day.upper())
+                print(f"Current Mandatory Days: {mandatory_days}")
             else:
                 print(f"Day {day.upper()} already added.")
 
-        sched.faculty.modifyFaculty(
+        sched.faculty.modify_faculty(
             config = sched.config,
             name = name,
-            maximumCredits = maximumCredits,
-            maximumDays = maximumDays,
-            minimumCredits = minimumCredits,
-            uniqueCourseLimit = uniqueCourseLimit,
+            maximum_credits = maximum_credits,
+            maximum_days = maximum_days,
+            minimum_credits = minimum_credits,
+            unique_course_limit = unique_course_limit,
             times = times,
-            coursePreferences = coursePreferences,
-            roomPreferences = roomPreferences,
-            labPreferences = labPreferences,
-            mandatoryDays = mandatoryDays
+            course_preferences = course_preferences,
+            room_preferences = room_preferences,
+            lab_preferences = lab_preferences,
+            mandatory_days = mandatory_days
         )
 
     except KeyboardInterrupt:

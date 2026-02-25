@@ -10,15 +10,15 @@ class conflict():
     def __init__(self):
         return
 
-    def validateEntry(self, config: str, courseID: str, operation: str, conflictingCourseID: str = None) -> bool:
+    def validate_entry(self, config: str, course_id: str, operation: str, conflicting_course_id: str = None) -> bool:
         """
         Validates conflict entry based on operation type.
         
         Parameters:
         - config: Configuration object
-        - courseID: ID of the course
+        - course_id: ID of the course
         - operation: 'add', 'modify', or 'delete'
-        - conflictingCourseID: ID of the conflicting course (optional)
+        - conflicting_course_id: ID of the conflicting course (optional)
         
         Returns:
         - True if validation passes, False otherwise
@@ -26,139 +26,139 @@ class conflict():
         courses = config.config.courses
         
         # Check if main course exists
-        courseFound = False
-        targetCourse = None
+        course_found = False
+        target_course = None
         for course in courses:
-            if course.course_id == courseID:
-                courseFound = True
-                targetCourse = course
+            if course.course_id == course_id:
+                course_found = True
+                target_course = course
                 break
         
-        if not courseFound:
-            print(f"Error: Course '{courseID}' not found — returning to menu.")
+        if not course_found:
+            print(f"Error: Course '{course_id}' not found — returning to menu.")
             return False
         
         # For operations that need a conflicting course
-        if conflictingCourseID:
+        if conflicting_course_id:
             # Check if conflicting course exists in system
-            conflictingCourseExists = False
+            conflicting_course_exists = False
             for course in courses:
-                if course.course_id == conflictingCourseID:
-                    conflictingCourseExists = True
+                if course.course_id == conflicting_course_id:
+                    conflicting_course_exists = True
                     break
             
-            if not conflictingCourseExists:
-                print(f"Error: Conflicting course '{conflictingCourseID}' not found — returning to menu.")
+            if not conflicting_course_exists:
+                print(f"Error: Conflicting course '{conflicting_course_id}' not found — returning to menu.")
                 return False
             
             if operation == "add":
-                if conflictingCourseID in targetCourse.conflicts:
-                    print(f"Error: Conflict already exists between '{courseID}' and '{conflictingCourseID}' — returning to menu.")
+                if conflicting_course_id in target_course.conflicts:
+                    print(f"Error: Conflict already exists between '{course_id}' and '{conflicting_course_id}' — returning to menu.")
                     return False
             
             elif operation in ["modify", "delete"]:
-                if conflictingCourseID not in targetCourse.conflicts:
-                    print(f"Error: Conflict not found between '{courseID}' and '{conflictingCourseID}' — returning to menu.")
+                if conflicting_course_id not in target_course.conflicts:
+                    print(f"Error: Conflict not found between '{course_id}' and '{conflicting_course_id}' — returning to menu.")
                     return False
         
         return True
 
     #Add Conflict
     #Adds a conflict between two courses
-    #Parameters: courseID (the course to add conflict to), conflictingCourseID (the course that conflicts)
-    #Example usage: addConflict("CMSC 140", "CMSC 161")
+    #Parameters: course_id (the course to add conflict to), conflicting_course_id (the course that conflicts)
+    #Example usage: add_conflict("CMSC 140", "CMSC 161")
     # Note: This adds the conflict to the specified course. For bidirectional conflicts, call twice.
-    def addConflict(self, config: str, courseID: str, conflictingCourseID: str):
+    def add_conflict(self, config: str, course_id: str, conflicting_course_id: str):
         
         # Reference to courses list inside database
         courses = config.config.courses
         
         # Find the course to add conflict to
-        courseFound = False
+        course_found = False
         for course in courses:
-            if course.course_id == courseID:
-                courseFound = True
+            if course.course_id == course_id:
+                course_found = True
                 
                 # Check if conflict already exists
-                if conflictingCourseID in course.conflicts:
-                    print(f"Conflict already exists between '{courseID}' and '{conflictingCourseID}' — no change made.")
+                if conflicting_course_id in course.conflicts:
+                    print(f"Conflict already exists between '{course_id}' and '{conflicting_course_id}' — no change made.")
                     return
                 
                 # Add the conflict
-                course.conflicts.append(conflictingCourseID)
-                print(f"Conflict added: '{courseID}' now conflicts with '{conflictingCourseID}'.")
+                course.conflicts.append(conflicting_course_id)
+                print(f"Conflict added: '{course_id}' now conflicts with '{conflicting_course_id}'.")
                 return
         
-        if not courseFound:
-            print(f"Course '{courseID}' not found — no changes made.")
+        if not course_found:
+            print(f"Course '{course_id}' not found — no changes made.")
 
     #Delete Conflict
     #Removes a conflict between two courses
-    #Parameters: courseID (the course to remove conflict from), conflictingCourseID (the conflicting course to remove)
-    #Example usage: deleteConflict("CMSC 140", "CMSC 161")
-    def deleteConflict(self, config: str, courseID: str, conflictingCourseID: str):
+    #Parameters: course_id (the course to remove conflict from), conflicting_course_id (the conflicting course to remove)
+    #Example usage: delete_conflict("CMSC 140", "CMSC 161")
+    def delete_conflict(self, config: str, course_id: str, conflicting_course_id: str):
         
         #Reference to courses list inside database
         courses = config.config.courses
         
         #Find the course to remove conflict from
-        courseFound = False
+        course_found = False
         for course in courses:
-            if course.course_id == courseID:
-                courseFound = True
+            if course.course_id == course_id:
+                course_found = True
                 
                 # Check if conflict exists
-                if conflictingCourseID not in course.conflicts:
-                    print(f"Conflict not found between '{courseID}' and '{conflictingCourseID}' — nothing deleted.")
+                if conflicting_course_id not in course.conflicts:
+                    print(f"Conflict not found between '{course_id}' and '{conflicting_course_id}' — nothing deleted.")
                     return
                 
                 # Remove the conflict
-                course.conflicts.remove(conflictingCourseID)
-                print(f"Conflict removed: '{courseID}' no longer conflicts with '{conflictingCourseID}'.")
+                course.conflicts.remove(conflicting_course_id)
+                print(f"Conflict removed: '{course_id}' no longer conflicts with '{conflicting_course_id}'.")
                 return
         
-        if not courseFound:
-            print(f"Course '{courseID}' not found — no changes made.")
+        if not course_found:
+            print(f"Course '{course_id}' not found — no changes made.")
 
     #Modify Conflict
     #Modifies an existing conflict by replacing the conflicting course
-    #Parameters: courseID, oldConflictingCourseID, newConflictingCourseID
-    #Example usage: modifyConflict("CMSC 140", "CMSC 161", "CMSC 162")
-    def modifyConflict(self, config: str, courseID: str, oldConflictingCourseID: str, newConflictingCourseID: str):
+    #Parameters: course_id, old_conflicting_course_id, new_conflicting_course_id
+    #Example usage: modify_conflict("CMSC 140", "CMSC 161", "CMSC 162")
+    def modify_conflict(self, config: str, course_id: str, old_conflicting_course_id: str, new_conflicting_course_id: str):
         
         #Reference to courses list inside database
         courses = config.config.courses
         
         #Find the course to modify conflict in
-        courseFound = False
+        course_found = False
         for course in courses:
-            if course.course_id == courseID:
-                courseFound = True
+            if course.course_id == course_id:
+                course_found = True
                 
                 #Check if old conflict exists
-                if oldConflictingCourseID not in course.conflicts:
-                    print(f"Original conflict not found between '{courseID}' and '{oldConflictingCourseID}' — no changes made.")
+                if old_conflicting_course_id not in course.conflicts:
+                    print(f"Original conflict not found between '{course_id}' and '{old_conflicting_course_id}' — no changes made.")
                     return
                 
                 #Check if new conflict already exists
-                if newConflictingCourseID in course.conflicts:
-                    print(f"New conflict already exists between '{courseID}' and '{newConflictingCourseID}' — choose a different course.")
+                if new_conflicting_course_id in course.conflicts:
+                    print(f"New conflict already exists between '{course_id}' and '{new_conflicting_course_id}' — choose a different course.")
                     return
                 
                 #Replace the conflict (maintain order)
-                index = course.conflicts.index(oldConflictingCourseID)
-                course.conflicts[index] = newConflictingCourseID
-                print(f"Conflict modified: '{courseID}' now conflicts with '{newConflictingCourseID}' instead of '{oldConflictingCourseID}'.")
+                index = course.conflicts.index(old_conflicting_course_id)
+                course.conflicts[index] = new_conflicting_course_id
+                print(f"Conflict modified: '{course_id}' now conflicts with '{new_conflicting_course_id}' instead of '{old_conflicting_course_id}'.")
                 return
         
-        if not courseFound:
-            print(f"Course '{courseID}' not found — no changes made.")
+        if not course_found:
+            print(f"Course '{course_id}' not found — no changes made.")
 
     #Print Conflicts
     #Prints all course conflicts currently stored in the configuration
     #Displays each course ID along with its associated conflict list
     #Parameters: Configuration file
-    def printConflicts(self, config: str):
+    def print_conflicts(self, config: str):
         courses = config.config.courses
         print("\nCourse Conflicts:")
         for course in courses:            

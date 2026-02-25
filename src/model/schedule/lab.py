@@ -11,13 +11,13 @@ class lab():
     def __init__(self):
         return
 
-    def validateEntry(self, config: str, labName: str, operation: str) -> bool:
+    def validate_entry(self, config: str, lab_name: str, operation: str) -> bool:
         """
         Validates lab entry based on operation type.
         
         Parameters:
         - config: Configuration object
-        - labName: Name of the lab to validate
+        - lab_name: Name of the lab to validate
         - operation: 'add', 'modify', or 'delete'
         
         Returns:
@@ -26,18 +26,18 @@ class lab():
         labs = config.config.labs
         
         # Check for empty input
-        if labName == "":
+        if lab_name == "":
             print("Error: Lab must have a name — returning to menu.")
             return False
         
         if operation == "add":
-            if labName in labs:
-                print(f"Error: Lab '{labName}' already exists — returning to menu.")
+            if lab_name in labs:
+                print(f"Error: Lab '{lab_name}' already exists — returning to menu.")
                 return False
         
         elif operation in ["modify", "delete"]:
-            if labName not in labs:
-                print(f"Error: Lab '{labName}' does not exist — returning to menu.")
+            if lab_name not in labs:
+                print(f"Error: Lab '{lab_name}' does not exist — returning to menu.")
                 return False
         
         return True
@@ -46,7 +46,7 @@ class lab():
     #Adds a lab to the configuration json
     #Parameters: Configuration file, Lab to add
     #Example usage: add_lab(example.json, Windows)
-    def addLab(self, config: str, lab_name: str):
+    def add_lab(self, config: str, lab_name: str):
 
         #Reference to labs list inside database
         labs = config.config.labs
@@ -65,7 +65,7 @@ class lab():
     #Deletes a lab from the configuration JSON
     #Parameters: Configuration file, Lab to delete
     #Example usage: delete_lab(example.json, Linux)
-    def deleteLab(self, config: str, lab_name: str):
+    def delete_lab(self, config: str, lab_name: str):
 
         #Reference to labs list inside database
         labs = config.config.labs
@@ -82,7 +82,7 @@ class lab():
     #Modifies a lab from the configuration JSON
     #Parameters: Configuration file, old name for lab, new name for lab
     #Example usage: modify_lab(example.json, Linux, Linux_0)
-    def modifyLab(self, config: str, old_name: str, new_name: str):
+    def modify_lab(self, config: str, old_name: str, new_name: str):
 
         #Reference to labs list inside database
         labs = config.config.labs
@@ -107,7 +107,7 @@ class lab():
     #Prints all labs currently stored in the configuration
     #Displays the name of each lab
     #Parameters: Configuration file
-    def printLabs(self, config: str):
+    def print_labs(self, config: str):
         labs = config.config.labs
         print("\nLabs:")
         for lab in labs:            

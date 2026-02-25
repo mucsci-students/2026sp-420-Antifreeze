@@ -33,7 +33,7 @@ class Schedule():
         self.faculty = faculty()
         self.lab = lab()
         self.room = room()
-        self.config = self.loadConfig("2026sp-420-Antifreeze\\src\\schedule\\empty.json")
+        self.config = self.load_config("2026sp-420-Antifreeze\\src\\schedule\\empty.json")
         self.result = []
 
     #--------------#
@@ -43,9 +43,9 @@ class Schedule():
     #Loads a configuration file into the scheduler
     #Replaces the current configuration with the loaded file
     #Parameters: Configuration file path
-    def loadConfig(self, fileName):
+    def load_config(self, file_name):
         try:
-            self.config = load_config_from_file(CombinedConfig, fileName)
+            self.config = load_config_from_file(CombinedConfig, file_name)
             print("Config loaded successfully.")
 
         except Exception as e:
@@ -56,11 +56,11 @@ class Schedule():
 
     #Save Configuration
     #Saves the current configuration to a file
-    def saveConfig(self):
+    def save_config(self):
         print("Enter the path of the file you would like to save to, including extension\n==> ",end="")
-        fileName = input()
+        file_name = input()
         try:
-            with open(fileName, "w") as f:
+            with open(file_name, "w") as f:
                 f.write(self.config.model_dump_json(indent=2))
                 print("Config saved successfully.")
         except Exception as e:
@@ -70,19 +70,19 @@ class Schedule():
 
     #Print Configuration
     #Prints the current configuration in a human-readable format
-    def printConfig(self):
-        self.conflict.printConflicts(self.config)
-        self.course.printCourses(self.config)
-        self.faculty.printFaculty(self.config)
-        self.lab.printLabs(self.config)
-        self.room.printRooms(self.config)
+    def print_config(self):
+        self.conflict.print_conflicts(self.config)
+        self.course.print_courses(self.config)
+        self.faculty.print_faculty(self.config)
+        self.lab.print_labs(self.config)
+        self.room.print_rooms(self.config)
         return
 
     #Run Scheduler
     #Executes the scheduling engine using the current configuration
     #Prompts the user for generation limits, output format, and optimization options
     #Generates schedules and writes results to a file
-    def runScheduler(self):
+    def run_scheduler(self):
         limit = int(prompt("How many schedules to generate?\n==> "))
 
         while True:
@@ -160,7 +160,7 @@ class Schedule():
     #Displays the current schedule in a human-readable, formatted layout
     #Prints courses, faculty assignments, classes, time slots, and misc settings
     #Requires a loaded configuration   
-    def printSchedule(self):
+    def print_schedule(self):
         if not self.result:
             print("No schedules available to print.")
             return
@@ -186,4 +186,3 @@ class Schedule():
 
             for sch in self.result[i]:
                 print(sch.as_csv())
-
