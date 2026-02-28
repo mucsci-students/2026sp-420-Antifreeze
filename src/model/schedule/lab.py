@@ -112,3 +112,63 @@ class lab():
         print("\nLabs:")
         for lab in labs:            
             print(f"Name: {lab}")
+
+    #Get Lab IDs
+    #Returns a list of lab names (IDs) from the configuration JSON
+    #Parameters: Configuration file
+    #Returns: List of lab name strings
+    def get_lab_ids(self, config: str) -> list[str]:
+        labs = config.config.labs
+        return list(labs)
+
+    #Get Lab Schedule
+    #Returns a dictionary mapping each lab name to a list of course sections
+    #that use that lab, parsed from a CSV schedule file
+    #Each entry contains course ID, section, faculty, room, and meeting times
+    #The lab session meeting is identified by a trailing '^' in the time field
+    #Parameters: csv_path - path to the CSV schedule file
+    #Returns: Dictionary mapping lab name (str) to list of course info dicts
+    def get_lab_schedule(self, csv_path: str) -> dict[str, list[dict]]:
+        import csv
+
+        lab_schedule = {}
+
+        with open(csv_path, newline='') as f:
+            for line in f:
+                line = line.strip()
+
+                # Skip blank lines and schedule header lines
+                if not line or line.startswith("Schedule"):
+                    continue
+
+                parts = [p.strip() for p in line.split(',')]
+
+                # Expect at least: course_section, faculty, room, lab, and one meeting
+                if len(parts) < 5:
+                    continue
+
+                course_section = parts[0]
+                faculty        = parts[1]
+                room           = parts[2]
+                lab_name       = parts[3]
+                meetings       = parts[4:]
+
+                # Only include rows that have an assigned lab
+                if lab_name == "None" or lab_name == "":
+                    continue
+
+                course_id, _, section = course_section.partition('.')
+
+                entry = {
+                    "course_id": course_id,
+                    "section": section,
+                    "faculty": faculty,
+                    "room": room,
+                    "meetings": meetings
+                }
+
+                if lab_name not in lab_schedule:
+                    lab_schedule[lab_name] = []
+                lab_schedule[lab_name].append(entry)
+
+        return lab_schedule
