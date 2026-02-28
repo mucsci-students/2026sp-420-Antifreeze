@@ -115,3 +115,58 @@ class room():
         print("\nRooms:")
         for room in rooms:            
             print(f"Name: {room}")
+
+    #Get Room IDs
+    #Returns a list of room names (IDs) from the configuration JSON
+    #Parameters: Configuration file
+    #Returns: List of room name strings
+    def get_room_ids(self, config: str) -> list[str]:
+        rooms = config.config.rooms
+        return list(rooms)
+
+    #Get Room Schedule
+    #Returns a dictionary mapping each room name to a list of course sections
+    #scheduled in that room, parsed from a CSV schedule file
+    #Each entry contains course ID, section, faculty, lab, and meeting times
+    #Parameters: csv_path - path to the CSV schedule file
+    #Returns: Dictionary mapping room name (str) to list of course info dicts
+    def get_room_schedule(self, csv_path: str) -> dict[str, list[dict]]:
+        import csv
+
+        room_schedule = {}
+
+        with open(csv_path, newline='') as f:
+            for line in f:
+                line = line.strip()
+
+                # Skip blank lines and schedule header lines
+                if not line or line.startswith("Schedule"):
+                    continue
+
+                parts = [p.strip() for p in line.split(',')]
+
+                # Expect at least: course_section, faculty, room, lab, and one meeting
+                if len(parts) < 5:
+                    continue
+
+                course_section = parts[0]
+                faculty        = parts[1]
+                room_name      = parts[2]
+                lab_name       = parts[3]
+                meetings       = parts[4:]
+
+                course_id, _, section = course_section.partition('.')
+
+                entry = {
+                    "course_id": course_id,
+                    "section": section,
+                    "faculty": faculty,
+                    "lab": lab_name,
+                    "meetings": meetings
+                }
+
+                if room_name not in room_schedule:
+                    room_schedule[room_name] = []
+                room_schedule[room_name].append(entry)
+
+        return room_schedule
