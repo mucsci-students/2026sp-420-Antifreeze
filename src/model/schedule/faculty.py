@@ -131,3 +131,58 @@ class faculty():
                 return False
         
         return True
+
+    #Get Faculty IDs
+    #Returns a list of faculty names (IDs) from the configuration JSON
+    #Parameters: Configuration file
+    #Returns: List of faculty name strings
+    def get_faculty_ids(self, config) -> list[str]:
+        fac = config.config.faculty
+        return [prof.name for prof in fac]
+
+    #Get Faculty Schedule
+    #Returns a dictionary mapping each faculty name to a list of course sections
+    #assigned to them, parsed from a CSV schedule file
+    #Each entry contains course ID, section, room, lab, and meeting times
+    #The lab session meeting is identified by a trailing '^' in the time field
+    #Parameters: csv_path - path to the CSV schedule file
+    #Returns: Dictionary mapping faculty name (str) to list of course info dicts
+    def get_faculty_schedule(self, csv_path: str) -> dict[str, list[dict]]:
+
+        faculty_schedule = {}
+
+        with open(csv_path, newline='') as f:
+            for line in f:
+                line = line.strip()
+
+                # Skip blank lines and schedule header lines
+                if not line or line.startswith("Schedule"):
+                    continue
+
+                parts = [p.strip() for p in line.split(',')]
+
+                # Expect at least: course_section, faculty, room, lab, and one meeting
+                if len(parts) < 5:
+                    continue
+
+                course_section = parts[0]
+                faculty_name   = parts[1]
+                room           = parts[2]
+                lab_name       = parts[3]
+                meetings       = parts[4:]
+
+                course_id, _, section = course_section.partition('.')
+
+                entry = {
+                    "course_id": course_id,
+                    "section": section,
+                    "room": room,
+                    "lab": lab_name,
+                    "meetings": meetings
+                }
+
+                if faculty_name not in faculty_schedule:
+                    faculty_schedule[faculty_name] = []
+                faculty_schedule[faculty_name].append(entry)
+
+        return faculty_schedule
