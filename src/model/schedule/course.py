@@ -12,10 +12,9 @@ from scheduler import (
 )
 from scheduler.config import CombinedConfig, CourseConfig
 import csv
-import io
 
 
-class course():
+class Course():
      
     #initialize course subclass
     def __init__(self):
@@ -152,32 +151,71 @@ class course():
     # Parameters: pydantic model of a config
     # Returns: List of course names
     def get_course_id(self,config: str) -> list[str]:
-  
-        return [ c.course_id for c.course_id in config.config.courses]
-     
-    def get_course_schedule(self, csv_path: str) -> dict[str,list[dict]]:
-        courses = []
-        reader = csv.reader(io.StringIO(csv_path))
+            print([ c.course_id for c in config.config.courses])
+            return [ c.course_id for c in config.config.courses]
     
-        for row in reader:
-            if not row:
-                continue
-            
-            course = {
-                "course": row[0].strip(),
-                "faculty": row[1].strip(),
-                "room": row[2].strip(),
-                "lab": row[3].strip(),
-                "times": [time.strip() for time in row[4:]]
-            }
-            courses.append(course)
+
+
+    def get_course_schedule(self, csv_path: str) -> list[dict]:
+        courses = []
         
+        with open(csv_path, newline='') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if not row:
+                    continue
+                
+                course = {
+                    "course": row[0].strip(),
+                    "faculty": row[1].strip(),
+                    "room": row[2].strip(),
+                    "lab": row[3].strip(),
+                    "times": [time.strip() for time in row[4:]]
+                }
+                courses.append(course)
         
         courses.sort(key=lambda c: (
-            int(c["course"].split()[1].split(".")[0]), 
-            c["course"].split(".")[1]                   
+            int(c["course"].split()[1].split(".")[0]),
+            c["course"].split(".")[1]
         ))
-        
+
         return courses
-                    
-                    
+    
+
+
+def display_test_get_course_schedule():
+        import tempfile
+        # Sample CSV data (intentionally unsorted)
+        sample_data = [
+            ["CS 202.2", "Dr. Smith", "Room 201", "Lab A", "Mon 10AM", "Wed 10AM"],
+            ["CS 101.1", "Dr. Adams", "Room 101", "Lab B", "Tue 9AM", "Thu 9AM"],
+            ["CS 101.2", "Dr. Brown", "Room 102", "Lab C", "Mon 1PM", "Wed 1PM"],
+            ["CS 202.1", "Dr. Clark", "Room 202", "Lab D", "Tue 11AM", "Thu 11AM"],
+        ]
+
+        # Create temporary CSV file
+        with tempfile.NamedTemporaryFile(mode='w+', newline='', delete=False) as tmp:
+            writer = csv.writer(tmp)
+            writer.writerows(sample_data)
+            tmp_path = tmp.name
+
+        # Create instance of your class
+        manager = Course()  # Replace with your actual class name if different
+        
+        # Call function
+        result = manager.get_course_schedule(tmp_path)
+
+        # Display results
+        print("\nSorted Course Schedule:\n")
+        for course in result:
+            print(f"Course: {course['course']}\nFaculty: {course['faculty']}\nRoom: {course['room']}\nLab: {course['lab']}")
+            print(f"Times: {', '.join(course['times'])}")
+            print("-" * 50)
+
+       
+        print("\nFull Data Structure:")
+        print(result)
+
+
+if __name__ == "__main__":
+        display_test_get_course_schedule()
