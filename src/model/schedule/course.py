@@ -151,7 +151,6 @@ class Course():
     # Parameters: pydantic model of a config
     # Returns: List of course names
     def get_course_id(self,config: str) -> list[str]:
-            print([ c.course_id for c in config.config.courses])
             return [ c.course_id for c in config.config.courses]
     
 
@@ -183,39 +182,3 @@ class Course():
     
 
 
-def display_test_get_course_schedule():
-        import tempfile
-        # Sample CSV data (intentionally unsorted)
-        sample_data = [
-            ["CS 202.2", "Dr. Smith", "Room 201", "Lab A", "Mon 10AM", "Wed 10AM"],
-            ["CS 101.1", "Dr. Adams", "Room 101", "Lab B", "Tue 9AM", "Thu 9AM"],
-            ["CS 101.2", "Dr. Brown", "Room 102", "Lab C", "Mon 1PM", "Wed 1PM"],
-            ["CS 202.1", "Dr. Clark", "Room 202", "Lab D", "Tue 11AM", "Thu 11AM"],
-        ]
-
-        # Create temporary CSV file
-        with tempfile.NamedTemporaryFile(mode='w+', newline='', delete=False) as tmp:
-            writer = csv.writer(tmp)
-            writer.writerows(sample_data)
-            tmp_path = tmp.name
-
-        # Create instance of your class
-        manager = Course()  # Replace with your actual class name if different
-        
-        # Call function
-        result = manager.get_course_schedule(tmp_path)
-
-        # Display results
-        print("\nSorted Course Schedule:\n")
-        for course in result:
-            print(f"Course: {course['course']}\nFaculty: {course['faculty']}\nRoom: {course['room']}\nLab: {course['lab']}")
-            print(f"Times: {', '.join(course['times'])}")
-            print("-" * 50)
-
-       
-        print("\nFull Data Structure:")
-        print(result)
-
-
-if __name__ == "__main__":
-        display_test_get_course_schedule()
