@@ -1,5 +1,5 @@
 import pytest
-from src.schedule.faculty import faculty
+from src.model.schedule.faculty import faculty
 
 def testAdd():
     assert 1 == 1
