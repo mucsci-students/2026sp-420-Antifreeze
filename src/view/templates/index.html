@@ -23,27 +23,27 @@
         <hr />
         <div class="edit-bar">
           <button id="back-button">
-            <img src="../static/images/back_shadow.png" alt="Back" />Back
+            <img src="{{ url_for('static', filename='images/back_shadow.png')}}" alt="Back" />Back
           </button>
           <button id="forward-button">
-            <img src="../static/images/forward_shadow.png" alt="Forward" />Forward
+            <img src="/static/images/forward_shadow.png" alt="Forward" />Forward
           </button>
           <div id="vertical-line"></div>
           <button id="add-button">
-            <img src="../static/images/add_shadow.png" alt="Add" />Add
+            <img src="/static/images/add_shadow.png" alt="Add" />Add
           </button>
           <button id="modify-button">
-            <img src="../static/images/modify_shadow.png" alt="Modify" />Modify
+            <img src="/static/images/modify_shadow.png" alt="Modify" />Modify
           </button>
           <button id="delete-button">
-            <img src="../static/images/delete_shadow.png" alt="Delete" />Delete
+            <img src="/static/images/delete_shadow.png" alt="Delete" />Delete
           </button>
           <div id="vertical-line"></div>
           <button id="view-button">
-            <img src="../static/images/view.png" alt="View" />View
+            <img src="/static/images/view.png" alt="View" />View
           </button>
           <button id="print-button">
-            <img src="../static/images/print.png" alt="Print" />Print
+            <img src="/static/images/print.png" alt="Print" />Print
           </button>
         </div>
         <hr />
@@ -75,8 +75,7 @@
         <button id="popup-save">Save</button>
       </div>
     </div>
-    <script src="../../controller/navigation.js" defer></script>
-    <script src="../../controller/navigation.js" defer></script>
+    <script src="/controller/navigation.js" defer></script>
   </body>
 </html>
 

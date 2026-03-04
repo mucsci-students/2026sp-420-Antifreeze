@@ -83,18 +83,18 @@ function setup_dynamic_fields(fields) {
 // Updates back and forward button images
 function update_button_images() {
   if (back_stack.length > 0) {
-    back_img.src = "../view/static/images/back.png";
+    back_img.src = "/static/images/back.png";
     back_button.style.color = "#484848";
   } else {
-    back_img.src = "../view/static/images/back_shadow.png";
+    back_img.src = "/static/images/back_shadow.png";
     back_button.style.color = "#808080";
   }
 
   if (forward_stack.length > 0) {
-    forward_img.src = "../view/static/images/forward.png";
+    forward_img.src = "/static/images/forward.png";
     forward_button.style.color = "#484848";
   } else {
-    forward_img.src = "../view/static/images/forward_shadow.png";
+    forward_img.src = "/static/images/forward_shadow.png";
     forward_button.style.color = "#808080";
   }
 }
@@ -389,16 +389,16 @@ function edit_popup(action) {
 // Updates add/modify/delete button images
 function update_amd_images() {
   if (current_field !== null) {
-    add_img.src = "../view/static/images/add.png";
-    modify_img.src = "../view/static/images/modify.png";
-    delete_img.src = "../view/static/images/delete.png";
+    add_img.src = "/static/images/add.png";
+    modify_img.src = "/static/images/modify.png";
+    delete_img.src = "/static/images/delete.png";
     add_button.style.color = "#484848";
     modify_button.style.color = "#484848";
     delete_button.style.color = "#484848";
   } else {
-    add_img.src = "../view/static/images/add_shadow.png";
-    modify_img.src = "../view/static/images/modify_shadow.png";
-    delete_img.src = "../view/static/images/delete_shadow.png";
+    add_img.src = "/static/images/add_shadow.png";
+    modify_img.src = "/static/images/modify_shadow.png";
+    delete_img.src = "/static/images/delete_shadow.png";
     add_button.style.color = "#808080";
     modify_button.style.color = "#808080";
     delete_button.style.color = "#808080";
@@ -409,6 +409,7 @@ function update_amd_images() {
 faculty_button_element.addEventListener("click", () => {
   current_field = "Faculty";
   navigate_to("Existing faculty would be printed here");
+  console.log("Test");
   update_amd_images();
 });
 
