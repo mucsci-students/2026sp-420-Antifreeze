@@ -11,9 +11,10 @@ from scheduler import (
     Lab
 )
 from scheduler.config import CombinedConfig, CourseConfig
+import csv
 
 
-class course():
+class Course():
      
     #initialize course subclass
     def __init__(self):
@@ -123,7 +124,7 @@ class course():
     # Modifys a Course already present in configs 
     #Params: course_id, list of room names, list of lab names, list of conflicts, list of faculty
     def modify_course(self,config,id: str, creds: int, rms: list[str], lbs: list[str], con: list[str], fac: list[str]):
-            
+         
             courses = config.config.courses
 
             for course in courses:
@@ -144,3 +145,40 @@ class course():
         print("\nCourses:")
         for course in courses:            
             print(f"Course ID: {course.course_id}, \n\tCredits: {course.credits}, \n\tRooms: {course.room}, \n\tLabs: {course.lab}, \n\tConflicts: {course.conflicts}, \n\tFaculty: {course.faculty}")
+    
+    # Get Course IDs
+    # Return list of course names (IDs) from a json
+    # Parameters: pydantic model of a config
+    # Returns: List of course names
+    def get_course_id(self,config: str) -> list[str]:
+            return [ c.course_id for c in config.config.courses]
+    
+
+
+    def get_course_schedule(self, csv_path: str) -> list[dict]:
+        courses = []
+        
+        with open(csv_path, newline='') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if not row:
+                    continue
+                
+                course = {
+                    "course": row[0].strip(),
+                    "faculty": row[1].strip(),
+                    "room": row[2].strip(),
+                    "lab": row[3].strip(),
+                    "times": [time.strip() for time in row[4:]]
+                }
+                courses.append(course)
+        
+        courses.sort(key=lambda c: (
+            int(c["course"].split()[1].split(".")[0]),
+            c["course"].split(".")[1]
+        ))
+
+        return courses
+    
+
+

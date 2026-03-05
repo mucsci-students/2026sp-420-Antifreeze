@@ -186,3 +186,5 @@ class Schedule():
 
             for sch in self.result[i]:
                 print(sch.as_csv())
+
+
