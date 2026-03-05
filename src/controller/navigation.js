@@ -669,20 +669,51 @@ forward_button.addEventListener("click", () => {
 });
 
 // Add, delete, modify buttons
-add_button.addEventListener("click", () => edit_popup("Add"));
-modify_button.addEventListener("click", () => edit_popup("Modify"));
-delete_button.addEventListener("click", () => edit_popup("Delete"));
+add_button.addEventListener("click", () => {
+  if (current_field === "Faculty") faculty_button.focus();
+  else if (current_field === "Courses") courses_button.focus();
+  else if (current_field === "Labs") labs_button.focus();
+  else if (current_field === "Rooms") rooms_button.focus();
+
+  edit_popup("Add");
+});
+modify_button.addEventListener("click", () => {
+  if (current_field === "Faculty") faculty_button.focus();
+  else if (current_field === "Courses") courses_button.focus();
+  else if (current_field === "Labs") labs_button.focus();
+  else if (current_field === "Rooms") rooms_button.focus();
+
+  edit_popup("Modify");
+});
+delete_button.addEventListener("click", () => {
+  if (current_field === "Faculty") faculty_button.focus();
+  else if (current_field === "Courses") courses_button.focus();
+  else if (current_field === "Labs") labs_button.focus();
+  else if (current_field === "Rooms") rooms_button.focus();
+  
+  edit_popup("Delete");
+});
 
 // AMD Popup Event Listeners
 popup_save.addEventListener("click", () => {
   popup_form.innerHTML = "";
   amd_popup.classList.add("popup-hidden");
   wrapper.style.pointerEvents = "all";
+
+  if (current_field === "Faculty") faculty_button.focus();
+  else if (current_field === "Courses") courses_button.focus();
+  else if (current_field === "Labs") labs_button.focus();
+  else if (current_field === "Rooms") rooms_button.focus();
 });
 
 popup_close.addEventListener("click", () => {
   popup_form.innerHTML = "";
   amd_popup.classList.add("popup-hidden");
   wrapper.style.pointerEvents = "all";
+  
+  if (current_field === "Faculty") faculty_button.focus();
+  else if (current_field === "Courses") courses_button.focus();
+  else if (current_field === "Labs") labs_button.focus();
+  else if (current_field === "Rooms") rooms_button.focus();
 });
 
