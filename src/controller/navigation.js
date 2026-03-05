@@ -13,10 +13,10 @@ const view_button = document.getElementById("view-button");
 const print_button = document.getElementById("print-button");
 
 // Fields Buttons
-const faculty_button_element = document.getElementById("faculty-button");
-const courses_button_element = document.getElementById("courses-button");
-const labs_button_element = document.getElementById("labs-button");
-const rooms_button_element = document.getElementById("rooms-button");
+const faculty_button = document.getElementById("faculty-button");
+const courses_button = document.getElementById("courses-button");
+const labs_button = document.getElementById("labs-button");
+const rooms_button = document.getElementById("rooms-button");
 
 // Images inside buttons
 const back_img = back_button.querySelector("img");
@@ -130,27 +130,27 @@ function edit_popup(action) {
         popup_form.innerHTML = `
           <div class="form-line">
             <label for="faculty-name">Faculty Name:</label>
-            <input type="text" id="faculty-name" placeholder="e.g. Hobbs" />
+            <input type="text" id="faculty-name" placeholder="e.g. Hobbs" required/>
           </div>
 
           <div class="form-line">
             <label for="faculty-max-credits">Max Credits:</label>
-            <input type="number" id="faculty-max-credits" placeholder="Must be >= min credits" />
+            <input type="number" id="faculty-max-credits" placeholder="Must be >= min credits" required/>
           </div>
 
           <div class="form-line">
             <label for="faculty-min-credits">Min Credits:</label>
-            <input type="number" id="faculty-min-credits" placeholder="Must be <= max credits" />
+            <input type="number" id="faculty-min-credits" placeholder="Must be <= max credits" required/>
           </div>
 
           <div class="form-line">
             <label for="faculty-unique-course-limit">Unique Course Limit:</label>
-            <input type="number" id="faculty-unique-course-limit" />
+            <input type="number" id="faculty-unique-course-limit" required/>
           </div>
 
           <div class="form-line">
             <label for="faculty-max-days">Max Days:</label>
-            <input type="number" id="faculty-max-days" placeholder="1-5" />
+            <input type="number" id="faculty-max-days" placeholder="1-5" required/>
           </div>
 
           <hr />
@@ -199,7 +199,7 @@ function edit_popup(action) {
             <label>Mandatory Days:</label>
             <div id="faculty-mandatory-days-container" class="dynamic-container">
               <div class="input-wrapper">
-                <input type="text" name="faculty-mandatory-day" placeholder="e.g. MON/TUE/WED/THU/FRI" />
+                <input type="text" name="faculty-mandatory-day" placeholder="e.g. MON/TUE/WED/THU/FRI" required/>
               </div>
             </div>
             <button type="button" id="add-faculty-mandatory-days">+</button>
@@ -245,12 +245,12 @@ function edit_popup(action) {
         popup_form.innerHTML = `
           <div class="form-line">
             <label for="courses-id">Course ID:</label>
-            <input type="text" id="courses-id" placeholder="e.g. CMSC 420"/>
+            <input type="text" id="courses-id" placeholder="e.g. CMSC 420" required/>
           </div>
 
           <div class="form-line">
             <label for="courses-credits">Credits:</label>
-            <input type="number" id="courses-credits" placeholder="Must be greater than 0" />
+            <input type="number" id="courses-credits" placeholder="Must be greater than 0" required/>
           </div>
 
           <hr />
@@ -259,7 +259,7 @@ function edit_popup(action) {
             <label>Rooms:</label>
             <div id="courses-rooms-container" class="dynamic-container">
               <div class="input-wrapper">
-                <input type="text" name="courses-room" placeholder="e.g. Roddy 140"/>
+                <input type="text" name="courses-room" placeholder="e.g. Roddy 140" required/>
               </div>
             </div>
             <button type="button" id="add-courses-rooms">+</button>
@@ -269,7 +269,7 @@ function edit_popup(action) {
             <label>Labs:</label>
             <div id="courses-labs-container" class="dynamic-container">
               <div class="input-wrapper">
-                <input type="text" name="courses-lab" placeholder="e.g. Linux"/>
+                <input type="text" name="courses-lab" placeholder="e.g. Linux" />
               </div>
             </div>
             <button type="button" id="add-courses-labs">+</button>
@@ -279,7 +279,7 @@ function edit_popup(action) {
             <label>Conflicts:</label>
             <div id="courses-conflicts-container" class="dynamic-container">
               <div class="input-wrapper">
-                <input type="text" name="courses-conflict" placeholder="e.g. CMSC 380"/>
+                <input type="text" name="courses-conflict" placeholder="e.g. CMSC 380" />
               </div>
             </div>
             <button type="button" id="add-courses-conflicts">+</button>
@@ -289,7 +289,7 @@ function edit_popup(action) {
             <label>Faculty:</label>
             <div id="courses-faculty-container" class="dynamic-container">
               <div class="input-wrapper">
-                <input type="text" name="courses-faculty" placeholder="e.g. Hobbs"/>
+                <input type="text" name="courses-faculty" placeholder="e.g. Hobbs" />
               </div>
             </div>
             <button type="button" id="add-courses-faculty">+</button>
@@ -328,7 +328,7 @@ function edit_popup(action) {
         popup_form.innerHTML = `
           <div class="form-line">
             <label for="labs-name">Lab Name:</label>
-            <input type="text" id="labs-name" placeholder="e.g. Mac" />
+            <input type="text" id="labs-name" placeholder="e.g. Mac" required/>
           </div>
         `;
         break;
@@ -337,7 +337,7 @@ function edit_popup(action) {
         popup_form.innerHTML = `
           <div class="form-line">
             <label for="rooms-name">Room Name:</label>
-            <input type="text" id="rooms-name" placeholder="e.g. Roddy 147" />
+            <input type="text" id="rooms-name" placeholder="e.g. Roddy 147" required/>
           </div>
         `;
         break;
@@ -350,7 +350,7 @@ function edit_popup(action) {
         popup_form.innerHTML = `
           <div class="form-line">
             <label for="faculty-name">Faculty Name:</label> 
-            <input type="text" id="faculty-name" placeholder="e.g. Hobbs" />
+            <input type="text" id="faculty-name" placeholder="e.g. Hobbs" required/>
           </div>
         `;
         break;
@@ -358,7 +358,7 @@ function edit_popup(action) {
         popup_form.innerHTML = `
           <div class="form-line">
             <label for="courses-id">Course ID:</label>
-            <input type="text" id="courses-id" placeholder="e.g. CMSC 420"/>
+            <input type="text" id="courses-id" placeholder="e.g. CMSC 420" required/>
           </div>
         `;
         break;
@@ -366,7 +366,7 @@ function edit_popup(action) {
         popup_form.innerHTML = `
             <div class="form-line">
               <label for="labs-name">Lab Name:</label>
-              <input type="text" id="labs-name" placeholder="e.g. Mac" />
+              <input type="text" id="labs-name" placeholder="e.g. Mac" required/>
             </div>
           `;
         break;
@@ -375,7 +375,7 @@ function edit_popup(action) {
         popup_form.innerHTML = `
             <div class="form-line">
               <label for="rooms-name">Room Name:</label>
-              <input type="text" id="rooms-name" placeholder="e.g. Roddy 147" />
+              <input type="text" id="rooms-name" placeholder="e.g. Roddy 147" required/>
             </div>
           `;
         break;
@@ -406,26 +406,26 @@ function update_amd_images() {
 }
 
 // Fields event listeners
-faculty_button_element.addEventListener("click", () => {
+faculty_button.addEventListener("click", () => {
   current_field = "Faculty";
   navigate_to("Existing faculty would be printed here");
   console.log("Test");
   update_amd_images();
 });
 
-courses_button_element.addEventListener("click", () => {
+courses_button.addEventListener("click", () => {
   current_field = "Courses";
   navigate_to("Existing courses would be printed here");
   update_amd_images();
 });
 
-labs_button_element.addEventListener("click", () => {
+labs_button.addEventListener("click", () => {
   current_field = "Labs";
   navigate_to("Existing labs would be printed here");
   update_amd_images();
 });
 
-rooms_button_element.addEventListener("click", () => {
+rooms_button.addEventListener("click", () => {
   current_field = "Rooms";
   navigate_to(`Existing ${current_field} would be printed here`);
   update_amd_images();
