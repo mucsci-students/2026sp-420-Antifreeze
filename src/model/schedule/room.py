@@ -63,10 +63,8 @@ class room():
 
     def delete_room(self, config: str, room_name: str):
 
-        #Reference to rooms list in database
         rooms = config.config.rooms
 
-        #Checking for empty input or nonexistent room
         if room_name == "":
             print("Room must have a name — no changes made.")
             return
@@ -74,18 +72,26 @@ class room():
             print("Room does not exist — no changes made.")
             return
 
-        #Removing room from rooms list
+        # Remove from master list
         rooms.remove(room_name)
 
-        #CLI outputs room deleted successfully
-        print(f"Room '{room_name}' deleted successfully.")
+        # ---- Cascade: Courses ----
+        for course in config.config.courses:
+            if room_name in course.room:
+                course.room = [r for r in course.room if r != room_name]
 
+        # ---- Cascade: Faculty Preferences ----
+        for faculty in config.config.faculty:
+            if room_name in faculty.room_preferences:
+                del faculty.room_preferences[room_name]
+
+        print(f"Room '{room_name}' deleted successfully.")
+    
+    
     def modify_room(self, config: str, old_name: str, new_name: str):
 
-        #Reference to rooms list in database
         rooms = config.config.rooms
 
-        #Checking for empty inputs, nonexistent rooms, or duplicate rooms
         if old_name == "":
             print("Room must have a name — no changes made.")
             return
@@ -99,12 +105,24 @@ class room():
             print("New room already exists — choose a different room.")
             return
 
-        #Replace old room with new room
+        # Rename in master list
         index = rooms.index(old_name)
         rooms[index] = new_name
 
-        #CLI outputs room modified successfully
-        print(f"Room renamed from '{old_name}' to '{new_name}' successfully.") 
+        # ---- Cascade: Courses ----
+        for course in config.config.courses:
+            course.room = [
+                new_name if r == old_name else r
+                for r in course.room
+            ]
+
+        # ---- Cascade: Faculty Preferences ----
+        for faculty in config.config.faculty:
+            prefs = faculty.room_preferences
+            if old_name in prefs:
+                prefs[new_name] = prefs.pop(old_name)
+
+        print(f"Room renamed from '{old_name}' to '{new_name}' successfully.")
     
     #Print Rooms
     #Prints all rooms currently stored in the configuration

@@ -31,9 +31,10 @@ class faculty():
 
         #Checking for duplicate faculty name
         for prof in fac:
-            if prof.name == name:
+            if prof.name.upper() == name.upper():
                 print("Faculty already exists - no change made.")
-        
+                return
+
         new_member = FacultyConfig(name = name, maximum_credits = maximum_credits, maximum_days = maximum_days, 
                                   minimum_credits = minimum_credits, unique_course_limit = unique_course_limit,
                                   times = times, course_preferences = course_preferences, room_preferences = room_preferences, 
@@ -45,43 +46,82 @@ class faculty():
     #Modifies the details of an existing faculty member in the configuration json
     #Parameters: Configuration file, scheduler, name of faculty, maximum credits, maximum days, minimum credits, unique course
                 #limit, times, course preferences, room preferences, lab preferences, mandatory days
-    def modify_faculty(self, config, name: Faculty, maximum_credits: int, maximum_days: int, minimum_credits: int,
-                      unique_course_limit: int, times: dict[Day, list[TimeRange]], course_preferences: dict[Course, Preference],
-                      room_preferences: dict[Room, Preference], lab_preferences: dict[Lab, Preference], mandatory_days: set[Day]):
-        #Reference to faculty list inside database
-        fac = config.config.faculty
+    def modify_faculty(self, config, old_name: Faculty, new_name: Faculty,
+                   maximum_credits: int, maximum_days: int, minimum_credits: int,
+                   unique_course_limit: int, times: dict[Day, list[TimeRange]],
+                   course_preferences: dict[Course, Preference],
+                   room_preferences: dict[Room, Preference],
+                   lab_preferences: dict[Lab, Preference],
+                   mandatory_days: set[Day]):
 
-        #Checking to see if faculty exists under provided name
+        fac = config.config.faculty
+        target = None
+
         for prof in fac:
-            if prof.name == name:
-                fac.remove(prof)
-                new_member = FacultyConfig(name = name, maximum_credits = maximum_credits, maximum_days = maximum_days, 
-                                          minimum_credits = minimum_credits, unique_course_limit = unique_course_limit,
-                                          times = times, course_preferences = course_preferences, room_preferences = room_preferences, 
-                                          lab_preferences = lab_preferences, mandatory_days = mandatory_days)
-                fac.append(new_member)
-                print(f"Faculty member '{name}' modified successfully")
+            if prof.name.upper() == old_name.upper():
+                target = prof
+                break
+
+        if target is None:
+            print("No such faculty member exists.")
+            return
+
+        # Prevent duplicate names
+        for prof in fac:
+            if prof.name.upper() == new_name.upper() and prof != target:
+                print("Faculty name already exists.")
                 return
 
-        print("No such faculty member exists.")
-        return
+        # ---- Rename cascade ----
+        if old_name.upper() != new_name.upper():
+            for course in config.config.courses:
+                course.faculty = [
+                    new_name if f.upper() == old_name.upper() else f
+                    for f in course.faculty
+                ]
+
+        # Update faculty fields
+        target.name = new_name
+        target.maximum_credits = maximum_credits
+        target.maximum_days = maximum_days
+        target.minimum_credits = minimum_credits
+        target.unique_course_limit = unique_course_limit
+        target.times = times
+        target.course_preferences = course_preferences
+        target.room_preferences = room_preferences
+        target.lab_preferences = lab_preferences
+        target.mandatory_days = mandatory_days
+
+        print(f"Faculty member '{old_name}' modified successfully.")
     
 
     #Delete Faculty
     #Delete an existing faculty from the configuration json
     #Parameters: Configuration file, name of faculty
     def delete_faculty(self, config, name: Faculty):
-        
-        #Reference to faculty list inside database
         fac = config.config.faculty
+        target = None
 
-        #Checking to see if faculty exists under provided name
         for prof in fac:
-            if prof.name == name:
-                fac.remove(prof)
-                print(f"Faculty member '{name}' deleted successfully")
-                return
-        print("No such faculty member exists.")
+            if prof.name.upper() == name.upper():
+                target = prof
+                break
+
+        if target is None:
+            print("No such faculty member exists.")
+            return
+
+        # Remove faculty from faculty list
+        fac.remove(target)
+
+        # ---- Cascade: remove from course assignments ----
+        for course in config.config.courses:
+            course.faculty = [
+                f for f in course.faculty
+                if f.upper() != name.upper()
+            ]
+
+        print(f"Faculty member '{name}' deleted successfully (cascade applied)")
 
     #Print Faculty
     #Prints all faculty members currently stored in the configuration

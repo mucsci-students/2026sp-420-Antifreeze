@@ -67,14 +67,24 @@ class lab():
     #Example usage: delete_lab(example.json, Linux)
     def delete_lab(self, config: str, lab_name: str):
 
-        #Reference to labs list inside database
         labs = config.config.labs
 
         if lab_name not in labs:
             print("Lab not found — nothing deleted.")
             return
 
+        # Remove from labs list
         labs.remove(lab_name)
+
+        # ---- Cascade: Courses ----
+        for course in config.config.courses:
+            if lab_name in course.lab:
+                course.lab = [l for l in course.lab if l != lab_name]
+
+        # ---- Cascade: Faculty Preferences ----
+        for faculty in config.config.faculty:
+            if lab_name in faculty.lab_preferences:
+                del faculty.lab_preferences[lab_name]
 
         print(f"Lab '{lab_name}' deleted successfully.")
     
@@ -84,7 +94,6 @@ class lab():
     #Example usage: modify_lab(example.json, Linux, Linux_0)
     def modify_lab(self, config: str, old_name: str, new_name: str):
 
-        #Reference to labs list inside database
         labs = config.config.labs
 
         if old_name not in labs:
@@ -95,11 +104,24 @@ class lab():
             print("New lab name already exists — choose a different name.")
             return
 
-        #Replace so that order stays the same
+        # Rename in labs list
         index = labs.index(old_name)
         labs[index] = new_name
 
-        print(f"Lab renamed from '{old_name}' to '{new_name}'.") 
+        # ---- Cascade: Courses ----
+        for course in config.config.courses:
+            course.lab = [
+                new_name if lab == old_name else lab
+                for lab in course.lab
+            ]
+
+        # ---- Cascade: Faculty Preferences ----
+        for faculty in config.config.faculty:
+            prefs = faculty.lab_preferences
+            if old_name in prefs:
+                prefs[new_name] = prefs.pop(old_name)
+
+        print(f"Lab renamed from '{old_name}' to '{new_name}'.")
     
 
     
