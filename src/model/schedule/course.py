@@ -14,7 +14,7 @@ from scheduler.config import CombinedConfig, CourseConfig
 import csv
 
 
-class Course():
+class course():
      
     #initialize course subclass
     def __init__(self):
@@ -91,6 +91,13 @@ class Course():
                     print("course already exists")
             # Returns bool
             return test
+    def cascade_changes(self,config, id:str):
+        for c in config.config.courses:
+            for con in c.conflicts:
+                if id.upper() == con.upper():
+                    c.conflicts.remove(con)
+        print(config)        
+        return
     
     # add Courses
     # Adds a Course to Config
@@ -114,6 +121,7 @@ class Course():
             for course in courses:
                 if course.course_id.upper() == id.upper():
                     config.config.courses.remove(course)
+                    self.cascade_changes(config,id)
                     print('Deleted data')
                     return
             print("course DOES NOT already exists")
@@ -153,8 +161,10 @@ class Course():
     def get_course_id(self,config: str) -> list[str]:
             return [ c.course_id for c in config.config.courses]
     
-
-
+    # Get Course Schedule
+    # Return list of courses in terms of the course from a CSV
+    # Parameters: CSV path
+    # Returns: shedule sorted by course 
     def get_course_schedule(self, csv_path: str) -> list[dict]:
         courses = []
         
@@ -164,14 +174,14 @@ class Course():
                 if not row:
                     continue
                 
-                course = {
+                s_course = {
                     "course": row[0].strip(),
                     "faculty": row[1].strip(),
                     "room": row[2].strip(),
                     "lab": row[3].strip(),
                     "times": [time.strip() for time in row[4:]]
                 }
-                courses.append(course)
+                courses.append(s_course)
         
         courses.sort(key=lambda c: (
             int(c["course"].split()[1].split(".")[0]),
