@@ -109,31 +109,90 @@ class Course():
     # Delete Course
     # Deletes a course already in the Config
     # Params: id of course
-    def delete_course(self,config, id: str):
-            courses = config.config.courses
-            for course in courses:
-                if course.course_id.upper() == id.upper():
-                    config.config.courses.remove(course)
-                    print('Deleted data')
-                    return
-            print("course DOES NOT already exists")
+    def delete_course(self, config, id: str):
+
+        courses = config.config.courses
+        target = None
+
+        for course in courses:
+            if course.course_id.upper() == id.upper():
+                target = course
+                break
+
+        if target is None:
+            print("Course does not exist — no changes made.")
+            return
+
+        # Remove the course
+        courses.remove(target)
+
+        # ---- Cascade: remove from other course conflicts ----
+        for course in courses:
+            if id in course.conflicts:
+                course.conflicts = [c for c in course.conflicts if c.upper() != id.upper()]
+
+        # ---- Cascade: remove from faculty course preferences ----
+        for faculty in config.config.faculty:
+            prefs = faculty.course_preferences
+            if id in prefs:
+                del prefs[id]
+
+        print(f"Course '{id}' deleted successfully.")
             
             
 
     # Modifys Course
     # Modifys a Course already present in configs 
     #Params: course_id, list of room names, list of lab names, list of conflicts, list of faculty
-    def modify_course(self,config,id: str, creds: int, rms: list[str], lbs: list[str], con: list[str], fac: list[str]):
-         
-            courses = config.config.courses
+    def modify_course(self, config, old_id: str, new_id: str,
+                  creds: int, rms: list[str], lbs: list[str],
+                  con: list[str], fac: list[str]):
+        courses = config.config.courses
+        target = None
 
-            for course in courses:
-                if course.course_id.upper() == id.upper():
-                    self.delete_course(config=config, id=id)
-                    self.add_course(config=config,id=id,creds=creds,rms=rms,lbs=lbs,con=con,fac=fac)
-                    print("Modified successfully. ")
-                    return
-            print("dont have it.")
+        for course in courses:
+            if course.course_id.upper() == old_id.upper():
+                target = course
+                break
+
+        if target is None:
+            print("Course not found.")
+            return
+
+        # Prevent duplicate course IDs
+        for course in courses:
+            if course.course_id.upper() == new_id.upper() and course != target:
+                print("New course ID already exists.")
+                return
+
+        # Validate referenced objects
+        if not self.existing_items(config, old_id, rms, lbs, con, fac):
+            return
+
+        # ---- Rename course ----
+        target.course_id = new_id
+
+        # ---- Update other course conflicts ----
+        for course in courses:
+            course.conflicts = [
+                new_id if c.upper() == old_id.upper() else c
+                for c in course.conflicts
+            ]
+
+        # ---- Update faculty course preferences ----
+        for faculty in config.config.faculty:
+            prefs = faculty.course_preferences
+            if old_id in prefs:
+                prefs[new_id] = prefs.pop(old_id)
+
+        # ---- Update remaining course fields ----
+        target.credits = creds
+        target.room = rms
+        target.lab = lbs
+        target.conflicts = con
+        target.faculty = fac
+
+        print(f"Course '{old_id}' modified to '{new_id}' successfully (cascade applied).")
         
     #Print Courses
     #Prints all courses currently stored in the configuration
