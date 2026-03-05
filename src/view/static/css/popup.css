@@ -113,17 +113,36 @@
   overflow-y: auto;
   height: 540px;
 }
+#popup-footer {
+  width: 500px;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  position: relative;
+}
 #popup-save {
   padding-left: 15px;
   padding-right: 15px;
   padding-top: 5px;
   padding-bottom: 5px;
-   border: outset;
+  border: outset;
   border-top-color: #ffffff;
   border-left-color: #ffffff;
   border-bottom-color: #bbbbbb;
   border-right-color: #bbbbbb;
   border-width: 3px;
+  left: 215px;
+  top: 5px;
+  position: absolute;
+}
+#popup-save:hover {
+  color: #808080;
+  text-shadow: -1px -1px #ffffff;
+  border: inset;
+  border-top-color: #bbbbbb;
+  border-left-color: #bbbbbb;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
 }
 
 /* ----- AMD Popup Inner Form ----- */
@@ -147,9 +166,17 @@
   padding-right: 5px;
   padding-top: 2px;
   padding-bottom: 2px;
-  margin: 1px;
+  margin-top: 1px;
+  margin-bottom: 1px;
+  margin-left: 0;
+}
+.form-line button:hover {
+  background-color: #bbbbbb;
 }
 .input-wrapper {
   margin-right: 2px;
+}
+#remove-button {
+  margin-left: 8px;
 }
 

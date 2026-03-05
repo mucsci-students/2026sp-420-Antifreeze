@@ -63,6 +63,7 @@ function add_dynamic_input(button_id, container_id, name, placeholder) {
     input.placeholder = placeholder;
 
     const remove_button = document.createElement("button");
+    remove_button.id = "remove-button";
     remove_button.type = "button";
     remove_button.textContent = "-";
     remove_button.addEventListener("click", () => wrapper.remove());
