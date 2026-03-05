@@ -343,7 +343,223 @@ function edit_popup(action) {
         break;
     }
   } else if (action === "Modify") {
-    popup_form.innerHTML = `<div class="form-line">Modify</div>`;
+    switch (current_field) {
+      case "Faculty":
+        popup_form.innerHTML = `
+          <div class="form-line">
+            <label for="faculty-name">Faculty Name:</label>
+            <input type="text" id="faculty-name" placeholder="e.g. Hobbs" />
+          </div>
+
+          <div class="form-line">
+            <label for="faculty-max-credits">Max Credits:</label>
+            <input type="number" id="faculty-max-credits" placeholder="Must be >= min credits" />
+          </div>
+
+          <div class="form-line">
+            <label for="faculty-min-credits">Min Credits:</label>
+            <input type="number" id="faculty-min-credits" placeholder="Must be <= max credits" />
+          </div>
+
+          <div class="form-line">
+            <label for="faculty-unique-course-limit">Unique Course Limit:</label>
+            <input type="number" id="faculty-unique-course-limit" />
+          </div>
+
+          <div class="form-line">
+            <label for="faculty-max-days">Max Days:</label>
+            <input type="number" id="faculty-max-days" placeholder="1-5" />
+          </div>
+
+          <hr />
+
+          <div class="form-line">
+            <label>Time Slots:</label>
+            <div id="faculty-time-slots-container" class="dynamic-container">
+              <div class="input-wrapper">
+                <input type="text" name="faculty-time-slot" placeholder="e.g. MON 13:00-17:00" />
+              </div>
+            </div>
+            <button type="button" id="add-faculty-time-slots">+</button>
+          </div>
+
+          <div class="form-line">
+            <label>Course Preferences:</label>
+            <div id="faculty-course-preferences-container" class="dynamic-container">
+              <div class="input-wrapper">
+                <input type="text" name="faculty-course-preference" placeholder="e.g. CMSC 162" />
+              </div>
+            </div>
+            <button type="button" id="add-faculty-course-preferences">+</button>
+          </div>
+
+          <div class="form-line">
+            <label>Room Preferences:</label>
+            <div id="faculty-room-preferences-container" class="dynamic-container">
+              <div class="input-wrapper">
+                <input type="text" name="faculty-room-preference" placeholder="e.g. Roddy 136" />
+              </div>
+            </div>
+            <button type="button" id="add-faculty-room-preferences">+</button>
+          </div>
+
+          <div class="form-line">
+            <label>Lab Preferences:</label>
+            <div id="faculty-lab-preferences-container" class="dynamic-container">
+              <div class="input-wrapper">
+                <input type="text" name="faculty-lab-preference" placeholder="e.g. Mac" />
+              </div>
+            </div>
+            <button type="button" id="add-faculty-lab-preferences">+</button>
+          </div>
+
+          <div class="form-line">
+            <label>Mandatory Days:</label>
+            <div id="faculty-mandatory-days-container" class="dynamic-container">
+              <div class="input-wrapper">
+                <input type="text" name="faculty-mandatory-day" placeholder="e.g. MON/TUE/WED/THU/FRI" />
+              </div>
+            </div>
+            <button type="button" id="add-faculty-mandatory-days">+</button>
+          </div>
+        `;
+
+        // Setup dynamic inputs
+        setup_dynamic_fields([
+          {
+            button_id: "add-faculty-time-slots",
+            container_id: "faculty-time-slots-container",
+            name: "faculty-time-slot",
+            placeholder: "e.g. TUE 09:00-12:00",
+          },
+          {
+            button_id: "add-faculty-course-preferences",
+            container_id: "faculty-course-preferences-container",
+            name: "faculty-course-preference",
+            placeholder: "e.g. CMSC 162",
+          },
+          {
+            button_id: "add-faculty-room-preferences",
+            container_id: "faculty-room-preferences-container",
+            name: "faculty-room-preference",
+            placeholder: "e.g. Roddy 136",
+          },
+          {
+            button_id: "add-faculty-lab-preferences",
+            container_id: "faculty-lab-preferences-container",
+            name: "faculty-lab-preference",
+            placeholder: "e.g. Mac",
+          },
+          {
+            button_id: "add-faculty-mandatory-days",
+            container_id: "faculty-mandatory-days-container",
+            name: "faculty-mandatory-day",
+            placeholder: "e.g. TUE",
+          },
+        ]);
+        break;
+
+      case "Courses":
+        popup_form.innerHTML = `
+          <div class="form-line">
+            <label for="courses-id">Course ID:</label>
+            <input type="text" id="courses-id" placeholder="e.g. CMSC 420"/>
+          </div>
+
+          <div class="form-line">
+            <label for="courses-credits">Credits:</label>
+            <input type="number" id="courses-credits" placeholder="Must be greater than 0" />
+          </div>
+
+          <hr />
+
+          <div class="form-line">
+            <label>Rooms:</label>
+            <div id="courses-rooms-container" class="dynamic-container">
+              <div class="input-wrapper">
+                <input type="text" name="courses-room" placeholder="e.g. Roddy 140"/>
+              </div>
+            </div>
+            <button type="button" id="add-courses-rooms">+</button>
+          </div>
+
+          <div class="form-line">
+            <label>Labs:</label>
+            <div id="courses-labs-container" class="dynamic-container">
+              <div class="input-wrapper">
+                <input type="text" name="courses-lab" placeholder="e.g. Linux"/>
+              </div>
+            </div>
+            <button type="button" id="add-courses-labs">+</button>
+          </div>
+
+          <div class="form-line">
+            <label>Conflicts:</label>
+            <div id="courses-conflicts-container" class="dynamic-container">
+              <div class="input-wrapper">
+                <input type="text" name="courses-conflict" placeholder="e.g. CMSC 380"/>
+              </div>
+            </div>
+            <button type="button" id="add-courses-conflicts">+</button>
+          </div>
+
+          <div class="form-line">
+            <label>Faculty:</label>
+            <div id="courses-faculty-container" class="dynamic-container">
+              <div class="input-wrapper">
+                <input type="text" name="courses-faculty" placeholder="e.g. Hobbs"/>
+              </div>
+            </div>
+            <button type="button" id="add-courses-faculty">+</button>
+          </div>
+        `;
+
+        setup_dynamic_fields([
+          {
+            button_id: "add-courses-rooms",
+            container_id: "courses-rooms-container",
+            name: "courses-room",
+            placeholder: "e.g. Roddy 140",
+          },
+          {
+            button_id: "add-courses-labs",
+            container_id: "courses-labs-container",
+            name: "courses-lab",
+            placeholder: "e.g. Linux",
+          },
+          {
+            button_id: "add-courses-conflicts",
+            container_id: "courses-conflicts-container",
+            name: "courses-conflict",
+            placeholder: "e.g. CMSC 380",
+          },
+          {
+            button_id: "add-courses-faculty",
+            container_id: "courses-faculty-container",
+            name: "courses-faculty",
+            placeholder: "e.g. Hobbs",
+          },
+        ]);
+        break;
+
+      case "Labs":
+        popup_form.innerHTML = `
+          <div class="form-line">
+            <label for="labs-name">Lab Name:</label>
+            <input type="text" id="labs-name" placeholder="e.g. Mac" />
+          </div>
+        `;
+        break;
+
+      case "Rooms":
+        popup_form.innerHTML = `
+          <div class="form-line">
+            <label for="rooms-name">Room Name:</label>
+            <input type="text" id="rooms-name" placeholder="e.g. Roddy 147" />
+          </div>
+        `;
+        break;
+    }
   } else if (action === "Delete") {
     switch (current_field) {
       case "Faculty":
