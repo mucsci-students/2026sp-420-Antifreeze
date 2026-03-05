@@ -17,8 +17,13 @@
       </header>
       <nav class="nav-bar">
         <div class="top-bar">
-          <button id="load-button">Load</button>
-          <button id="save-button">Save</button>
+          <button id="load-button">
+            <label for="load">Load</label>
+            <input id="load" type="file" name="load" accept=".json, .csv" />
+          </button>
+          <button id="save-button">
+            <a href="path_to_file" download="proposed_file_name">Save</a>
+          </button>
         </div>
         <hr />
         <div class="edit-bar">
@@ -67,9 +72,9 @@
     </div>
     <div id="amd-popup" class="popup-hidden">
       <div class="popup-box">
-        <button id="popup-close">X</button>
         <div id="popup-header">
           <p id="popup-title"></p>
+          <button id="popup-close">X</button>
         </div>
         <div id="popup-form"></div>
         <button id="popup-save">Save</button>

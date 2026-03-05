@@ -1,7 +1,24 @@
+/* ----- AMD Popup ----- */
 #amd-popup {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.popup-hidden {
+  display: none !important;
 }
 .popup-box {
+  background-color: #e6e6e6;
+  padding: 20px;
+  min-width: 250px;
+  width: 500px;
   font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
     "Lucida Sans", Arial, sans-serif;
   border: outset;
@@ -12,25 +29,73 @@
   border-width: 3px;
   box-shadow: 3px 3px #464646;
   position: absolute;
-  right: 0;
-  bottom: -7px;
+  right: 155px;
+  bottom: 25px;
   padding: 5px;
   height: 666px;
 }
 #popup-header {
   position: sticky;
   top: 0;
-  background-color: #e6e6e6;
+  background-image: linear-gradient(
+    to right,
+    rgba(254, 82, 58, 1),
+    rgba(254, 179, 86, 1),
+    rgba(255, 240, 77, 1),
+    rgba(88, 190, 62, 0.75),
+    rgba(82, 134, 254, 0.5),
+    rgba(200, 92, 255, 0.25),
+    rgba(255, 0, 0, 0)
+  );
+  box-shadow: -3px 0px #91000d;
+  width: 495px;
+  height: 30px;
   padding-top: 4px;
   padding-bottom: 2px;
+  margin-left: 2px;
+  margin-right: 2px;
+  margin-bottom: 5px;
+  align-items: center;
+  display: flex;
 }
 #popup-title {
-  display: block;
-  color: #484848;
-  margin-bottom: 0;
+  display: inline-block;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 1px 1px 2px #464646;
+  margin-bottom: 20px;
   text-align: left;
   margin-left: 10px;
-  position: sticky;
+  cursor: default;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+#popup-close {
+  font-weight: bold;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-bottom: 6px;
+  border: outset;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #bbbbbb;
+  border-right-color: #bbbbbb;
+  border-width: 3px;
+  right: 0;
+  position: absolute;
+}
+#popup-close:hover {
+  color: #808080;
+  text-shadow: -1px -1px #ffffff;
+  border: inset;
+  border-top-color: #bbbbbb;
+  border-left-color: #bbbbbb;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
 }
 #popup-form {
   text-align: left;
@@ -48,6 +113,20 @@
   overflow-y: auto;
   height: 540px;
 }
+#popup-save {
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+   border: outset;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #bbbbbb;
+  border-right-color: #bbbbbb;
+  border-width: 3px;
+}
+
+/* ----- AMD Popup Inner Form ----- */
 .form-line {
   display: block;
   margin-top: 0;
