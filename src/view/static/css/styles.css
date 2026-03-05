@@ -179,6 +179,7 @@ hr {
 #view-button {
   margin-right: 10px;
   padding: 5px;
+  color: #808080;
 }
 #view-button:hover {
   background-color: #bbbbbb;
