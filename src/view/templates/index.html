@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Team Antifreeze: Scheduler GUI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}" />
+  </head>
+  <body>
+    <div id="wrapper">
+      <header>
+        <h3>
+          <font color="#E84A3F">Te</font><font color="#FFA43F">am</font>
+          <font color="#FFDF2A">An</font><font color="#2BB971">ti</font
+          ><font color="#2EA0D6">fr</font><font color="#956CEE">ee</font
+          ><font color="#E93EC3">ze</font>
+        </h3>
+      </header>
+      <nav class="nav-bar">
+        <div class="top-bar">
+          <button id="load-button">
+            <label for="load">Load</label>
+            <input id="load" type="file" name="load" accept=".json, .csv" />
+          </button>
+          <button id="save-button">
+            <a href="path_to_file" download="proposed_file_name">Save</a>
+          </button>
+        </div>
+        <hr />
+        <div class="edit-bar">
+          <button id="back-button">
+            <img src="{{ url_for('static', filename='images/back_shadow.png')}}" alt="Back" />Back
+          </button>
+          <button id="forward-button">
+            <img src="/static/images/forward_shadow.png" alt="Forward" />Forward
+          </button>
+          <div id="vertical-line"></div>
+          <button id="add-button">
+            <img src="/static/images/add_shadow.png" alt="Add" />Add
+          </button>
+          <button id="modify-button">
+            <img src="/static/images/modify_shadow.png" alt="Modify" />Modify
+          </button>
+          <button id="delete-button">
+            <img src="/static/images/delete_shadow.png" alt="Delete" />Delete
+          </button>
+          <div id="vertical-line"></div>
+          <button id="view-button">
+            <img src="/static/images/view_shadow.png" alt="View" />View
+          </button>
+          <button id="print-button">
+            <img src="/static/images/print.png" alt="Print" />Print
+          </button>
+        </div>
+        <hr />
+        <div class="selection-bar">
+          <p>Fields:</p>
+          <button id="faculty-button">FACULTY</button>
+          <button id="courses-button">COURSES</button>
+          <button id="labs-button">LABS</button>
+          <button id="rooms-button">ROOMS</button>
+          <button id="schedule-button">SCHEDULE</button>
+        </div>
+      </nav>
+      <main>
+        <div id="faculty" class="navigator"></div>
+        <div id="courses" class="navigator"></div>
+        <div id="labs" class="navigator"></div>
+        <div id="rooms" class="navigator"></div>
+        <div id="schedule" class="navigator"></div>
+      </main>
+      <footer></footer>
+    </div>
+    <div id="amd-popup" class="popup-hidden">
+      <div class="popup-box">
+        <div id="popup-header">
+          <p id="popup-title"></p>
+          <button id="popup-close">X</button>
+        </div>
+        <div id="popup-form"></div>
+        <div id="popup-footer">
+          <button id="popup-save">Save</button>
+        </div>
+      </div>
+    </div>
+    <script src="/controller/navigation.js" defer></script>
+  </body>
+</html>
+
