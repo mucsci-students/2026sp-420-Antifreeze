@@ -196,14 +196,14 @@ class course():
                 if not row:
                     continue
                 
-                course = {
+                s_course = {
                     "course": row[0].strip(),
                     "faculty": row[1].strip(),
                     "room": row[2].strip(),
                     "lab": row[3].strip(),
                     "times": [time.strip() for time in row[4:]]
                 }
-                courses.append(course)
+                courses.append(s_course)
         
         courses.sort(key=lambda c: (
             int(c["course"].split()[1].split(".")[0]),
