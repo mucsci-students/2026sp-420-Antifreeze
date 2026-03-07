@@ -14,7 +14,10 @@ from scheduler import (
     OptimizerFlags
     
 )
-
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+import io
 
 from model.schedule.conflict import conflict
 from model.schedule.course import course
@@ -85,24 +88,9 @@ class Schedule():
     #Executes the scheduling engine using the current configuration
     #Prompts the user for generation limits, output format, and optimization options
     #Generates schedules and writes results to a file
-    def run_scheduler(self):
-        limit = int(prompt("How many schedules to generate?\n==> "))
+    def run_scheduler(self, limit: int = 10, optimize: bool = True):
 
-        while True:
-            fmt = prompt("Output format? (csv/json)\n==> ").lower()
-            if fmt in {"csv", "json"}:
-                break
-            print("Please enter 'csv' or 'json'.")
-
-        outfile = prompt("Output file name, including extensions\n==> ")
-
-        while True:
-            opt = prompt("Optimize schedules? (y/n)\n==> ").lower()
-            if opt in {"y", "n"}:
-                optimize = (opt == "y")
-                break
-            print("Please enter 'y' or 'n'.")
-        if opt == "y":
+        if optimize:
             self.config.optimizer_flags = [
                 "faculty_course",
                 "faculty_room",
@@ -113,81 +101,102 @@ class Schedule():
             ]
         else:
             self.config.optimizer_flags = []
-        print("Running scheduler, this may take a moment...\n")
+
         try:
             sched = Scheduler(self.config)
         except Exception as e:
             print("Scheduler error:", e)
-            return
+            return []
 
         self.result = []
+
         for model in sched.get_models():
             self.result.append(model)
+
             if len(self.result) >= limit:
                 break
-            print
 
-        if not self.result:
-            print("No valid schedules found.")
-            return
-
-        model = self.result[0]
-
-        if fmt == "csv":
-            try:
-                with open(outfile, "w") as f:
-                    i = 1
-                    for model in self.result:
-                        f.write(f"Schedule {i}:\n")
-                        for sch in model:
-                            f.write(sch.as_csv() + "\n\n")
-                        i += 1
-                        f.write("\n")
-
-            except Exception as e:
-                print("Could not save file, try again")
-                print(e)
-        else:
-            try:
-                with open(outfile, "w") as f:
-                    for model in self.result:
-                        for course in model:
-                            json.dump([course.model_dump()], f, indent=4)
-            except Exception as e:
-                print("Could not save file, try again")
-                print(e)
-        print("Schedule generated and saved.")
+        return self.result
 
 
     #Print Schedule
     #Displays the current schedule in a human-readable, formatted layout
     #Prints courses, faculty assignments, classes, time slots, and misc settings
     #Requires a loaded configuration   
-    def print_schedule(self):
+    def print_schedule(self, count: int = 1):
+
         if not self.result:
-            print("No schedules available to print.")
-            return
+            return []
 
-        total = len(self.result)
+        count = min(count, len(self.result))
 
-        while True:
-            try:
-                n = int(input(f"How many schedules would you like to print? (1–{total}): "))
+        output = []
 
-                if n < 1 or n > total:
-                    print("Invalid number. Please try again.")
-                    continue
-
-                break
-            except ValueError:
-                print("Invalid input. Please enter a number.")
-
-        print(f"\nPrinting first {n} schedule(s):\n")
-
-        for i in range(n):
-            print(f"\nSchedule {i + 1}:")
+        for i in range(count):
+            
+            schedule_lines = []
 
             for sch in self.result[i]:
-                print(sch.as_csv())
+                schedule_lines.append(sch.as_csv())
 
+            output.append(schedule_lines)
 
+        return output
+
+    def export_schedule_csv(self, index: int):
+        if not self.result:
+            return ""
+
+        model = self.result[index]
+
+        lines = []
+
+        for sch in model:
+            lines.append(sch.as_csv())
+
+        return "\n".join(lines)
+
+    def export_schedules_pdf(self):
+
+        if not self.result:
+            return None
+
+        buffer = io.BytesIO()
+
+        styles = getSampleStyleSheet()
+
+        elements = []
+
+        for i, model in enumerate(self.result):
+
+            elements.append(Paragraph(f"Schedule {i+1}", styles["Heading2"]))
+            elements.append(Spacer(1, 10))
+
+            table_data = [["Course", "Faculty", "Room", "Lab", "Time"]]
+
+            for sch in model:
+
+                parts = sch.as_csv().split(",")
+
+                if len(parts) < 5:
+                    continue
+
+                table_data.append([p.strip() for p in parts[:5]])
+
+            table = Table(table_data)
+
+            table.setStyle(TableStyle([
+                ("BACKGROUND", (0,0), (-1,0), colors.lightgrey),
+                ("GRID", (0,0), (-1,-1), 1, colors.black)
+            ]))
+
+            elements.append(table)
+            elements.append(Spacer(1, 30))
+
+        doc = SimpleDocTemplate(buffer)
+
+        doc.build(elements)
+
+        buffer.seek(0)
+
+        return buffer

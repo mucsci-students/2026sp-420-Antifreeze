@@ -17,6 +17,7 @@ const faculty_button = document.getElementById("faculty-button");
 const courses_button = document.getElementById("courses-button");
 const labs_button = document.getElementById("labs-button");
 const rooms_button = document.getElementById("rooms-button");
+const schedule_button = document.getElementById("schedule-button");
 
 // Images inside buttons
 const back_img = back_button.querySelector("img");
@@ -44,6 +45,7 @@ let loaded_file_extension = null;
 // Field we are currently editing
 let current_field = null;
 let current_operation = null;
+let schedules_generated = false;
 
 // History stacks
 let back_stack = [];
@@ -54,7 +56,7 @@ let current_content = navigator_div.innerHTML;
 function add_dynamic_input(button_id, container_id, name, placeholder) {
   const button = document.getElementById(button_id);
   if (!button) {
-    return; 
+    return;
   }
   button.addEventListener("click", () => {
     const container = document.getElementById(container_id);
@@ -631,28 +633,37 @@ function update_amd_images() {
 faculty_button.addEventListener("click", () => {
   current_field = "Faculty";
   navigate_to("Existing faculty would be printed here");
-  console.log(loaded_file_content);
+  loadFaculty();
   update_amd_images();
 });
 
 courses_button.addEventListener("click", () => {
   current_field = "Courses";
   navigate_to("Existing courses would be printed here");
+  loadCourses();
   update_amd_images();
 });
 
 labs_button.addEventListener("click", () => {
   current_field = "Labs";
   navigate_to("Existing labs would be printed here");
+  loadLabs();
   update_amd_images();
 });
 
 rooms_button.addEventListener("click", () => {
   current_field = "Rooms";
   navigate_to(`Existing ${current_field} would be printed here`);
+  loadRooms();
   update_amd_images();
 });
 
+schedule_button.addEventListener("click", () => {
+  current_field = "Schedule";
+  navigate_to("Schedule generator");
+  loadSchedule();
+  update_amd_images();
+});
 // Back button
 back_button.addEventListener("click", () => {
   if (back_stack.length > 0) {
@@ -673,11 +684,45 @@ forward_button.addEventListener("click", () => {
   }
 });
 
+view_button.addEventListener("click", () => {
+
+  if (!schedules_generated) {
+    return; 
+  }
+
+  viewSchedule(0);
+
+});
 // Loads content of json or csv file
 //load_button.addEventListener("change", function () {
 //})
+save_button.addEventListener("click", async (e) => {
 
-function load_file_content (input) {
+  e.preventDefault();  // stops redirect / form submit
+
+  const res = await fetch("/save_config");
+  const config = await res.json();
+
+  const blob = new Blob(
+    [JSON.stringify(config, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "schedule_config.json";
+  document.body.appendChild(a);
+  a.click();
+
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+});
+
+
+function load_file_content(input) {
   let fileTypes = ['json', 'csv'];
   let fileReader = new FileReader();
 
@@ -714,7 +759,7 @@ delete_button.addEventListener("click", () => {
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
   else if (current_field === "Rooms") rooms_button.focus();
-  
+
   edit_popup("Delete");
 });
 
@@ -792,85 +837,483 @@ popup_save.addEventListener("click", async () => {
       });
 
     }
-    console.log("MODIFY DATA:", data);
+
     await loadFaculty();
+  } else if (current_field === "Courses") {
+
+    const idInput = document.getElementById("courses-id");
+
+    if (!idInput) {
+      console.error("Course ID input not found");
+      return;
+    }
+
+    const course_id = idInput.value.trim();
+
+    const creditsInput = document.getElementById("courses-credits");
+    const credits = creditsInput ? parseInt(creditsInput.value) : null;
+
+    const rooms = [...document.querySelectorAll('input[name="courses-room"]')]
+      .map(i => i.value.trim())
+      .filter(v => v !== "");
+
+    const labs = [...document.querySelectorAll('input[name="courses-lab"]')]
+      .map(i => i.value.trim())
+      .filter(v => v !== "");
+
+    const conflicts = [...document.querySelectorAll('input[name="courses-conflict"]')]
+      .map(i => i.value.trim())
+      .filter(v => v !== "");
+
+    const faculty = [...document.querySelectorAll('input[name="courses-faculty"]')]
+      .map(i => i.value.trim())
+      .filter(v => v !== "");
+
+    if (current_operation === "add") {
+
+      await fetch("/courses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          course_id: course_id,
+          credits: credits,
+          room: rooms,
+          lab: labs,
+          conflicts: conflicts,
+          faculty: faculty
+        })
+      });
+
+    }
+
+    else if (current_operation === "delete") {
+
+      await fetch(`/courses/${encodeURIComponent(course_id)}`, {
+        method: "DELETE"
+      });
+
+    }
+
+    else if (current_operation === "modify") {
+
+      await fetch(`/courses/${encodeURIComponent(course_id)}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          course_id: course_id,
+          credits: credits,
+          room: rooms,
+          lab: labs,
+          conflicts: conflicts,
+          faculty: faculty
+        })
+      });
+
+    }
+
+    await loadCourses();
+  } else if (current_field === "Labs") {
+
+    const nameInput = document.getElementById("labs-name");
+
+    if (!nameInput) {
+      console.error("Lab name input not found");
+      return;
+    }
+
+    const name = nameInput.value.trim();
+
+    if (!name) {
+      alert("Enter a lab name");
+      return;
+    }
+
+    if (current_operation === "add") {
+
+      await fetch("/labs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: name
+        })
+      });
+
+    }
+
+    else if (current_operation === "delete") {
+
+      await fetch(`/labs/${encodeURIComponent(name)}`, {
+        method: "DELETE"
+      });
+
+    }
+
+    else if (current_operation === "modify") {
+
+      await fetch(`/labs/${encodeURIComponent(name)}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: name
+        })
+      });
+
+    }
+
+    await loadLabs();
+  } else if (current_field === "Rooms") {
+
+  const nameInput = document.getElementById("rooms-name");
+
+  if (!nameInput) {
+    console.error("Room name input not found");
+    return;
   }
+
+  const name = nameInput.value.trim();
+
+  if (!name) {
+    alert("Enter a room name");
+    return;
+  }
+
+  if (current_operation === "add") {
+
+    await fetch("/rooms", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: name
+      })
+    });
+
+  }
+
+  else if (current_operation === "delete") {
+
+    await fetch(`/rooms/${encodeURIComponent(name)}`, {
+      method: "DELETE"
+    });
+
+  }
+
+  else if (current_operation === "modify") {
+
+    await fetch(`/rooms/${encodeURIComponent(name)}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: name
+      })
+    });
+
+  }
+
+  await loadRooms();
+}
+
+});
+
+print_button.addEventListener("click", () => {
+
+  window.open("/print_schedules", "_blank");
 
 });
 
 const fileInput = document.getElementById("load");
 
 fileInput.addEventListener("change", async function () {
-    const file = fileInput.files[0];
+  const file = fileInput.files[0];
 
-    const formData = new FormData();
-    formData.append("file", file);
+  const formData = new FormData();
+  formData.append("file", file);
 
-    const res = await fetch("/load_config", {
-        method: "POST",
-        body: formData
-    });
+  const res = await fetch("/load_config", {
+    method: "POST",
+    body: formData
+  });
 
-    const data = await res.json();
-    console.log(data);
+  const data = await res.json();
+  console.log(data);
 });
 
 popup_close.addEventListener("click", () => {
   popup_form.innerHTML = "";
   amd_popup.classList.add("popup-hidden");
   wrapper.style.pointerEvents = "all";
-  
+  popup_save.style.display = "block"; 
   if (current_field === "Faculty") faculty_button.focus();
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
   else if (current_field === "Rooms") rooms_button.focus();
 });
 
-const facultyButton = document.getElementById("faculty-button");
 
-async function loadFaculty() {
 
-    const res = await fetch("/faculty");
-    const faculty = await res.json();
-
-    const container = document.getElementById("faculty");
-    container.innerHTML = "";
-
-    faculty.forEach(f => {
-        const div = document.createElement("div");
-        div.textContent = f.name;
-        container.appendChild(div);
-    });
-
-}
 
 async function addFaculty(formData) {
-    const res = await fetch("/faculty", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-    });
+  const res = await fetch("/faculty", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(formData)
+  });
 
-    const data = await res.json();
-    console.log(data);
+  const data = await res.json();
+  console.log(data);
 }
 
-facultyButton.addEventListener("click", loadFaculty);
 
-async function load_faculty_into_form(name) {
+async function loadCourses() {
+  clear_field_containers();
+  navigator_div.innerHTML = "";
+  const res = await fetch("/courses");
+  const courses = await res.json();
 
-  const res = await fetch(`/faculty/${encodeURIComponent(name)}`);
+  console.log("courses response:", courses);
+
+  const container = document.getElementById("courses");
+  container.innerHTML = "";
+
+  courses.forEach(c => {
+    const div = document.createElement("div");
+    div.textContent = `${c.course_id} (${c.credits})`;
+    container.appendChild(div);
+  });
+
+}
+
+async function loadFaculty() {
+  clear_field_containers();
+  navigator_div.innerHTML = "";
+  const res = await fetch("/faculty");
+  const faculty = await res.json();
+
+  const container = document.getElementById("faculty");
+  container.innerHTML = "";
+
+  faculty.forEach(f => {
+    const div = document.createElement("div");
+    div.textContent = f.name;
+    container.appendChild(div);
+  });
+
+}
+
+
+async function loadRooms() {
+  clear_field_containers();
+  navigator_div.innerHTML = "";
+  const res = await fetch("/rooms");
+  const rooms = await res.json();
+
+  console.log("rooms response:", rooms);
+
+  const container = document.getElementById("rooms");
+  container.innerHTML = "";
+
+  rooms.forEach(r => {
+    const div = document.createElement("div");
+    div.textContent = r.name;
+    container.appendChild(div);
+  });
+
+}
+
+async function loadLabs() {
+  clear_field_containers();
+  navigator_div.innerHTML = "";
+  const res = await fetch("/labs");
+  const labs = await res.json();
+
+  console.log("labs response:", labs);
+
+  const container = document.getElementById("labs");
+  container.innerHTML = "";
+
+  labs.forEach(l => {
+    const div = document.createElement("div");
+    div.textContent = l.name;
+    container.appendChild(div);
+  });
+
+}
+async function generateSchedules() {
+
+  const status = document.getElementById("schedule-status");
+
+  const count = parseInt(
+    document.getElementById("schedule-count").value
+  );
+
+  const optimize =
+    document.getElementById("schedule-optimize").checked;
+
+  status.textContent = "Creating schedules...";
+
+  const res = await fetch("/run_scheduler", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      limit: count,
+      optimize: optimize
+    })
+  });
+
+  const data = await res.json();
+  console.log(data);
+  if (data.count === 0) {
+    status.textContent =
+      "No valid schedules. Please modify config.";
+  }
+  else {
+    schedules_generated = true;
+    status.textContent =
+      data.count + " schedules generated.";
+    view_img.src = "/static/images/view.png";
+    view_button.style.color = "#484848";
+  }
+}
+async function loadSchedule() {
+  clear_field_containers();
+
+  const container = document.getElementById("schedule");
+
+  container.innerHTML = `
+    <h3>Schedule Generator</h3>
+
+    <div class="form-line">
+      <label>Number of schedules:</label>
+      <input id="schedule-count" type="number" value="10" min="1">
+    </div>
+
+    <div class="form-line">
+      <label>Optimize schedules:</label>
+      <input id="schedule-optimize" type="checkbox" checked>
+    </div>
+
+    <div class="form-line">
+      <button id="generate-schedules">Generate</button>
+    </div>
+
+    <hr>
+
+    <div id="schedule-status">
+      Waiting to generate schedules...
+    </div>
+  `;
+
+  document
+    .getElementById("generate-schedules")
+    .addEventListener("click", generateSchedules);
+}
+
+async function viewSchedule(index = 0) {
+
+  popup_save.style.display = "none";
+
+  const res = await fetch(`/schedule/${index}`);
   const data = await res.json();
 
   if (data.error) {
-    alert("Faculty not found");
+    alert(data.error);
     return;
   }
 
-  document.getElementById("faculty-max-credits").value = data.maximum_credits;
-  document.getElementById("faculty-min-credits").value = data.minimum_credits;
-  document.getElementById("faculty-max-days").value = data.maximum_days;
+  popup_title.textContent = `Schedule ${index + 1}`;
+  popup_form.innerHTML = "";
+
+  // ---- schedule selector ----
+  const selector = document.createElement("div");
+  selector.className = "form-line";
+
+  const label = document.createElement("label");
+  label.textContent = "Schedule #:";
+
+  const input = document.createElement("input");
+  input.type = "number";
+  input.min = "1";
+  input.value = index + 1;
+  input.style.width = "60px";
+
+  const button = document.createElement("button");
+  button.textContent = "Load";
+
+  button.addEventListener("click", () => {
+    const newIndex = parseInt(input.value) - 1;
+    viewSchedule(newIndex);
+  });
+
+  selector.appendChild(label);
+  selector.appendChild(input);
+  selector.appendChild(button);
+
+  popup_form.appendChild(selector);
+
+  // ---- schedule table ----
+  const table = document.createElement("table");
+  table.style.width = "100%";
+  table.style.borderCollapse = "collapse";
+
+  const headerRow = document.createElement("tr");
+
+  const headers = ["Course", "Faculty", "Room", "Lab", "Time"];
+
+  headers.forEach(h => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    th.style.border = "1px solid #989898";
+    th.style.background = "#e6e6e6";
+    th.style.padding = "4px";
+    headerRow.appendChild(th);
+  });
+
+  table.appendChild(headerRow);
+
+  data.schedule.forEach(line => {
+
+    const parts = line.split(",");
+
+    const row = document.createElement("tr");
+
+    parts.forEach(cell => {
+      const td = document.createElement("td");
+      td.textContent = cell.trim();
+      td.style.border = "1px solid #989898";
+      td.style.padding = "4px";
+      row.appendChild(td);
+    });
+
+    table.appendChild(row);
+
+  });
+
+  popup_form.appendChild(table);
+
+  amd_popup.classList.remove("popup-hidden");
+  wrapper.style.pointerEvents = "none";
 }
 
+
+function clear_field_containers() {
+  document.getElementById("faculty").innerHTML = "";
+  document.getElementById("courses").innerHTML = "";
+  document.getElementById("rooms").innerHTML = "";
+  document.getElementById("labs").innerHTML = "";
+  document.getElementById("schedule").innerHTML = "";
+}

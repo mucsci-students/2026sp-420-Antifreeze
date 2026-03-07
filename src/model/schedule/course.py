@@ -159,16 +159,6 @@ class course():
             print("Course not found.")
             return
 
-        # Prevent duplicate course IDs
-        for course in courses:
-            if course.course_id.upper() == new_id.upper() and course != target:
-                print("New course ID already exists.")
-                return
-
-        # Validate referenced objects
-        if not self.existing_items(config, old_id, rms, lbs, con, fac):
-            return
-
         # ---- Rename course ----
         target.course_id = new_id
 
