@@ -14,24 +14,19 @@ from scheduler.config import CombinedConfig, CourseConfig
 import csv
 
 
+# Manages course entries in the scheduler configuration.
 class course():
      
-    #initialize course subclass
+    # Initializes course subclass.
     def __init__(self):
         return
     
+    # Validates a course entry based on operation type.
+    # For 'add': fails if course already exists.
+    # For 'modify' or 'delete': fails if course does not exist.
+    # Parameters: config, course_id, operation ('add'/'modify'/'delete')
+    # Returns: True if validation passes, False otherwise
     def validate_entry(self, config: str, course_id: str, operation: str) -> bool:
-        """
-        Validates course entry based on operation type.
-        
-        Parameters:
-        - config: Configuration object
-        - course_id: ID of the course to validate
-        - operation: 'add', 'modify', or 'delete'
-        
-        Returns:
-        - True if validation passes, False otherwise
-        """
         courses = [c.course_id.upper() for c in config.config.courses]
         
         if operation == "add":
@@ -46,33 +41,29 @@ class course():
         
         return True
     
-    # Existing Item
-    # Tests to see if params passed exist in the config
-    # params: Config with data, course_id, list of rooms, list of labs, list fo conflicts, list of faculty
-    def existing_items(self,config:str, id:str, rms:list[str], lbs:list[str],con: list[str], fac:list[str]) ->bool:
+    # Checks whether all referenced items (rooms, labs, conflicts, faculty) exist in the config.
+    # Parameters: config, id (course_id), rms (rooms), lbs (labs), con (conflicts), fac (faculty)
+    # Returns: True if all items exist, False if any are missing
+    def existing_items(self, config: str, id: str, rms: list[str], lbs: list[str], con: list[str], fac: list[str]) -> bool:
             #variable being passed
             test = True
             # lists being tested against
             courses = [c.course_id.upper() for c in config.config.courses]
             labs = [l.upper() for l in config.config.labs]
             rooms = [r.upper() for r in config.config.rooms]
-            fac_name =[f.name.upper() for f in config.config.faculty]
+            fac_name = [f.name.upper() for f in config.config.faculty]
             
-        
             #tests and error detection 
             for name in fac:
                 if name.upper() not in fac_name:
                     test = False
                     print(f"the person '{name}' does not exist in the database\n")
 
-
             for rm in rms:
                 if rm.upper() not in rooms:
                     test = False
                     print(f"the room '{rm}' does not exist in the database\n")
-                
-                
-                
+
             for course_lab in lbs:
                 if course_lab.upper() not in labs:
                     test = False
@@ -82,9 +73,7 @@ class course():
                 if c.upper() not in courses:
                     test = False
                     print(f"the course '{c}' does not exist in the list of courses\n")
-            
-                    
-        
+
             for course in courses:
                 if course == id.upper():
                     test = False
@@ -92,25 +81,22 @@ class course():
             # Returns bool
             return test
     
-    # add Courses
-    # Adds a Course to Config
-    #Params: data to parse in config,course_id, list of room names, list of lab names, list of conflicts, list of faculty
-    def add_course(self,config: str,id: str, creds: int, rms: list[str], lbs: list[str], con: list[str], fac: list[str]):
+    # Adds a course to the config after validating all referenced items exist.
+    # Parameters: config, id (course_id), creds (credits), rms (rooms),
+    #             lbs (labs), con (conflicts), fac (faculty)
+    def add_course(self, config: str, id: str, creds: int, rms: list[str], lbs: list[str], con: list[str], fac: list[str]):
             # calls existing_items to see if all values are able to be used.
-            tests = self.existing_items(config,id,rms,lbs,con,fac)
-            
+            tests = self.existing_items(config, id, rms, lbs, con, fac)
             
             # if all values are good then we can finally add test to config   
-            if tests is True :
-                addition = CourseConfig( course_id= str(id), credits= int(creds), room= rms, lab= lbs, conflicts= con,faculty= fac)
+            if tests is True:
+                addition = CourseConfig(course_id=str(id), credits=int(creds), room=rms, lab=lbs, conflicts=con, faculty=fac)
                 config.config.courses.append(addition)
-            
 
-    # Delete Course
-    # Deletes a course already in the Config
-    # Params: id of course
+    # Deletes a course from the config by ID.
+    # Cascades removal to other course conflict lists and faculty course preferences.
+    # Parameters: config, id (course_id)
     def delete_course(self, config, id: str):
-
         courses = config.config.courses
         target = None
 
@@ -138,12 +124,11 @@ class course():
                 del prefs[id]
 
         print(f"Course '{id}' deleted successfully.")
-            
-            
 
-    # Modifys Course
-    # Modifys a Course already present in configs 
-    #Params: course_id, list of room names, list of lab names, list of conflicts, list of faculty
+    # Modifies an existing course in the config, including renaming.
+    # Cascades the ID rename to other course conflict lists and faculty preferences.
+    # Parameters: config, old_id, new_id, creds (credits), rms (rooms),
+    #             lbs (labs), con (conflicts), fac (faculty)
     def modify_course(self, config, old_id: str, new_id: str,
                   creds: int, rms: list[str], lbs: list[str],
                   con: list[str], fac: list[str]):
@@ -157,16 +142,6 @@ class course():
 
         if target is None:
             print("Course not found.")
-            return
-
-        # Prevent duplicate course IDs
-        for course in courses:
-            if course.course_id.upper() == new_id.upper() and course != target:
-                print("New course ID already exists.")
-                return
-
-        # Validate referenced objects
-        if not self.existing_items(config, old_id, rms, lbs, con, fac):
             return
 
         # ---- Rename course ----
@@ -193,27 +168,25 @@ class course():
         target.faculty = fac
 
         print(f"Course '{old_id}' modified to '{new_id}' successfully (cascade applied).")
-        
-    #Print Courses
-    #Prints all courses currently stored in the configuration
-    #Displays course details including credits, assigned rooms, labs,
-    #conflicts, and associated faculty
-    #Parameters: Configuration file
+
+    # Prints all courses in the config with their credits, rooms, labs, conflicts, and faculty.
+    # Parameters: config
     def print_courses(self, config: str):
         courses = config.config.courses 
         print("\nCourses:")
         for course in courses:            
             print(f"Course ID: {course.course_id}, \n\tCredits: {course.credits}, \n\tRooms: {course.room}, \n\tLabs: {course.lab}, \n\tConflicts: {course.conflicts}, \n\tFaculty: {course.faculty}")
     
-    # Get Course IDs
-    # Return list of course names (IDs) from a json
-    # Parameters: pydantic model of a config
-    # Returns: List of course names
-    def get_course_id(self,config: str) -> list[str]:
-            return [ c.course_id for c in config.config.courses]
-    
+    # Returns a list of all course IDs from the config.
+    # Parameters: config
+    # Returns: List of course ID strings
+    def get_course_id(self, config: str) -> list[str]:
+            return [c.course_id for c in config.config.courses]
 
-
+    # Parses the CSV schedule file and returns a list of all course entries,
+    # sorted by course number then section.
+    # Parameters: csv_path - path to the CSV schedule file
+    # Returns: List of dicts with keys: course, faculty, room, lab, times
     def get_course_schedule(self, csv_path: str) -> list[dict]:
         courses = []
         
@@ -238,6 +211,3 @@ class course():
         ))
 
         return courses
-    
-
-
