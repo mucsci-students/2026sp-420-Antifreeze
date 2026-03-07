@@ -24,14 +24,21 @@ def register_course_routes(app, scheduler):
 
     # Adds a new course. Expects course_id, credits, room, lab, conflicts,
     # and faculty in the JSON body.
+    # Returns 409 if a course with that ID already exists.
     @app.route("/courses", methods=["POST"])
     def add_course():
         try:
             data = request.json
+            course_id = data["course_id"]
+
+            # Check for duplicate before delegating to model
+            existing = [c.course_id.upper() for c in scheduler.config.config.courses]
+            if course_id.upper() in existing:
+                return jsonify({"error": f'"{course_id}" already exists.'}), 409
 
             scheduler.course.add_course(
                 scheduler.config,
-                data["course_id"],
+                course_id,
                 data["credits"],
                 data["room"],
                 data["lab"],
@@ -41,18 +48,24 @@ def register_course_routes(app, scheduler):
 
             return jsonify({"status": "added"})
 
+        except KeyError as e:
+            return jsonify({"error": f"Missing field: {str(e)}"}), 400
+
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
     # Deletes a course by course_id from the scheduler config.
+    # Returns 404 if the course does not exist.
     # Parameters: course_id - taken from the URL path
     @app.route("/courses/<course_id>", methods=["DELETE"])
     def delete_course(course_id):
         try:
-            scheduler.course.delete_course(
-                scheduler.config,
-                course_id
-            )
+            existing = [c.course_id.upper() for c in scheduler.config.config.courses]
+
+            if course_id.upper() not in existing:
+                return jsonify({"error": f'"{course_id}" was not found. Please check the course ID and try again.'}), 404
+
+            scheduler.course.delete_course(scheduler.config, course_id)
 
             return jsonify({"status": "deleted"})
 
@@ -61,16 +74,28 @@ def register_course_routes(app, scheduler):
 
     # Modifies an existing course. The URL course_id is the old ID.
     # Expects new course_id, credits, room, lab, conflicts, and faculty in the JSON body.
+    # Returns 404 if the old course_id does not exist.
+    # Returns 409 if the new course_id already belongs to a different course.
     # Parameters: course_id - old course ID taken from the URL path
     @app.route("/courses/<course_id>", methods=["PUT"])
     def modify_course(course_id):
         try:
             data = request.json
+            new_id = data["course_id"]
+
+            existing = [c.course_id.upper() for c in scheduler.config.config.courses]
+
+            if course_id.upper() not in existing:
+                return jsonify({"error": f'"{course_id}" was not found. Please check the course ID and try again.'}), 404
+
+            # Only check for collision if the ID is actually changing
+            if new_id.upper() != course_id.upper() and new_id.upper() in existing:
+                return jsonify({"error": f'"{new_id}" already exists. Choose a different course ID.'}), 409
 
             scheduler.course.modify_course(
                 scheduler.config,
-                course_id,          # old id
-                data["course_id"],  # new id
+                course_id,
+                new_id,
                 data["credits"],
                 data["room"],
                 data["lab"],
@@ -79,6 +104,9 @@ def register_course_routes(app, scheduler):
             )
 
             return jsonify({"status": "modified"})
+
+        except KeyError as e:
+            return jsonify({"error": f"Missing field: {str(e)}"}), 400
 
         except Exception as e:
             return jsonify({"error": str(e)}), 500

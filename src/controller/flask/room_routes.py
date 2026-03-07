@@ -1,11 +1,8 @@
 from flask import request, jsonify
 
 
-# Registers all room REST API routes on the Flask app.
-# All handlers close over `scheduler` for access to the config directly.
 def register_room_routes(app, scheduler):
 
-    # Returns a JSON array of all room names.
     @app.route("/rooms", methods=["GET"])
     def get_rooms():
         try:
@@ -21,8 +18,7 @@ def register_room_routes(app, scheduler):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-    # Adds a new room. Expects name in the JSON body.
-    # Returns "exists" status if the room already exists.
+
     @app.route("/rooms", methods=["POST"])
     def add_room():
         try:
@@ -32,8 +28,7 @@ def register_room_routes(app, scheduler):
             rooms = scheduler.config.config.rooms
 
             if name in rooms:
-                print("Room already exists.")
-                return jsonify({"status": "exists"})
+                return jsonify({"error": f'"{name}" already exists.'}), 409
 
             rooms.append(name)
 
@@ -44,17 +39,14 @@ def register_room_routes(app, scheduler):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-    # Deletes a room by name. Cascades removal from all course room lists.
-    # Returns "not_found" status if the room does not exist.
-    # Parameters: room_name - taken from the URL path
+
     @app.route("/rooms/<room_name>", methods=["DELETE"])
     def delete_room(room_name):
         try:
             rooms = scheduler.config.config.rooms
 
             if room_name not in rooms:
-                print("Room not found.")
-                return jsonify({"status": "not_found"})
+                return jsonify({"error": f'"{room_name}" was not found. Please check the name and try again.'}), 404
 
             rooms.remove(room_name)
 
@@ -72,9 +64,7 @@ def register_room_routes(app, scheduler):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-    # Renames a room. Cascades the rename to all course room lists.
-    # Expects new name in the JSON body. Returns 404 if room not found.
-    # Parameters: room_name - current room name taken from the URL path
+
     @app.route("/rooms/<room_name>", methods=["PUT"])
     def modify_room(room_name):
         try:
@@ -84,7 +74,10 @@ def register_room_routes(app, scheduler):
             rooms = scheduler.config.config.rooms
 
             if room_name not in rooms:
-                return jsonify({"error": "Room not found"}), 404
+                return jsonify({"error": f'"{room_name}" was not found. Please check the name and try again.'}), 404
+
+            if new_name in rooms:
+                return jsonify({"error": f'"{new_name}" already exists. Choose a different name.'}), 409
 
             rooms[rooms.index(room_name)] = new_name
 
