@@ -3,8 +3,13 @@ import os
 import json
 import io
 
+
+# Registers all schedule-level REST API routes on the Flask app.
+# Covers config loading/saving, scheduler execution, result retrieval, and PDF export.
 def register_schedule_routes(app, scheduler):
 
+    # Accepts a uploaded JSON config file, saves it to /uploads, and loads it into the scheduler.
+    # Expects a multipart file upload with key "file".
     @app.route("/load_config", methods=["POST"])
     def load_config():
         file = request.files["file"]
@@ -17,7 +22,8 @@ def register_schedule_routes(app, scheduler):
         scheduler.load_config(path)
 
         return jsonify({"status": "loaded"})
-    
+
+    # Serializes the current scheduler config to JSON and returns it as a downloadable file.
     @app.route("/save_config")
     def save_config():
         file_data = scheduler.config.model_dump_json(indent=2)
@@ -28,10 +34,12 @@ def register_schedule_routes(app, scheduler):
             as_attachment=True,
             download_name="schedule_config.json"
         )
-        
+
+    # Runs the scheduler with the given parameters.
+    # Expects limit (int) and optimize (bool) in the JSON body.
+    # Returns the count of generated schedules.
     @app.route("/run_scheduler", methods=["POST"])
     def run_scheduler_route():
-
         try:
             data = request.json
 
@@ -46,10 +54,12 @@ def register_schedule_routes(app, scheduler):
 
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-        
+
+    # Returns a single generated schedule by index as a list of CSV row strings.
+    # Returns 400 if no schedules exist, 400 if index is out of range.
+    # Parameters: index - zero-based position in the results list
     @app.route("/schedule/<int:index>", methods=["GET"])
     def get_schedule(index):
-
         try:
 
             if not scheduler.result:
@@ -71,9 +81,11 @@ def register_schedule_routes(app, scheduler):
 
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+
     from flask import send_file
 
-
+    # Exports all generated schedules as a PDF and returns it as a downloadable file.
+    # Returns 400 if no schedules have been generated yet.
     @app.route("/print_schedules", methods=["GET"])
     def print_schedules():
 

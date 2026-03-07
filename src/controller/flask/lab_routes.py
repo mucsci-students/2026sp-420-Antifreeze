@@ -1,8 +1,11 @@
 from flask import request, jsonify
 
 
+# Registers all lab REST API routes on the Flask app.
+# All handlers close over `scheduler` for access to the config directly.
 def register_lab_routes(app, scheduler):
 
+    # Returns a JSON array of all lab names.
     @app.route("/labs", methods=["GET"])
     def get_labs():
         try:
@@ -18,7 +21,8 @@ def register_lab_routes(app, scheduler):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-
+    # Adds a new lab. Expects name in the JSON body.
+    # Returns "exists" status if the lab already exists.
     @app.route("/labs", methods=["POST"])
     def add_lab():
         try:
@@ -40,7 +44,9 @@ def register_lab_routes(app, scheduler):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-
+    # Deletes a lab by name. Cascades removal from all course lab lists.
+    # Returns "not_found" status if the lab does not exist.
+    # Parameters: lab_name - taken from the URL path
     @app.route("/labs/<lab_name>", methods=["DELETE"])
     def delete_lab(lab_name):
         try:
@@ -66,7 +72,9 @@ def register_lab_routes(app, scheduler):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-
+    # Renames a lab. Cascades the rename to all course lab lists.
+    # Expects new name in the JSON body. Returns 404 if lab not found.
+    # Parameters: lab_name - current lab name taken from the URL path
     @app.route("/labs/<lab_name>", methods=["PUT"])
     def modify_lab(lab_name):
         try:
