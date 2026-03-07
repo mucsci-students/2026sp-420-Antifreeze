@@ -10,7 +10,7 @@ class conflict():
     def __init__(self):
         return
 
-    def validate_entry(self, config: str, course_id: str, operation: str, conflicting_course_id: str = None) -> bool:
+    def validate_entry(self, config, course_id: str, operation: str, conflicting_course_id: str = None) -> bool:
         """
         Validates conflict entry based on operation type.
         
@@ -23,6 +23,9 @@ class conflict():
         Returns:
         - True if validation passes, False otherwise
         """
+        if not course_id.strip():
+            print(f"Error: Course ID cannot be empty.")
+            return False
         courses = config.config.courses
         
         # Check if main course exists

@@ -20,7 +20,7 @@ class course():
     def __init__(self):
         return
     
-    def validate_entry(self, config: str, course_id: str, operation: str) -> bool:
+    def validate_entry(self, config, course_id: str, operation: str) -> bool:
         """
         Validates course entry based on operation type.
         
@@ -32,6 +32,10 @@ class course():
         Returns:
         - True if validation passes, False otherwise
         """
+        if not course_id.strip():
+            print(f"Error: Course ID cannot be empty.")
+            return False
+        
         courses = [c.course_id.upper() for c in config.config.courses]
         
         if operation == "add":
@@ -49,7 +53,7 @@ class course():
     # Existing Item
     # Tests to see if params passed exist in the config
     # params: Config with data, course_id, list of rooms, list of labs, list fo conflicts, list of faculty
-    def existing_items(self,config:str, id:str, rms:list[str], lbs:list[str],con: list[str], fac:list[str]) ->bool:
+    def existing_items(self,config, id:str, rms:list[str], lbs:list[str],con: list[str], fac:list[str]) ->bool:
             #variable being passed
             test = True
             # lists being tested against
@@ -95,7 +99,7 @@ class course():
     # add Courses
     # Adds a Course to Config
     #Params: data to parse in config,course_id, list of room names, list of lab names, list of conflicts, list of faculty
-    def add_course(self,config: str,id: str, creds: int, rms: list[str], lbs: list[str], con: list[str], fac: list[str]):
+    def add_course(self,config ,id: str, creds: int, rms: list[str], lbs: list[str], con: list[str], fac: list[str]):
             # calls existing_items to see if all values are able to be used.
             tests = self.existing_items(config,id,rms,lbs,con,fac)
             
@@ -209,7 +213,7 @@ class course():
     # Return list of course names (IDs) from a json
     # Parameters: pydantic model of a config
     # Returns: List of course names
-    def get_course_id(self,config: str) -> list[str]:
+    def get_course_id(self,config) -> list[str]:
             return [ c.course_id for c in config.config.courses]
     
 
