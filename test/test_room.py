@@ -26,8 +26,18 @@ class MockConfig:
     def __init__(self, rooms):
         self.config = self
         self.rooms = list(rooms)
+        self.courses = []
+        self.faculty = []
+
+class MockCourse:
+    def __init__(self, rooms):
+        self.room = rooms
 
 
+class MockFaculty:
+    def __init__(self, prefs):
+        self.room_preferences = prefs
+        
 SAMPLE_CSV_CONTENT = """\
 Schedule 1:
 CMSC 140.01,Hardy,Roddy 136,None,MON 09:00-09:50,WED 09:00-10:50,FRI 09:00-09:50
@@ -189,8 +199,31 @@ class TestDeleteRoom:
         cfg = MockConfig(["Roddy 136", "Roddy 140", "Roddy 147"])
         R.delete_room(cfg, "")  # must not raise
         assert len(cfg.config.rooms) == 3
+    
 
+    def test_delete_removes_room_from_courses(self, R):
+        cfg = MockConfig(["Roddy 136", "Roddy 140"])
 
+        cfg.config.courses = [
+            MockCourse(["Roddy 136", "Roddy 140"]),
+            MockCourse(["Roddy 136"])
+        ]
+
+        R.delete_room(cfg, "Roddy 136")
+
+        assert "Roddy 136" not in cfg.config.courses[0].room
+        assert "Roddy 136" not in cfg.config.courses[1].room
+    
+    def test_delete_removes_room_preferences(self, R):
+        cfg = MockConfig(["Roddy 136", "Roddy 140"])
+
+        cfg.config.faculty = [
+            MockFaculty({"Roddy 136": 1, "Roddy 140": 2})
+        ]
+
+        R.delete_room(cfg, "Roddy 136")
+
+        assert "Roddy 136" not in cfg.config.faculty[0].room_preferences
 
 # modify_room
 
@@ -234,6 +267,32 @@ class TestModifyRoom:
         cfg = MockConfig(["Roddy 136", "Roddy 140", "Roddy 147"])
         R.modify_room(cfg, "", "Roddy 200")
         assert len(cfg.config.rooms) == 3
+    
+    def test_modify_updates_course_rooms(self, R):
+        cfg = MockConfig(["Roddy 136", "Roddy 140"])
+
+        cfg.config.courses = [
+            MockCourse(["Roddy 136"])
+        ]
+
+        R.modify_room(cfg, "Roddy 136", "Roddy 200")
+
+        assert "Roddy 200" in cfg.config.courses[0].room
+        assert "Roddy 136" not in cfg.config.courses[0].room
+   
+    def test_modify_updates_faculty_preferences(self, R):
+        cfg = MockConfig(["Roddy 136", "Roddy 140"])
+
+        cfg.config.faculty = [
+            MockFaculty({"Roddy 136": 1})
+        ]
+
+        R.modify_room(cfg, "Roddy 136", "Roddy 200")
+
+        prefs = cfg.config.faculty[0].room_preferences
+
+        assert "Roddy 200" in prefs
+        assert "Roddy 136" not in prefs
 
 
 

@@ -27,7 +27,17 @@ class MockConfig:
     def __init__(self, labs):
         self.config = self
         self.labs = list(labs)
+        self.courses = []
+        self.faculty = []
+        
+class MockCourse:
+    def __init__(self, labs):
+        self.lab = labs
 
+
+class MockFaculty:
+    def __init__(self, prefs):
+        self.lab_preferences = prefs
 
 SAMPLE_CSV_CONTENT = """\
 Schedule 1:
@@ -41,7 +51,7 @@ CMSC 161.01,Zoppetti,Roddy 136,Linux,MON 11:00-11:50,THU 10:00-11:50^,FRI 11:00-
 
 CMSC 161.02,Wertz,Roddy 140,Linux,TUE 08:00-09:50^,THU 08:00-09:50
 
-CMSC 161.03,Rogers,Roddy 136,Linux,TUE 17:40-19:30,THU 17:40-19:30^
+CMSC 161.03,Rogers,Roddy 136,Linux,TUE 17:40-19:30,THU 17:40-19:30
 
 CMSC 162.01,Hogg,Roddy 140,Linux,MON 11:00-11:50,TUE 10:00-11:50^,FRI 11:00-11:50
 
@@ -54,7 +64,7 @@ CMSC 340.02,Yang,Roddy 147,Linux,MON 10:00-10:50,WED 09:00-10:50^,FRI 10:00-10:5
 CMSC 362.01,Zoppetti,Roddy 136,Linux,MON 15:00-15:50,THU 14:10-16:00^,FRI 15:00-15:50
 
 CMSC 366.01,Xie,Roddy 140,Mac,MON 13:00-13:50,WED 13:00-14:50^,FRI 13:00-13:50
-
+  
 CMSC 366.02,Xie,Roddy 140,Mac,MON 12:00-12:50,WED 11:00-12:50^,FRI 12:00-12:50
 
 CMSC 380.01,Hogg,Roddy 140,Mac,MON 09:00-09:50,WED 09:00-10:50^,FRI 09:00-09:50
@@ -137,6 +147,7 @@ class TestValidateEntryDelete:
         cfg = MockConfig(["Linux", "Mac"])
         assert L.validate_entry(cfg, "", "delete") is False
 
+  
 
 
 # add_lab
@@ -177,6 +188,24 @@ class TestDeleteLab:
         L.delete_lab(cfg, "Linux")
         L.delete_lab(cfg, "Linux")  # already gone — must not raise
         assert len(cfg.config.labs) == 1
+      
+    def test_delete_removes_lab_from_courses(self, L):
+        cfg = MockConfig(["Linux", "Mac"])
+        cfg.config.courses = [
+            MockCourse(["Linux", "Mac"]),
+            MockCourse(["Linux"])
+        ]
+        L.delete_lab(cfg, "Linux")
+        assert "Linux" not in cfg.config.courses[0].lab
+        assert "Linux" not in cfg.config.courses[1].lab
+
+    def test_delete_removes_lab_preferences(self, L):
+        cfg = MockConfig(["Linux", "Mac"])
+        cfg.config.faculty = [
+            MockFaculty({"Linux": 1, "Mac": 2})
+        ]
+        L.delete_lab(cfg, "Linux")
+        assert "Linux" not in cfg.config.faculty[0].lab_preferences
 
 
 # modify_lab
@@ -211,6 +240,25 @@ class TestModifyLab:
         cfg = MockConfig(["Linux", "Mac"])
         L.modify_lab(cfg, "Linux", "Mac")  # "Mac" already exists
         assert "Linux" in cfg.config.labs
+    
+    def test_modify_updates_course_labs(self, L):
+        cfg = MockConfig(["Linux", "Mac"])
+        cfg.config.courses = [
+            MockCourse(["Linux"])
+        ]
+        L.modify_lab(cfg, "Linux", "Linux_0")
+        assert "Linux_0" in cfg.config.courses[0].lab
+        assert "Linux" not in cfg.config.courses[0].lab
+        
+    def test_modify_updates_faculty_preferences(self, L):
+        cfg = MockConfig(["Linux", "Mac"])
+        cfg.config.faculty = [
+            MockFaculty({"Linux": 1})
+        ]
+        L.modify_lab(cfg, "Linux", "Linux_0")
+        prefs = cfg.config.faculty[0].lab_preferences
+        assert "Linux_0" in prefs
+        assert "Linux" not in prefs
 
 
 
