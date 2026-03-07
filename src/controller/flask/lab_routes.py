@@ -1,11 +1,8 @@
 from flask import request, jsonify
 
 
-# Registers all lab REST API routes on the Flask app.
-# All handlers close over `scheduler` for access to the config directly.
 def register_lab_routes(app, scheduler):
 
-    # Returns a JSON array of all lab names.
     @app.route("/labs", methods=["GET"])
     def get_labs():
         try:
@@ -21,8 +18,7 @@ def register_lab_routes(app, scheduler):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-    # Adds a new lab. Expects name in the JSON body.
-    # Returns "exists" status if the lab already exists.
+
     @app.route("/labs", methods=["POST"])
     def add_lab():
         try:
@@ -32,8 +28,7 @@ def register_lab_routes(app, scheduler):
             labs = scheduler.config.config.labs
 
             if name in labs:
-                print("Lab already exists.")
-                return jsonify({"status": "exists"})
+                return jsonify({"error": f'"{name}" already exists.'}), 409
 
             labs.append(name)
 
@@ -44,17 +39,14 @@ def register_lab_routes(app, scheduler):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-    # Deletes a lab by name. Cascades removal from all course lab lists.
-    # Returns "not_found" status if the lab does not exist.
-    # Parameters: lab_name - taken from the URL path
+
     @app.route("/labs/<lab_name>", methods=["DELETE"])
     def delete_lab(lab_name):
         try:
             labs = scheduler.config.config.labs
 
             if lab_name not in labs:
-                print("Lab not found.")
-                return jsonify({"status": "not_found"})
+                return jsonify({"error": f'"{lab_name}" was not found. Please check the name and try again.'}), 404
 
             labs.remove(lab_name)
 
@@ -72,9 +64,7 @@ def register_lab_routes(app, scheduler):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-    # Renames a lab. Cascades the rename to all course lab lists.
-    # Expects new name in the JSON body. Returns 404 if lab not found.
-    # Parameters: lab_name - current lab name taken from the URL path
+
     @app.route("/labs/<lab_name>", methods=["PUT"])
     def modify_lab(lab_name):
         try:
@@ -84,7 +74,10 @@ def register_lab_routes(app, scheduler):
             labs = scheduler.config.config.labs
 
             if lab_name not in labs:
-                return jsonify({"error": "Lab not found"}), 404
+                return jsonify({"error": f'"{lab_name}" was not found. Please check the name and try again.'}), 404
+
+            if new_name in labs:
+                return jsonify({"error": f'"{new_name}" already exists. Choose a different name.'}), 409
 
             labs[labs.index(lab_name)] = new_name
 
