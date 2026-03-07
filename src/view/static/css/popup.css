@@ -19,6 +19,7 @@
   padding: 20px;
   min-width: 250px;
   width: 500px;
+  height: 666px;
   font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
     "Lucida Sans", Arial, sans-serif;
   border: outset;
@@ -32,7 +33,7 @@
   right: 155px;
   bottom: 25px;
   padding: 5px;
-  height: 666px;
+  resize: both;
 }
 #popup-header {
   position: sticky;
@@ -180,3 +181,8 @@
   margin-left: 8px;
 }
 
+/* ----- Schedule Popup ----- */
+#schedule-load-button {
+  margin-left: 10px;
+  margin-bottom: 15px;
+}

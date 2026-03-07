@@ -41,12 +41,21 @@ const print_img = print_button.querySelector("img");
 const navigator_div = document.querySelector(".navigator");
 const main = document.querySelector(".main");
 
+// Navigation bar and outer assets
+const nav_bar = document.querySelector(".nav-bar");
+const top_bar = document.querySelector(".top-bar");
+const team_name = document.querySelector(".team-name");
+const gui_wrapper = document.getElementById("wrapper");
+const gui_body = document.querySelector(".body");
+
 // Popup elements
 const amd_popup = document.getElementById("amd-popup");
 const popup_save = document.getElementById("popup-save");
 const popup_title = document.getElementById("popup-title");
 const popup_form = document.getElementById("popup-form");
 const popup_close = document.getElementById("popup-close");
+const popup_box = document.querySelector(".popup-box");
+const popup_header = document.getElementById("popup-header");
 
 // Holds contents of loaded file
 let loaded_file_content = null;
@@ -1007,6 +1016,8 @@ faculty_button.addEventListener("click", () => {
   navigate_to("Existing faculty would be printed here");
   load_faculty();
   update_amd_images();
+  popup_form.style.height = "540px";
+  popup_box.style.width = "500px";
 });
 
 courses_button.addEventListener("click", () => {
@@ -1014,6 +1025,9 @@ courses_button.addEventListener("click", () => {
   navigate_to("Existing courses would be printed here");
   load_courses();
   update_amd_images();
+  popup_form.style.height = "540px";
+  popup_box.style.width = "500px";
+  popup_header.style.width = "495px";
 });
 
 labs_button.addEventListener("click", () => {
@@ -1021,6 +1035,9 @@ labs_button.addEventListener("click", () => {
   navigate_to("Existing labs would be printed here");
   load_labs();
   update_amd_images();
+  popup_form.style.height = "540px";
+  popup_box.style.width = "500px";
+  popup_header.style.width = "495px";
 });
 
 rooms_button.addEventListener("click", () => {
@@ -1028,6 +1045,9 @@ rooms_button.addEventListener("click", () => {
   navigate_to(`Existing ${current_field} would be printed here`);
   load_rooms();
   update_amd_images();
+  popup_form.style.height = "540px";
+  popup_box.style.width = "500px";
+  popup_header.style.width = "495px";
 });
 
 schedule_button.addEventListener("click", () => {
@@ -1035,6 +1055,9 @@ schedule_button.addEventListener("click", () => {
   navigate_to("Schedule generator");
   load_schedule();
   update_amd_images();
+  popup_form.style.height = "605px";
+  popup_box.style.width = "600px";
+  popup_header.style.width = "595px";
 });
 
 // Back button
@@ -1142,6 +1165,69 @@ delete_button.addEventListener("click", () => {
   else if (current_field === "Schedule") schedule_button.focus();
 
   edit_popup("Delete");
+});
+
+// Keeps field button focused when clicking around in navigator_div
+navigator_div.addEventListener("click", () => {
+  if (current_field === "Faculty") faculty_button.focus();
+  else if (current_field === "Courses") courses_button.focus();
+  else if (current_field === "Labs") labs_button.focus();
+  else if (current_field === "Rooms") rooms_button.focus();
+  else if (current_field === "Schedule") schedule_button.focus();
+});
+
+// Keeps field button focused when clicking around in main
+main.addEventListener("click", () => {
+  if (current_field === "Faculty") faculty_button.focus();
+  else if (current_field === "Courses") courses_button.focus();
+  else if (current_field === "Labs") labs_button.focus();
+  else if (current_field === "Rooms") rooms_button.focus();
+  else if (current_field === "Schedule") schedule_button.focus();
+});
+
+// Keeps field button focused when clicking around in nav_bar
+nav_bar.addEventListener("click", () => {
+  if (current_field === "Faculty") faculty_button.focus();
+  else if (current_field === "Courses") courses_button.focus();
+  else if (current_field === "Labs") labs_button.focus();
+  else if (current_field === "Rooms") rooms_button.focus();
+  else if (current_field === "Schedule") schedule_button.focus();
+});
+
+// Keeps field button focused when clicking around in top_bar
+top_bar.addEventListener("click", () => {
+  if (current_field === "Faculty") faculty_button.focus();
+  else if (current_field === "Courses") courses_button.focus();
+  else if (current_field === "Labs") labs_button.focus();
+  else if (current_field === "Rooms") rooms_button.focus();
+  else if (current_field === "Schedule") schedule_button.focus();
+});
+
+// Keeps field button focused when clicking around in team_name
+team_name.addEventListener("click", () => {
+  if (current_field === "Faculty") faculty_button.focus();
+  else if (current_field === "Courses") courses_button.focus();
+  else if (current_field === "Labs") labs_button.focus();
+  else if (current_field === "Rooms") rooms_button.focus();
+  else if (current_field === "Schedule") schedule_button.focus();
+});
+
+// Keeps field button focused when clicking around in gui_wrapper
+gui_wrapper.addEventListener("click", () => {
+  if (current_field === "Faculty") faculty_button.focus();
+  else if (current_field === "Courses") courses_button.focus();
+  else if (current_field === "Labs") labs_button.focus();
+  else if (current_field === "Rooms") rooms_button.focus();
+  else if (current_field === "Schedule") schedule_button.focus();
+});
+
+// Keeps field button focused when clicking around in gui_body
+gui_body.addEventListener("click", () => {
+  if (current_field === "Faculty") faculty_button.focus();
+  else if (current_field === "Courses") courses_button.focus();
+  else if (current_field === "Labs") labs_button.focus();
+  else if (current_field === "Rooms") rooms_button.focus();
+  else if (current_field === "Schedule") schedule_button.focus();
 });
 
 // Save button: validates form inputs, then POSTs to the appropriate API route
@@ -1480,6 +1566,7 @@ popup_close.addEventListener("click", () => {
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
   else if (current_field === "Rooms") rooms_button.focus();
+  else if (current_field === "Schedule") schedule_button.focus();
 });
 
 // POSTs a new faculty member to the API and logs the response.
@@ -1675,7 +1762,7 @@ async function view_schedule(index = 0) {
   selector.className = "form-line";
 
   const label = document.createElement("label");
-  label.textContent = "Schedule #:";
+  label.textContent = "Schedule number:";
 
   const input = document.createElement("input");
   input.type = "number";
@@ -1684,6 +1771,7 @@ async function view_schedule(index = 0) {
   input.style.width = "60px";
 
   const button = document.createElement("button");
+  button.id = "schedule-load-button";
   button.textContent = "Load";
 
   button.addEventListener("click", () => {
