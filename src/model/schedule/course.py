@@ -166,7 +166,7 @@ class course():
                 return
 
         # Validate referenced objects
-        if not self.existing_items(config, old_id, rms, lbs, con, fac):
+        if not self.existing_items(config, new_id, rms, lbs, con, fac):
             return
 
         # ---- Rename course ----
