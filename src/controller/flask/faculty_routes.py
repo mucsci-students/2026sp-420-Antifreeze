@@ -1,8 +1,11 @@
 from flask import request, jsonify
 
 
+# Registers all faculty REST API routes on the Flask app.
+# All handlers close over `scheduler` for access to the config and faculty model.
 def register_faculty_routes(app, scheduler):
 
+    # Returns a JSON array of all faculty names from the scheduler config.
     @app.route("/faculty", methods=["GET"])
     def get_faculty():
         faculty_list = []
@@ -18,7 +21,9 @@ def register_faculty_routes(app, scheduler):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-
+    # Adds a new faculty member. Requires name, maximum_credits, maximum_days,
+    # minimum_credits in the JSON body. Optional: unique_course_limit, times,
+    # course/room/lab_preferences, mandatory_days.
     @app.route("/faculty", methods=["POST"])
     def add_faculty():
         try:
@@ -60,8 +65,8 @@ def register_faculty_routes(app, scheduler):
         except Exception as e:
             print("Faculty add error:", e)
             return jsonify({"error": str(e)}), 500
-        
-        
+
+    # Deletes the faculty member matching `name` from the scheduler config.
     @app.route("/faculty/<name>", methods=["DELETE"])
     def delete_faculty(name):
         try:
@@ -75,6 +80,9 @@ def register_faculty_routes(app, scheduler):
         except Exception as e:
             print("Faculty delete error:", e)
             return jsonify({"error": str(e)}), 500
+
+    # Returns details for a single faculty member. Search is case-insensitive.
+    # Returns 404 if not found.
     @app.route("/faculty/<name>", methods=["GET"])
     def get_single_faculty(name):
         try:
