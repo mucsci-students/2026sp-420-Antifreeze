@@ -37,6 +37,10 @@ const popup_title = document.getElementById("popup-title");
 const popup_form = document.getElementById("popup-form");
 const popup_close = document.getElementById("popup-close");
 
+// Holds contents of loaded file
+let loaded_file_content = null;
+let loaded_file_extension = null;
+
 // Field we are currently editing
 let current_field = null;
 
@@ -626,7 +630,7 @@ function update_amd_images() {
 faculty_button.addEventListener("click", () => {
   current_field = "Faculty";
   navigate_to("Existing faculty would be printed here");
-  console.log("Test");
+  console.log(loaded_file_content);
   update_amd_images();
 });
 
@@ -667,6 +671,22 @@ forward_button.addEventListener("click", () => {
     update_button_images();
   }
 });
+
+// Loads content of json or csv file
+//load_button.addEventListener("change", function () {
+//})
+
+function load_file_content (input) {
+  let fileTypes = ['json', 'csv'];
+  let fileReader = new FileReader();
+
+  fileReader.onload = function () {
+    // PUT FETCH IN HERE
+    loaded_file_content = fileReader.result;
+  }
+
+  fileReader.readAsText(input.files[0]);
+}
 
 // Add, delete, modify buttons
 add_button.addEventListener("click", () => {
