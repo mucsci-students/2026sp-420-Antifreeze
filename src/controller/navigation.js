@@ -644,35 +644,35 @@ function update_amd_images() {
 faculty_button.addEventListener("click", () => {
   current_field = "Faculty";
   navigate_to("Existing faculty would be printed here");
-  loadFaculty();
+  load_faculty();
   update_amd_images();
 });
 
 courses_button.addEventListener("click", () => {
   current_field = "Courses";
   navigate_to("Existing courses would be printed here");
-  loadCourses();
+  load_courses();
   update_amd_images();
 });
 
 labs_button.addEventListener("click", () => {
   current_field = "Labs";
   navigate_to("Existing labs would be printed here");
-  loadLabs();
+  load_labs();
   update_amd_images();
 });
 
 rooms_button.addEventListener("click", () => {
   current_field = "Rooms";
   navigate_to(`Existing ${current_field} would be printed here`);
-  loadRooms();
+  load_rooms();
   update_amd_images();
 });
 
 schedule_button.addEventListener("click", () => {
   current_field = "Schedule";
   navigate_to("Schedule generator");
-  loadSchedule();
+  load_schedule();
   update_amd_images();
 });
 
@@ -717,10 +717,10 @@ forward_button.addEventListener("click", () => {
 view_button.addEventListener("click", () => {
 
   if (!schedules_generated) {
-    return; 
+    return;
   }
 
-  viewSchedule(0);
+  view_schedule(0);
 
 });
 
@@ -754,15 +754,15 @@ save_button.addEventListener("click", async (e) => {
 
 
 function load_file_content(input) {
-  let fileTypes = ['json', 'csv'];
-  let fileReader = new FileReader();
+  let file_types = ['json', 'csv'];
+  let file_reader = new FileReader();
 
-  fileReader.onload = function () {
+  file_reader.onload = function () {
     // PUT FETCH IN HERE
-    loaded_file_content = fileReader.result;
+    loaded_file_content = file_reader.result;
   }
 
-  fileReader.readAsText(input.files[0]);
+  file_reader.readAsText(input.files[0]);
 }
 
 // Add button: sets current_operation and opens the Add popup for the active field.
@@ -816,7 +816,7 @@ popup_save.addEventListener("click", async () => {
 
     if (current_operation === "add") {
 
-      const maxCredits = parseInt(
+      const max_credits = parseInt(
         document.getElementById("faculty-max-credits").value
       );
 
@@ -827,7 +827,7 @@ popup_save.addEventListener("click", async () => {
         },
         body: JSON.stringify({
           name: name,
-          maximum_credits: maxCredits,
+          maximum_credits: max_credits,
           maximum_days: 4,
           minimum_credits: 0,
           unique_course_limit: 1,
@@ -877,20 +877,20 @@ popup_save.addEventListener("click", async () => {
 
     }
 
-    await loadFaculty();
+    await load_faculty();
   } else if (current_field === "Courses") {
 
-    const idInput = document.getElementById("courses-id");
+    const id_input = document.getElementById("courses-id");
 
-    if (!idInput) {
+    if (!id_input) {
       console.error("Course ID input not found");
       return;
     }
 
-    const course_id = idInput.value.trim();
+    const course_id = id_input.value.trim();
 
-    const creditsInput = document.getElementById("courses-credits");
-    const credits = creditsInput ? parseInt(creditsInput.value) : null;
+    const credits_input = document.getElementById("courses-credits");
+    const credits = credits_input ? parseInt(credits_input.value) : null;
 
     const rooms = [...document.querySelectorAll('input[name="courses-room"]')]
       .map(i => i.value.trim())
@@ -954,17 +954,17 @@ popup_save.addEventListener("click", async () => {
 
     }
 
-    await loadCourses();
+    await load_courses();
   } else if (current_field === "Labs") {
 
-    const nameInput = document.getElementById("labs-name");
+    const name_input = document.getElementById("labs-name");
 
-    if (!nameInput) {
+    if (!name_input) {
       console.error("Lab name input not found");
       return;
     }
 
-    const name = nameInput.value.trim();
+    const name = name_input.value.trim();
 
     if (!name) {
       alert("Enter a lab name");
@@ -1007,61 +1007,61 @@ popup_save.addEventListener("click", async () => {
 
     }
 
-    await loadLabs();
+    await load_labs();
   } else if (current_field === "Rooms") {
 
-  const nameInput = document.getElementById("rooms-name");
+    const name_input = document.getElementById("rooms-name");
 
-  if (!nameInput) {
-    console.error("Room name input not found");
-    return;
+    if (!name_input) {
+      console.error("Room name input not found");
+      return;
+    }
+
+    const name = name_input.value.trim();
+
+    if (!name) {
+      alert("Enter a room name");
+      return;
+    }
+
+    if (current_operation === "add") {
+
+      await fetch("/rooms", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: name
+        })
+      });
+
+    }
+
+    else if (current_operation === "delete") {
+
+      await fetch(`/rooms/${encodeURIComponent(name)}`, {
+        method: "DELETE"
+      });
+
+    }
+
+    else if (current_operation === "modify") {
+
+      await fetch(`/rooms/${encodeURIComponent(name)}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: name
+        })
+      });
+
+    }
+
+    await load_rooms();
   }
-
-  const name = nameInput.value.trim();
-
-  if (!name) {
-    alert("Enter a room name");
-    return;
-  }
-
-  if (current_operation === "add") {
-
-    await fetch("/rooms", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        name: name
-      })
-    });
-
-  }
-
-  else if (current_operation === "delete") {
-
-    await fetch(`/rooms/${encodeURIComponent(name)}`, {
-      method: "DELETE"
-    });
-
-  }
-
-  else if (current_operation === "modify") {
-
-    await fetch(`/rooms/${encodeURIComponent(name)}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        name: name
-      })
-    });
-
-  }
-
-  await loadRooms();
-}
 
 });
 
@@ -1073,17 +1073,17 @@ print_button.addEventListener("click", () => {
 
 // Listens for file selection on the load input, uploads the file to /load_config,
 // and logs the server response.
-const fileInput = document.getElementById("load");
+const file_input = document.getElementById("load");
 
-fileInput.addEventListener("change", async function () {
-  const file = fileInput.files[0];
+file_input.addEventListener("change", async function () {
+  const file = file_input.files[0];
 
-  const formData = new FormData();
-  formData.append("file", file);
+  const form_data = new FormData();
+  form_data.append("file", file);
 
   const res = await fetch("/load_config", {
     method: "POST",
-    body: formData
+    body: form_data
   });
 
   const data = await res.json();
@@ -1095,7 +1095,7 @@ popup_close.addEventListener("click", () => {
   popup_form.innerHTML = "";
   amd_popup.classList.add("popup-hidden");
   wrapper.style.pointerEvents = "all";
-  popup_save.style.display = "block"; 
+  popup_save.style.display = "block";
 
   if (current_field === "Faculty") faculty_button.focus();
   else if (current_field === "Courses") courses_button.focus();
@@ -1104,22 +1104,22 @@ popup_close.addEventListener("click", () => {
 });
 
 // POSTs a new faculty member to the API and logs the response.
-// Parameters: formData - object containing faculty fields
-async function addFaculty(formData) {
+// Parameters: form_data - object containing faculty fields
+async function add_faculty(form_data) {
   const res = await fetch("/faculty", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(formData)
+    body: JSON.stringify(form_data)
   });
 
   const data = await res.json();
   console.log(data);
 }
 
-// Fetches all courses from the API and renders each name as a div in the courses container.
-async function loadCourses() {
+
+async function load_courses() {
   clear_field_containers();
   navigator_div.innerHTML = "";
   const res = await fetch("/courses");
@@ -1138,8 +1138,7 @@ async function loadCourses() {
 
 }
 
-// Fetches all faculty from the API and renders each name as a div in the faculty container.
-async function loadFaculty() {
+async function load_faculty() {
   clear_field_containers();
   navigator_div.innerHTML = "";
   const res = await fetch("/faculty");
@@ -1156,8 +1155,8 @@ async function loadFaculty() {
 
 }
 
-// Fetches all rooms from the API and renders each name as a div in the rooms container.
-async function loadRooms() {
+
+async function load_rooms() {
   clear_field_containers();
   navigator_div.innerHTML = "";
   const res = await fetch("/rooms");
@@ -1175,8 +1174,7 @@ async function loadRooms() {
   });
 }
 
-// Fetches all labs from the API and renders each name as a div in the labs container.
-async function loadLabs() {
+async function load_labs() {
   clear_field_containers();
   navigator_div.innerHTML = "";
   const res = await fetch("/labs");
@@ -1193,9 +1191,7 @@ async function loadLabs() {
     container.appendChild(div);
   });
 }
-
-// Generates schedules
-async function generateSchedules() {
+async function generate_schedules() {
 
   const status = document.getElementById("schedule-status");
 
@@ -1221,7 +1217,12 @@ async function generateSchedules() {
 
   const data = await res.json();
   console.log(data);
-  if (data.count === 0) {
+
+  if (data.error || data.count === undefined) {
+    status.textContent =
+      "Config file is empty, cannot generate schedules, please load a config file.";
+  }
+  else if (data.count === 0) {
     status.textContent =
       "No valid schedules. Please modify config.";
   }
@@ -1233,9 +1234,7 @@ async function generateSchedules() {
     view_button.style.color = "#484848";
   }
 }
-
-// Displays a user-friendly interface in order to generate schedules based on the config
-async function loadSchedule() {
+async function load_schedule() {
   clear_field_containers();
 
   const container = document.getElementById("schedule");
@@ -1266,10 +1265,10 @@ async function loadSchedule() {
 
   document
     .getElementById("generate-schedules")
-    .addEventListener("click", generateSchedules);
+    .addEventListener("click", generate_schedules);
 }
 
-async function viewSchedule(index = 0) {
+async function view_schedule(index = 0) {
 
   popup_save.style.display = "none";
 
@@ -1301,8 +1300,8 @@ async function viewSchedule(index = 0) {
   button.textContent = "Load";
 
   button.addEventListener("click", () => {
-    const newIndex = parseInt(input.value) - 1;
-    viewSchedule(newIndex);
+    const new_index = parseInt(input.value) - 1;
+    view_schedule(new_index);
   });
 
   selector.appendChild(label);
@@ -1316,7 +1315,7 @@ async function viewSchedule(index = 0) {
   table.style.width = "100%";
   table.style.borderCollapse = "collapse";
 
-  const headerRow = document.createElement("tr");
+  const header_row = document.createElement("tr");
 
   const headers = ["Course", "Faculty", "Room", "Lab", "Time"];
 
@@ -1326,10 +1325,10 @@ async function viewSchedule(index = 0) {
     th.style.border = "1px solid #989898";
     th.style.background = "#e6e6e6";
     th.style.padding = "4px";
-    headerRow.appendChild(th);
+    header_row.appendChild(th);
   });
 
-  table.appendChild(headerRow);
+  table.appendChild(header_row);
 
   data.schedule.forEach(line => {
 
