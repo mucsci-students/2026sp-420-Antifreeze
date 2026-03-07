@@ -52,7 +52,9 @@ let back_stack = [];
 let forward_stack = [];
 let current_content = navigator_div.innerHTML;
 
-// Method for dynamic input in add/delete/modify popups
+// Adds a single dynamic input row to a container when its associated button is clicked.
+// Each row contains a text input and a remove button.
+// Parameters: button_id, container_id, name (input name attr), placeholder
 function add_dynamic_input(button_id, container_id, name, placeholder) {
   const button = document.getElementById(button_id);
   if (!button) {
@@ -81,14 +83,16 @@ function add_dynamic_input(button_id, container_id, name, placeholder) {
   });
 }
 
-// Sets up multiple dynamic fields in add/modify/delete popups
+// Sets up multiple dynamic input fields by calling add_dynamic_input for each.
+// Parameters: fields - array of { button_id, container_id, name, placeholder }
 function setup_dynamic_fields(fields) {
   fields.forEach(({ button_id, container_id, name, placeholder }) => {
     add_dynamic_input(button_id, container_id, name, placeholder);
   });
 }
 
-// Updates back and forward button images
+// Updates back and forward button images based on stack state.
+// Dims buttons when their respective stacks are empty.
 function update_button_images() {
   if (back_stack.length > 0) {
     back_img.src = "/static/images/back.png";
@@ -107,7 +111,9 @@ function update_button_images() {
   }
 }
 
-// Updates navigator_div to show output from clicking a navigation button
+// Navigates to new content by pushing the current view onto the back stack.
+// Clears the forward stack on new navigation. Updates button images.
+// Parameters: content - HTML string to display in navigator_div
 function navigate_to(content) {
   if (current_content !== content) {
     back_stack.push(current_content);
@@ -120,7 +126,10 @@ function navigate_to(content) {
   }
 }
 
-// Makes add/modify/delete popup occur when an action and field have been selected
+// Opens the add/modify/delete popup for the currently selected field.
+// Shows an error if no field is selected. Renders the appropriate form
+// fields for each combination of action and current_field.
+// Parameters: action - "Add", "Modify", or "Delete"
 function edit_popup(action) {
   if (current_field == null) {
     popup_title.textContent = "Error";
@@ -610,7 +619,8 @@ function edit_popup(action) {
   wrapper.style.pointerEvents = "none";
 }
 
-// Updates add/modify/delete button images
+// Updates add/modify/delete button images and colors based on whether a field is selected.
+// Dims buttons when no field is active.
 function update_amd_images() {
   if (current_field !== null) {
     add_img.src = "/static/images/add.png";
@@ -698,6 +708,7 @@ view_button.addEventListener("click", () => {
 //})
 save_button.addEventListener("click", async (e) => {
 
+<<<<<<< HEAD
   e.preventDefault();  // stops redirect / form submit
 
   const res = await fetch("/save_config");
@@ -722,6 +733,10 @@ save_button.addEventListener("click", async (e) => {
 });
 
 
+=======
+// Reads a file input and stores its text content in loaded_file_content.
+// Parameters: input - file input element
+>>>>>>> e6bf8858970a0988a0d513fc444370bc91d130b7
 function load_file_content(input) {
   let fileTypes = ['json', 'csv'];
   let fileReader = new FileReader();
@@ -734,7 +749,7 @@ function load_file_content(input) {
   fileReader.readAsText(input.files[0]);
 }
 
-// Add, delete, modify buttons
+// Add button: sets current_operation and opens the Add popup for the active field.
 add_button.addEventListener("click", () => {
   current_operation = "add";
   if (current_field === "Faculty") faculty_button.focus();
@@ -744,6 +759,8 @@ add_button.addEventListener("click", () => {
 
   edit_popup("Add");
 });
+
+// Modify button: sets current_operation and opens the Modify popup for the active field.
 modify_button.addEventListener("click", () => {
   current_operation = "modify";
   if (current_field === "Faculty") faculty_button.focus();
@@ -753,6 +770,8 @@ modify_button.addEventListener("click", () => {
 
   edit_popup("Modify");
 });
+
+// Delete button: sets current_operation and opens the Delete popup for the active field.
 delete_button.addEventListener("click", () => {
   current_operation = "delete";
   if (current_field === "Faculty") faculty_button.focus();
@@ -763,7 +782,8 @@ delete_button.addEventListener("click", () => {
   edit_popup("Delete");
 });
 
-// AMD Popup Event Listeners
+// Save button: reads form inputs and POSTs to the appropriate API route
+// based on current_field and current_operation. Refreshes faculty list on success.
 popup_save.addEventListener("click", async () => {
   console.log("SAVE CLICKED", current_field, current_operation);
   if (current_field === "Faculty") {
@@ -1032,6 +1052,8 @@ print_button.addEventListener("click", () => {
 
 });
 
+// Listens for file selection on the load input, uploads the file to /load_config,
+// and logs the server response.
 const fileInput = document.getElementById("load");
 
 fileInput.addEventListener("change", async function () {
@@ -1049,11 +1071,16 @@ fileInput.addEventListener("change", async function () {
   console.log(data);
 });
 
+// Close button: clears and hides the popup, restores pointer events, refocuses active field.
 popup_close.addEventListener("click", () => {
   popup_form.innerHTML = "";
   amd_popup.classList.add("popup-hidden");
   wrapper.style.pointerEvents = "all";
+<<<<<<< HEAD
   popup_save.style.display = "block"; 
+=======
+
+>>>>>>> e6bf8858970a0988a0d513fc444370bc91d130b7
   if (current_field === "Faculty") faculty_button.focus();
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
@@ -1061,8 +1088,29 @@ popup_close.addEventListener("click", () => {
 });
 
 
+<<<<<<< HEAD
 
+=======
+// Fetches all faculty from the API and renders each name as a div in the faculty container.
+async function loadFaculty() {
 
+  const res = await fetch("/faculty");
+  const faculty = await res.json();
+
+  const container = document.getElementById("faculty");
+  container.innerHTML = "";
+
+  faculty.forEach(f => {
+    const div = document.createElement("div");
+    div.textContent = f.name;
+    container.appendChild(div);
+  });
+
+}
+>>>>>>> e6bf8858970a0988a0d513fc444370bc91d130b7
+
+// POSTs a new faculty member to the API and logs the response.
+// Parameters: formData - object containing faculty fields
 async function addFaculty(formData) {
   const res = await fetch("/faculty", {
     method: "POST",
@@ -1077,11 +1125,18 @@ async function addFaculty(formData) {
 }
 
 
+<<<<<<< HEAD
 async function loadCourses() {
   clear_field_containers();
   navigator_div.innerHTML = "";
   const res = await fetch("/courses");
   const courses = await res.json();
+=======
+// Fetches a single faculty member by name and populates the modify form fields.
+// Shows an alert if the faculty member is not found.
+// Parameters: name - faculty member's name
+async function load_faculty_into_form(name) {
+>>>>>>> e6bf8858970a0988a0d513fc444370bc91d130b7
 
   console.log("courses response:", courses);
 
@@ -1235,6 +1290,7 @@ async function viewSchedule(index = 0) {
     return;
   }
 
+<<<<<<< HEAD
   popup_title.textContent = `Schedule ${index + 1}`;
   popup_form.innerHTML = "";
 
@@ -1316,4 +1372,9 @@ function clear_field_containers() {
   document.getElementById("rooms").innerHTML = "";
   document.getElementById("labs").innerHTML = "";
   document.getElementById("schedule").innerHTML = "";
+=======
+  document.getElementById("faculty-max-credits").value = data.maximum_credits;
+  document.getElementById("faculty-min-credits").value = data.minimum_credits;
+  document.getElementById("faculty-max-days").value = data.maximum_days;
+>>>>>>> e6bf8858970a0988a0d513fc444370bc91d130b7
 }
