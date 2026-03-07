@@ -695,15 +695,72 @@ delete_button.addEventListener("click", () => {
 });
 
 // AMD Popup Event Listeners
-popup_save.addEventListener("click", () => {
-  popup_form.innerHTML = "";
-  amd_popup.classList.add("popup-hidden");
-  wrapper.style.pointerEvents = "all";
+popup_save.addEventListener("click", async () => {
+  console.log("SAVE CLICKED", currentField, currentOperation);
+  if (currentField === "faculty") {
 
-  if (current_field === "Faculty") faculty_button.focus();
-  else if (current_field === "Courses") courses_button.focus();
-  else if (current_field === "Labs") labs_button.focus();
-  else if (current_field === "Rooms") rooms_button.focus();
+    const name = document.getElementById("faculty-name").value.trim();
+
+    if (!name) {
+      alert("Enter a faculty name");
+      return;
+    }
+
+    if (currentOperation === "add") {
+
+      const maxCredits = parseInt(
+        document.getElementById("faculty-max-credits").value
+      );
+
+      await fetch("/faculty", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: name,
+          maximum_credits: maxCredits,
+          maximum_days: 4,
+          minimum_credits: 0,
+          unique_course_limit: 1,
+          times: {},
+          course_preferences: {},
+          room_preferences: {},
+          lab_preferences: {},
+          mandatory_days: []
+        })
+      });
+
+    }
+
+    else if (currentOperation === "delete") {
+
+      await fetch(`/faculty/${encodeURIComponent(name)}`, {
+        method: "DELETE"
+      });
+
+    }
+
+    await loadFaculty();
+  }
+
+});
+
+const fileInput = document.getElementById("load");
+
+fileInput.addEventListener("change", async function () {
+    const file = fileInput.files[0];
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("/load_config", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await res.json();
+    console.log(data);
 });
 
 popup_close.addEventListener("click", () => {
@@ -717,3 +774,35 @@ popup_close.addEventListener("click", () => {
   else if (current_field === "Rooms") rooms_button.focus();
 });
 
+const facultyButton = document.getElementById("faculty-button");
+
+async function loadFaculty() {
+
+    const res = await fetch("/faculty");
+    const faculty = await res.json();
+
+    const container = document.getElementById("faculty");
+    container.innerHTML = "";
+
+    faculty.forEach(f => {
+        const div = document.createElement("div");
+        div.textContent = f.name;
+        container.appendChild(div);
+    });
+
+}
+
+async function addFaculty(formData) {
+    const res = await fetch("/faculty", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+    });
+
+    const data = await res.json();
+    console.log(data);
+}
+
+facultyButton.addEventListener("click", loadFaculty);

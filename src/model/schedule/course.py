@@ -14,7 +14,7 @@ from scheduler.config import CombinedConfig, CourseConfig
 import csv
 
 
-class Course():
+class course():
      
     #initialize course subclass
     def __init__(self):

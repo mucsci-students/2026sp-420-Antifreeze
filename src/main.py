@@ -1,15 +1,16 @@
-from flask import Flask, render_template, url_for, send_from_directory
+from flask import Flask
+from controller.flask.routes import register_routes
+from model.schedule import schedule
 
-app = Flask (__name__, template_folder="view/templates", static_folder="view/static")
+app = Flask(
+    __name__,
+    template_folder="view/templates",
+    static_folder="view/static"
+)
 
-@app.route ("/")
-def index ():
-    return render_template ("index.html")
+scheduler = schedule.Schedule()
 
-# Custom js path
-@app.route('/controller/<path:filename>')
-def custom_static (filename):
-    return send_from_directory ('controller/',filename)
+register_routes(app, scheduler)
 
 if __name__ == "__main__":
-    app.run (debug=True)
+    app.run(debug=True)

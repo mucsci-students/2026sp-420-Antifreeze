@@ -2,6 +2,7 @@ from fileinput import filename
 import json
 from sched import scheduler
 import sched
+import os
 from controller.modifyConfig.utilsCLI import prompt
 from scheduler import (
     Scheduler,
@@ -28,12 +29,14 @@ class Schedule():
     #Initializes all scheduling submodules and creates an empty configuration
     #Sets up conflict, course, faculty, lab, and room handlers
     def __init__(self):
+        base_dir = os.path.dirname(__file__)
+        empty_path = os.path.join(base_dir, "empty.json")
         self.conflict = conflict()
         self.course = course()
         self.faculty = faculty()
         self.lab = lab()
         self.room = room()
-        self.config = self.load_config("2026sp-420-Antifreeze\\src\\schedule\\empty.json")
+        self.config = self.load_config(empty_path)
         self.result = []
 
     #--------------#
