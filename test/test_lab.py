@@ -27,6 +27,8 @@ class MockConfig:
     def __init__(self, labs):
         self.config = self
         self.labs = list(labs)
+        self.courses = []
+        self.faculty = []
 
 
 SAMPLE_CSV_CONTENT = """\

@@ -47,6 +47,7 @@ class Schedule():
         try:
             self.config = load_config_from_file(CombinedConfig, file_name)
             print("Config loaded successfully.")
+            print(self.config)
 
         except Exception as e:
             if(e):

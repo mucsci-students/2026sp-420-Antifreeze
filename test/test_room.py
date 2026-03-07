@@ -3,6 +3,8 @@ import os
 import types
 import pytest
 
+
+
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
 scheduler_stub = types.ModuleType("scheduler")
@@ -26,6 +28,8 @@ class MockConfig:
     def __init__(self, rooms):
         self.config = self
         self.rooms = list(rooms)
+        self.courses = []
+        self.faculty = []
 
 
 SAMPLE_CSV_CONTENT = """\
