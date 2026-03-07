@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 from src.model.schedule.conflict import conflict
 
 
-#Mock Classes
+# Mock Classes
 class MockCourse:
     def __init__(self, course_id, conflicts=None):
         self.course_id = course_id
@@ -25,7 +25,7 @@ class MockConfig:
         self.config = MockInnerConfig(courses)
 
 
-# ---- Fixtures ----
+# Fixtures
 @pytest.fixture
 def sample_config():
     courses = [
@@ -41,7 +41,7 @@ def conflict_obj():
     return conflict()
 
 
-# ---- validate_entry tests ----
+# validate_entry  
 
 def test_validate_entry_valid_add(conflict_obj, sample_config):
     result = conflict_obj.validate_entry(sample_config, "CMSC 140", "add", "CMSC 162")
@@ -63,7 +63,7 @@ def test_validate_entry_conflict_not_found_for_delete(conflict_obj, sample_confi
     assert result is False
 
 
-# ---- add_conflict tests ----
+# add_conflict 
 
 def test_add_conflict_success(conflict_obj, sample_config):
     conflict_obj.add_conflict(sample_config, "CMSC 161", "CMSC 162")
@@ -77,7 +77,7 @@ def test_add_conflict_duplicate(conflict_obj, sample_config):
     assert course.conflicts.count("CMSC 161") == 1
 
 
-# ---- delete_conflict tests ----
+# delete_conflict 
 
 def test_delete_conflict_success(conflict_obj, sample_config):
     conflict_obj.delete_conflict(sample_config, "CMSC 140", "CMSC 161")
@@ -91,7 +91,7 @@ def test_delete_conflict_not_found(conflict_obj, sample_config):
     assert "CMSC 162" not in course.conflicts
 
 
-# ---- modify_conflict tests ----
+# modify_conflict 
 
 def test_modify_conflict_success(conflict_obj, sample_config):
     conflict_obj.modify_conflict(sample_config, "CMSC 140", "CMSC 161", "CMSC 162")
