@@ -369,8 +369,90 @@ main {
   display: block;
   cursor: pointer;
   overflow-y: auto;
-  margin: 10px;
 }
+
+/* ----- Fields Display ----- */
+#faculty {
+  margin-left: 10px;
+  margin-top: 10px;
+}
+#courses {
+  margin-left: 10px;
+  margin-top: 0;
+}
+#labs {
+  margin-left: 10px;
+  margin-top: 0;
+}
+#rooms {
+  margin-left: 10px;
+  margin-top: 0;
+}
+#schedule {
+  margin-left: 10px;
+  margin-top: 0;
+}
+#schedule-generator {
+  background-image: none;
+  background-color: #41b9f2;
+  border: outset;
+  border-top-color: #dafffd;
+  border-left-color: #dafffd;
+  border-bottom-color: #1394d1;
+  border-right-color: #1394d1;
+  width: 98%;
+  color: white;
+  padding-left: 10px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  margin-bottom: 10px;
+}
+.schedule-form-line {
+  margin-top: 5px;
+  display: block;
+}
+.schedule-form-line label {
+  width: 160px;
+  display: inline-block;
+}
+.schedule-form-line input {
+  display: inline-block;
+  width: 100px;
+}
+#generate-schedules {
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  margin-top: 5px;
+  margin-bottom: 1px;
+  margin-left: 0;
+  border: outset;
+  border-top-color: #eeeeee;
+  border-left-color: #eeeeee;
+  border-bottom-color: #bbbbbb;
+  border-right-color: #bbbbbb;
+  border-width: 3px;
+}
+#generate-schedules:hover {
+  color: #808080;
+  text-shadow: -1px -1px #ffffff;
+  border: inset;
+  border-top-color: #bbbbbb;
+  border-left-color: #bbbbbb;
+  border-bottom-color: #eeeeee;
+  border-right-color: #eeeeee;
+}
+#schedule-hr {
+  display: block;
+  margin-right: 9px;
+  margin-left: 0;
+  border: 1px solid #bbbbbb;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+/* ----- Footer ----- */
 footer {
   background-color: #e6e6e6;
   color: #484848;

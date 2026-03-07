@@ -30,6 +30,7 @@ const print_img = print_button.querySelector("img");
 
 // Whitespace where information is printed
 const navigator_div = document.querySelector(".navigator");
+const main = document.querySelector(".main");
 
 // Popup elements
 const amd_popup = document.getElementById("amd-popup");
@@ -1090,6 +1091,7 @@ add_button.addEventListener("click", () => {
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
   else if (current_field === "Rooms") rooms_button.focus();
+  else if (current_field === "Schedule") schedule_button.focus();
 
   edit_popup("Add");
 });
@@ -1101,6 +1103,7 @@ modify_button.addEventListener("click", () => {
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
   else if (current_field === "Rooms") rooms_button.focus();
+  else if (current_field === "Schedule") schedule_button.focus();
 
   edit_popup("Modify");
 });
@@ -1112,6 +1115,7 @@ delete_button.addEventListener("click", () => {
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
   else if (current_field === "Rooms") rooms_button.focus();
+  else if (current_field === "Schedule") schedule_button.focus();
 
   edit_popup("Delete");
 });
@@ -1454,25 +1458,6 @@ popup_close.addEventListener("click", () => {
   else if (current_field === "Rooms") rooms_button.focus();
 });
 
-
-
-// Fetches all faculty from the API and renders each name as a div in the faculty container.
-async function load_faculty() {
-
-  const res = await fetch("/faculty");
-  const faculty = await res.json();
-
-  const container = document.getElementById("faculty");
-  container.innerHTML = "";
-
-  faculty.forEach(f => {
-    const div = document.createElement("div");
-    div.textContent = f.name;
-    container.appendChild(div);
-  });
-
-}
-
 // POSTs a new faculty member to the API and logs the response.
 // Parameters: form_data - object containing faculty fields
 async function add_faculty(form_data) {
@@ -1542,7 +1527,6 @@ async function load_rooms() {
     div.textContent = r.name;
     container.appendChild(div);
   });
-
 }
 
 async function load_labs() {
@@ -1561,7 +1545,6 @@ async function load_labs() {
     div.textContent = l.name;
     container.appendChild(div);
   });
-
 }
 
 async function generate_schedules() {
@@ -1614,23 +1597,23 @@ async function load_schedule() {
   const container = document.getElementById("schedule");
 
   container.innerHTML = `
-    <h3>Schedule Generator</h3>
+    <h3 id="schedule-generator">Schedule Generator</h3>
 
-    <div class="form-line">
+    <div class="schedule-form-line">
       <label>Number of schedules:</label>
       <input id="schedule-count" type="number" value="10" min="1">
     </div>
 
-    <div class="form-line">
+    <div class="schedule-form-line">
       <label>Optimize schedules:</label>
       <input id="schedule-optimize" type="checkbox" checked>
     </div>
 
-    <div class="form-line">
+    <div class="schedule-form-line">
       <button id="generate-schedules">Generate</button>
     </div>
 
-    <hr>
+    <hr id="schedule-hr"/>
 
     <div id="schedule-status">
       Waiting to generate schedules...
@@ -1727,7 +1710,6 @@ async function view_schedule(index = 0) {
   amd_popup.classList.remove("popup-hidden");
   wrapper.style.pointerEvents = "none";
 }
-
 
 function clear_field_containers() {
   document.getElementById("faculty").innerHTML = "";
