@@ -5,24 +5,19 @@ from scheduler import (
 from scheduler.config import CombinedConfig
 
 
+# Manages lab entries in the scheduler configuration.
 class lab():
 
-    #initialize lab subclass
+    # Initializes lab subclass.
     def __init__(self):
         return
 
+    # Validates a lab entry based on operation type.
+    # For 'add': fails if lab already exists or name is empty.
+    # For 'modify' or 'delete': fails if lab does not exist.
+    # Parameters: config, lab_name, operation ('add'/'modify'/'delete')
+    # Returns: True if validation passes, False otherwise
     def validate_entry(self, config: str, lab_name: str, operation: str) -> bool:
-        """
-        Validates lab entry based on operation type.
-        
-        Parameters:
-        - config: Configuration object
-        - lab_name: Name of the lab to validate
-        - operation: 'add', 'modify', or 'delete'
-        
-        Returns:
-        - True if validation passes, False otherwise
-        """
         labs = config.config.labs
         
         # Check for empty input
@@ -42,49 +37,57 @@ class lab():
         
         return True
 
-    #Add Lab
-    #Adds a lab to the configuration json
-    #Parameters: Configuration file, Lab to add
-    #Example usage: add_lab(example.json, Windows)
+    # Adds a lab to the config.
+    # Parameters: config, lab_name
+    # Example: add_lab(config, "Windows")
     def add_lab(self, config: str, lab_name: str):
 
-        #Reference to labs list inside database
+        # Reference to labs list inside database
         labs = config.config.labs
 
-        #Checking for duplicate lab
+        # Checking for duplicate lab
         if lab_name in labs:
             print("Lab already exists — no change made.")
             return
 
         labs.append(lab_name)
 
-        #Convert back to JSON
+        # Convert back to JSON
         print(f"Lab '{lab_name}' added successfully.")
 
-    #Delete Lab
-    #Deletes a lab from the configuration JSON
-    #Parameters: Configuration file, Lab to delete
-    #Example usage: delete_lab(example.json, Linux)
+    # Deletes a lab from the config.
+    # Cascades removal to course lab lists and faculty lab preferences.
+    # Parameters: config, lab_name
+    # Example: delete_lab(config, "Linux")
     def delete_lab(self, config: str, lab_name: str):
 
-        #Reference to labs list inside database
         labs = config.config.labs
 
         if lab_name not in labs:
             print("Lab not found — nothing deleted.")
             return
 
+        # Remove from labs list
         labs.remove(lab_name)
+
+        # ---- Cascade: Courses ----
+        for course in config.config.courses:
+            if lab_name in course.lab:
+                course.lab = [l for l in course.lab if l != lab_name]
+
+        # ---- Cascade: Faculty Preferences ----
+        for faculty in config.config.faculty:
+            if lab_name in faculty.lab_preferences:
+                del faculty.lab_preferences[lab_name]
 
         print(f"Lab '{lab_name}' deleted successfully.")
     
-    #Modify Lab
-    #Modifies a lab from the configuration JSON
-    #Parameters: Configuration file, old name for lab, new name for lab
-    #Example usage: modify_lab(example.json, Linux, Linux_0)
+    # Renames a lab in the config.
+    # Cascades the rename to course lab lists and faculty lab preferences.
+    # Parameters: config, old_name, new_name
+    # Example: modify_lab(config, "Linux", "Linux_0")
     def modify_lab(self, config: str, old_name: str, new_name: str):
 
-        #Reference to labs list inside database
         labs = config.config.labs
 
         if old_name not in labs:
@@ -95,39 +98,45 @@ class lab():
             print("New lab name already exists — choose a different name.")
             return
 
-        #Replace so that order stays the same
+        # Rename in labs list
         index = labs.index(old_name)
         labs[index] = new_name
 
-        print(f"Lab renamed from '{old_name}' to '{new_name}'.") 
-    
+        # ---- Cascade: Courses ----
+        for course in config.config.courses:
+            course.lab = [
+                new_name if lab == old_name else lab
+                for lab in course.lab
+            ]
 
-    
-    #Print Labs
-    #Prints all labs currently stored in the configuration
-    #Displays the name of each lab
-    #Parameters: Configuration file
+        # ---- Cascade: Faculty Preferences ----
+        for faculty in config.config.faculty:
+            prefs = faculty.lab_preferences
+            if old_name in prefs:
+                prefs[new_name] = prefs.pop(old_name)
+
+        print(f"Lab renamed from '{old_name}' to '{new_name}'.")
+
+    # Prints all labs in the config.
+    # Parameters: config
     def print_labs(self, config: str):
         labs = config.config.labs
         print("\nLabs:")
         for lab in labs:            
             print(f"Name: {lab}")
 
-    #Get Lab IDs
-    #Returns a list of lab names (IDs) from the configuration JSON
-    #Parameters: Configuration file
-    #Returns: List of lab name strings
+    # Returns a list of all lab names from the config.
+    # Parameters: config
+    # Returns: List of lab name strings
     def get_lab_ids(self, config: str) -> list[str]:
         labs = config.config.labs
         return list(labs)
 
-    #Get Lab Schedule
-    #Returns a dictionary mapping each lab name to a list of course sections
-    #that use that lab, parsed from a CSV schedule file
-    #Each entry contains course ID, section, faculty, room, and meeting times
-    #The lab session meeting is identified by a trailing '^' in the time field
-    #Parameters: csv_path - path to the CSV schedule file
-    #Returns: Dictionary mapping lab name (str) to list of course info dicts
+    # Parses the CSV schedule file and returns a dict mapping each lab name
+    # to a list of course sections that use it. Skips rows with no assigned lab.
+    # Each entry contains: course_id, section, faculty, room, meetings.
+    # Parameters: csv_path - path to the CSV schedule file
+    # Returns: Dict mapping lab name (str) to list of course info dicts
     def get_lab_schedule(self, csv_path: str) -> dict[str, list[dict]]:
         import csv
 

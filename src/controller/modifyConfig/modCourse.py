@@ -167,6 +167,8 @@ def mod_course(sched):
         if not sched.course.validate_entry(sched.config, name, "modify"):
             return
         
+        new_name = prompt("Enter new Course ID\n==> ")  
+        
         credits = prompt("Enter new credits\n==> ")
         
         # Validate credits is an integer
@@ -233,7 +235,7 @@ def mod_course(sched):
             faculty.append(prof)
             print(f"Current Faculty: {faculty}")
 
-        sched.course.modify_course(
+        sched.course.modify_course(old_id=name, new_id=new_name,
             config=sched.config,
             id=name,
             creds=credits_int,

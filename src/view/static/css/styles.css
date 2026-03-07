@@ -1,0 +1,472 @@
+/* ----- General Body ----- */
+body {
+  background-color: #2d958a;
+  background-repeat: no-repeat;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+#wrapper {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+  background-color: #e6e6e6;
+  display: block;
+  border: outset;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #bbbbbb;
+  border-right-color: #bbbbbb;
+  border-width: 3px;
+  box-shadow: 3px 3px #464646;
+  min-width: 960px;
+  max-width: 2048px;
+}
+
+/* ----- Header ----- */
+header {
+  background-color: #e6e6e6;
+  background-size: 55% 165%;
+  height: 30px;
+  text-align: right;
+  padding-top: 1px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-bottom: 8px;
+}
+h3 {
+  margin: 0;
+  background-image: linear-gradient(
+    to right,
+    rgba(254, 82, 58, 1),
+    rgba(254, 179, 86, 1),
+    rgba(255, 240, 77, 1),
+    rgba(88, 190, 62, 0.75),
+    rgba(82, 134, 254, 0.5),
+    rgba(200, 92, 255, 0.25),
+    rgba(255, 0, 0, 0)
+  );
+  width: 98%;
+  height: 100%;
+  padding-top: 5px;
+  text-shadow: 1px 1px #3f2860;
+  box-shadow: -3px 0px #91000d;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
+/* ----- Navigation Bar ----- */
+nav {
+  text-decoration: none;
+  background-color: #e6e6e6;
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-right: 4px;
+  margin-bottom: 6px;
+  display: block;
+  border: 2px solid #989898;
+  box-shadow: 2px 2px #ffffff, 2px 2px #ffffff inset;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  color: #484848;
+  font-size: medium;
+}
+button {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  color: #484848;
+  font-size: medium;
+  margin-left: 5px;
+  margin-top: 5px;
+  background-color: #e6e6e6;
+  cursor: pointer;
+}
+hr {
+  display: block;
+  border: 1px solid #989898;
+  box-shadow: 0px 2px #ffffff;
+  padding: 0;
+  margin-bottom: 5px;
+}
+
+/* ----- Top Bar ----- */
+.top-bar button {
+  border: none;
+  border-radius: 0;
+  width: 45px;
+  padding: 2px;
+  cursor: pointer;
+}
+.top-bar button:hover {
+  background-color: #e6e6e6;
+  color: #808080;
+}
+#load-button label {
+  cursor: pointer;
+}
+#load {
+  visibility: hidden;
+  display: none;
+  cursor: pointer;
+}
+#save-button a {
+  text-decoration: none;
+  color: #484848;
+}
+#save-button a:hover {
+  color: #808080;
+}
+
+/* ----- Edit Bar ----- */
+.edit-bar button {
+  align-content: center;
+  text-align: center;
+  border: none;
+  margin-bottom: 6px;
+}
+.edit-bar button img {
+  display: block;
+  width: 48px;
+}
+#vertical-line {
+  display: inline-block;
+  border-left: 2px solid #989898;
+  box-shadow: 2px 0px #ffffff;
+  height: 65px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+#back-button {
+  color: #808080;
+  text-shadow: 1px 1px #ffffff;
+  margin-left: 20px;
+  margin-right: 10px;
+}
+#forward-button {
+  color: #808080;
+  text-shadow: 1px 1px #ffffff;
+  margin-left: 10px;
+  margin-right: 0px;
+}
+#add-button {
+  margin-right: 10px;
+  padding: 5px;
+  color: #808080;
+}
+#add-button:hover {
+  background-color: #bbbbbb;
+}
+#modify-button {
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 5px;
+  color: #808080;
+}
+#modify-button:hover {
+  background-color: #bbbbbb;
+}
+#delete-button {
+  margin-left: 10px;
+  padding: 5px;
+  color: #808080;
+}
+#delete-button:hover {
+  background-color: #bbbbbb;
+}
+#view-button {
+  margin-right: 10px;
+  padding: 5px;
+  color: #808080;
+}
+#view-button:hover {
+  background-color: #bbbbbb;
+}
+#print-button {
+  margin-left: 10px;
+}
+#print-button:hover {
+  background: #bbbbbb;
+}
+
+/* ----- Selection Bar ----- */
+.selection-bar {
+  display: flex;
+}
+.selection-bar p {
+  margin-left: 10px;
+  margin-bottom: 5px;
+  margin-top: 2px;
+}
+.selection-bar button {
+  border: none;
+  border-radius: 0;
+  margin-top: 0;
+  margin-bottom: 5px;
+  width: 95px;
+  height: 25px;
+  padding-bottom: 2px;
+}
+
+/* ----- Faculty Tab ----- */
+#faculty-button {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #ff685e;
+  border: outset;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #cd3329;
+  border-right-color: #cd3329;
+  border-width: 3px;
+}
+#faculty-button:hover {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #ff887f;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #ec584e;
+  border-right-color: #ec584e;
+}
+#faculty-button:focus {
+  background-color: #ed4134;
+  border: inset;
+  border-top-color: #cd3329;
+  border-left-color: #cd3329;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
+}
+
+/* ----- Courses Tab ----- */
+#courses-button {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #ffa43f;
+  border: outset;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #e97e26;
+  border-right-color: #e97e26;
+  border-width: 3px;
+}
+#courses-button:hover {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #ffbe74;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #ff953f;
+  border-right-color: #ff953f;
+}
+#courses-button:focus {
+  background-color: #f18e1d;
+  border: inset;
+  border-top-color: #e97e26;
+  border-left-color: #e97e26;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
+}
+
+/* ----- Labs Tab ----- */
+#labs-button {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #ffdf2a;
+  border: outset;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #e1ba11;
+  border-right-color: #e1ba11;
+  border-width: 3px;
+}
+#labs-button:hover {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #ffee8f;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #fed520;
+  border-right-color: #fed520;
+}
+#labs-button:focus {
+  background-color: #f5d312;
+  border: inset;
+  border-top-color: #e1ba11;
+  border-left-color: #e1ba11;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
+}
+
+/* ----- Rooms Tab ----- */
+#rooms-button {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #2bb971;
+  border: outset;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #21a442;
+  border-right-color: #21a442;
+}
+#rooms-button:hover {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #44e394;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #34c257;
+  border-right-color: #34c257;
+}
+#rooms-button:focus {
+  background-color: #21a362;
+  border: inset;
+  border-top-color: #1c973b;
+  border-left-color: #1c973b;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
+}
+
+/* ----- Schedule Tab ----- */
+#schedule-button {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #41b9f2;
+  border: outset;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #1394d1;
+  border-right-color: #1394d1;
+  border-width: 3px;
+}
+#schedule-button:hover {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #6bd0ff;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #2bb1ef;
+  border-right-color: #2bb1ef;
+}
+#schedule-button:focus {
+  background-color: #2daae4;
+  border: inset;
+  border-top-color: #0f82b7;
+  border-left-color: #0f82b7;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
+}
+
+/* ----- Main Body ----- */
+main {
+  background-color: #ffffff;
+  display: block;
+  margin-left: 3px;
+  margin-right: 3px;
+  border: inset;
+  border-top-color: #bbbbbb;
+  border-left-color: #bbbbbb;
+  border-bottom-color: #bbbbbb;
+  border-right-color: #ffffff;
+  min-width: 92%;
+  max-width: 2048px;
+  min-height: 405px;
+  max-height: 1080px;
+}
+.navigator {
+  display: block;
+  cursor: pointer;
+  overflow-y: auto;
+}
+
+/* ----- Fields Display ----- */
+#faculty {
+  margin-left: 10px;
+  margin-top: 10px;
+}
+#courses {
+  margin-left: 10px;
+  margin-top: 0;
+}
+#labs {
+  margin-left: 10px;
+  margin-top: 0;
+}
+#rooms {
+  margin-left: 10px;
+  margin-top: 0;
+}
+#schedule {
+  margin-left: 10px;
+  margin-top: 0;
+}
+#schedule-generator {
+  background-image: none;
+  background-color: #41b9f2;
+  border: outset;
+  border-top-color: #dafffd;
+  border-left-color: #dafffd;
+  border-bottom-color: #1394d1;
+  border-right-color: #1394d1;
+  width: 98%;
+  color: white;
+  padding-left: 10px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  margin-bottom: 10px;
+}
+.schedule-form-line {
+  margin-top: 5px;
+  display: block;
+}
+.schedule-form-line label {
+  width: 160px;
+  display: inline-block;
+}
+.schedule-form-line input {
+  display: inline-block;
+  width: 100px;
+}
+#generate-schedules {
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  margin-top: 5px;
+  margin-bottom: 1px;
+  margin-left: 0;
+  border: outset;
+  border-top-color: #eeeeee;
+  border-left-color: #eeeeee;
+  border-bottom-color: #bbbbbb;
+  border-right-color: #bbbbbb;
+  border-width: 3px;
+}
+#generate-schedules:hover {
+  color: #808080;
+  text-shadow: -1px -1px #ffffff;
+  border: inset;
+  border-top-color: #bbbbbb;
+  border-left-color: #bbbbbb;
+  border-bottom-color: #eeeeee;
+  border-right-color: #eeeeee;
+}
+#schedule-hr {
+  display: block;
+  margin-right: 9px;
+  margin-left: 0;
+  border: 1px solid #bbbbbb;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+/* ----- Footer ----- */
+footer {
+  background-color: #e6e6e6;
+  color: #484848;
+  font-size: small;
+  padding-top: 8px;
+  padding-bottom: 10px;
+  margin-top: 4px;
+  margin-left: 2px;
+  margin-right: 4px;
+  margin-bottom: 5px;
+  border: inset;
+  border-top-color: #bbbbbb;
+  border-left-color: #bbbbbb;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
+  border-width: 2px;
+}
