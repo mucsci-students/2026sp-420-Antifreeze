@@ -19,6 +19,15 @@ const labs_button = document.getElementById("labs-button");
 const rooms_button = document.getElementById("rooms-button");
 const schedule_button = document.getElementById("schedule-button");
 
+// Disable the buttons until file is loaded
+back_button.disabled = true;
+forward_button.disabled = true;
+add_button.disabled = true;
+modify_button.disabled= true;
+delete_button.disabled = true;
+view_button.disabled = true;
+print_button.disabled = true;
+
 // Images inside buttons
 const back_img = back_button.querySelector("img");
 const forward_img = forward_button.querySelector("img");
@@ -98,17 +107,21 @@ function update_button_images() {
   if (back_stack.length > 0) {
     back_img.src = "/static/images/back.png";
     back_button.style.color = "#484848";
+    back_button.disabled = false;
   } else {
     back_img.src = "/static/images/back_shadow.png";
     back_button.style.color = "#808080";
+    back_button.disabled = true;
   }
 
   if (forward_stack.length > 0) {
     forward_img.src = "/static/images/forward.png";
     forward_button.style.color = "#484848";
+    forward_button.disabled = false;
   } else {
     forward_img.src = "/static/images/forward_shadow.png";
     forward_button.style.color = "#808080";
+    forward_button.disabled = true;
   }
 }
 
@@ -967,6 +980,12 @@ function update_amd_images() {
     add_button.style.color = "#808080";
     modify_button.style.color = "#808080";
     delete_button.style.color = "#808080";
+
+    // Disable the buttons
+    add_button.disabled = true;
+    modify_button.disabled = true;
+    delete_button.disabled = true;
+    print_button.disabled = true;
   } else {
     add_img.src = "/static/images/add.png";
     modify_img.src = "/static/images/modify.png";
@@ -974,6 +993,11 @@ function update_amd_images() {
     add_button.style.color = "#484848";
     modify_button.style.color = "#484848";
     delete_button.style.color = "#484848";
+
+    // Disable the buttons
+    add_button.disabled = false;
+    modify_button.disabled = false;
+    delete_button.disabled = false;
   }
 }
 
@@ -1590,6 +1614,10 @@ async function generate_schedules() {
     print_img.src = "/static/images/print.png";
     print_button.style.color = "#484848";
     view_button.style.color = "#484848";
+
+    // allow printing of schedules now
+    view_button.disabled = false;
+    print_button.disabled = false;
   }
 }
 

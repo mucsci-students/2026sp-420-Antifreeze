@@ -119,6 +119,10 @@ hr {
 }
 
 /* ----- Edit Bar ----- */
+button:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
 .edit-bar button {
   align-content: center;
   text-align: center;
@@ -156,40 +160,25 @@ hr {
   padding: 5px;
   color: #808080;
 }
-#add-button:hover {
-  background-color: #bbbbbb;
-}
 #modify-button {
   margin-left: 10px;
   margin-right: 10px;
   padding: 5px;
   color: #808080;
 }
-#modify-button:hover {
-  background-color: #bbbbbb;
-}
 #delete-button {
   margin-left: 10px;
   padding: 5px;
   color: #808080;
-}
-#delete-button:hover {
-  background-color: #bbbbbb;
 }
 #view-button {
   margin-right: 10px;
   padding: 5px;
   color: #808080;
 }
-#view-button:hover {
-  background-color: #bbbbbb;
-}
 #print-button {
   margin-left: 10px;
   color: #808080;
-}
-#print-button:hover {
-  background: #bbbbbb;
 }
 
 /* ----- Selection Bar ----- */
