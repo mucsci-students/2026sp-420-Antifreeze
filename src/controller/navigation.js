@@ -43,6 +43,7 @@ let loaded_file_extension = null;
 
 // Field we are currently editing
 let current_field = null;
+let current_operation = null;
 
 // History stacks
 let back_stack = [];
@@ -690,6 +691,7 @@ function load_file_content (input) {
 
 // Add, delete, modify buttons
 add_button.addEventListener("click", () => {
+  current_operation = "add";
   if (current_field === "Faculty") faculty_button.focus();
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
@@ -698,6 +700,7 @@ add_button.addEventListener("click", () => {
   edit_popup("Add");
 });
 modify_button.addEventListener("click", () => {
+  current_operation = "modify";
   if (current_field === "Faculty") faculty_button.focus();
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
@@ -706,6 +709,7 @@ modify_button.addEventListener("click", () => {
   edit_popup("Modify");
 });
 delete_button.addEventListener("click", () => {
+  current_operation = "delete";
   if (current_field === "Faculty") faculty_button.focus();
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
@@ -716,8 +720,8 @@ delete_button.addEventListener("click", () => {
 
 // AMD Popup Event Listeners
 popup_save.addEventListener("click", async () => {
-  console.log("SAVE CLICKED", currentField, currentOperation);
-  if (currentField === "faculty") {
+  console.log("SAVE CLICKED", current_field, current_operation);
+  if (current_field === "Faculty") {
 
     const name = document.getElementById("faculty-name").value.trim();
 
@@ -726,7 +730,7 @@ popup_save.addEventListener("click", async () => {
       return;
     }
 
-    if (currentOperation === "add") {
+    if (current_operation === "add") {
 
       const maxCredits = parseInt(
         document.getElementById("faculty-max-credits").value
@@ -753,7 +757,7 @@ popup_save.addEventListener("click", async () => {
 
     }
 
-    else if (currentOperation === "delete") {
+    else if (current_operation === "delete") {
 
       await fetch(`/faculty/${encodeURIComponent(name)}`, {
         method: "DELETE"
@@ -761,6 +765,34 @@ popup_save.addEventListener("click", async () => {
 
     }
 
+    else if (current_operation === "modify") {
+
+      const max_credits = parseInt(
+        document.getElementById("faculty-max-credits").value
+      );
+
+      const data = {
+        maximum_credits: max_credits,
+        maximum_days: 4,
+        minimum_credits: 0,
+        unique_course_limit: 1,
+        times: {},
+        course_preferences: {},
+        room_preferences: {},
+        lab_preferences: {},
+        mandatory_days: []
+      };
+
+      await fetch(`/faculty/${encodeURIComponent(name)}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+    }
+    console.log("MODIFY DATA:", data);
     await loadFaculty();
   }
 
@@ -826,3 +858,19 @@ async function addFaculty(formData) {
 }
 
 facultyButton.addEventListener("click", loadFaculty);
+
+async function load_faculty_into_form(name) {
+
+  const res = await fetch(`/faculty/${encodeURIComponent(name)}`);
+  const data = await res.json();
+
+  if (data.error) {
+    alert("Faculty not found");
+    return;
+  }
+
+  document.getElementById("faculty-max-credits").value = data.maximum_credits;
+  document.getElementById("faculty-min-credits").value = data.minimum_credits;
+  document.getElementById("faculty-max-days").value = data.maximum_days;
+}
+

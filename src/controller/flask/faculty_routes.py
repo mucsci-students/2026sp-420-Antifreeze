@@ -75,4 +75,20 @@ def register_faculty_routes(app, scheduler):
         except Exception as e:
             print("Faculty delete error:", e)
             return jsonify({"error": str(e)}), 500
-    
+    @app.route("/faculty/<name>", methods=["GET"])
+    def get_single_faculty(name):
+        try:
+            for f in scheduler.config.config.faculty:
+                if f.name.upper() == name.upper():
+                    return jsonify({
+                        "name": f.name,
+                        "maximum_credits": f.maximum_credits,
+                        "maximum_days": f.maximum_days,
+                        "minimum_credits": f.minimum_credits,
+                        "unique_course_limit": f.unique_course_limit
+                    })
+
+            return jsonify({"error": "Faculty not found"}), 404
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
