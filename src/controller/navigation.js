@@ -960,20 +960,20 @@ function edit_popup(action) {
 // Updates add/modify/delete button images and colors based on whether a field is selected.
 // Dims buttons when no field is active.
 function update_amd_images() {
-  if (current_field !== null) {
-    add_img.src = "/static/images/add.png";
-    modify_img.src = "/static/images/modify.png";
-    delete_img.src = "/static/images/delete.png";
-    add_button.style.color = "#484848";
-    modify_button.style.color = "#484848";
-    delete_button.style.color = "#484848";
-  } else {
+  if (current_field == null || current_field == "Schedule") {
     add_img.src = "/static/images/add_shadow.png";
     modify_img.src = "/static/images/modify_shadow.png";
     delete_img.src = "/static/images/delete_shadow.png";
     add_button.style.color = "#808080";
     modify_button.style.color = "#808080";
     delete_button.style.color = "#808080";
+  } else {
+    add_img.src = "/static/images/add.png";
+    modify_img.src = "/static/images/modify.png";
+    delete_img.src = "/static/images/delete.png";
+    add_button.style.color = "#484848";
+    modify_button.style.color = "#484848";
+    delete_button.style.color = "#484848";
   }
 }
 
@@ -1587,6 +1587,8 @@ async function generate_schedules() {
     status.textContent =
       data.count + " schedules generated.";
     view_img.src = "/static/images/view.png";
+    print_img.src = "/static/images/print.png";
+    print_button.style.color = "#484848";
     view_button.style.color = "#484848";
   }
 }

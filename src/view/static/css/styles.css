@@ -186,6 +186,7 @@ hr {
 }
 #print-button {
   margin-left: 10px;
+  color: #808080;
 }
 #print-button:hover {
   background: #bbbbbb;
