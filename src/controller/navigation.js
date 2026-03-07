@@ -708,7 +708,6 @@ view_button.addEventListener("click", () => {
 //})
 save_button.addEventListener("click", async (e) => {
 
-<<<<<<< HEAD
   e.preventDefault();  // stops redirect / form submit
 
   const res = await fetch("/save_config");
@@ -733,10 +732,6 @@ save_button.addEventListener("click", async (e) => {
 });
 
 
-=======
-// Reads a file input and stores its text content in loaded_file_content.
-// Parameters: input - file input element
->>>>>>> e6bf8858970a0988a0d513fc444370bc91d130b7
 function load_file_content(input) {
   let fileTypes = ['json', 'csv'];
   let fileReader = new FileReader();
@@ -1076,11 +1071,8 @@ popup_close.addEventListener("click", () => {
   popup_form.innerHTML = "";
   amd_popup.classList.add("popup-hidden");
   wrapper.style.pointerEvents = "all";
-<<<<<<< HEAD
   popup_save.style.display = "block"; 
-=======
 
->>>>>>> e6bf8858970a0988a0d513fc444370bc91d130b7
   if (current_field === "Faculty") faculty_button.focus();
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
@@ -1088,9 +1080,7 @@ popup_close.addEventListener("click", () => {
 });
 
 
-<<<<<<< HEAD
 
-=======
 // Fetches all faculty from the API and renders each name as a div in the faculty container.
 async function loadFaculty() {
 
@@ -1107,7 +1097,6 @@ async function loadFaculty() {
   });
 
 }
->>>>>>> e6bf8858970a0988a0d513fc444370bc91d130b7
 
 // POSTs a new faculty member to the API and logs the response.
 // Parameters: formData - object containing faculty fields
@@ -1125,18 +1114,11 @@ async function addFaculty(formData) {
 }
 
 
-<<<<<<< HEAD
 async function loadCourses() {
   clear_field_containers();
   navigator_div.innerHTML = "";
   const res = await fetch("/courses");
   const courses = await res.json();
-=======
-// Fetches a single faculty member by name and populates the modify form fields.
-// Shows an alert if the faculty member is not found.
-// Parameters: name - faculty member's name
-async function load_faculty_into_form(name) {
->>>>>>> e6bf8858970a0988a0d513fc444370bc91d130b7
 
   console.log("courses response:", courses);
 
@@ -1290,7 +1272,6 @@ async function viewSchedule(index = 0) {
     return;
   }
 
-<<<<<<< HEAD
   popup_title.textContent = `Schedule ${index + 1}`;
   popup_form.innerHTML = "";
 
@@ -1372,9 +1353,4 @@ function clear_field_containers() {
   document.getElementById("rooms").innerHTML = "";
   document.getElementById("labs").innerHTML = "";
   document.getElementById("schedule").innerHTML = "";
-=======
-  document.getElementById("faculty-max-credits").value = data.maximum_credits;
-  document.getElementById("faculty-min-credits").value = data.minimum_credits;
-  document.getElementById("faculty-max-days").value = data.maximum_days;
->>>>>>> e6bf8858970a0988a0d513fc444370bc91d130b7
 }
