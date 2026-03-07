@@ -49,6 +49,9 @@ class MockConfig:
     def __init__(self, names):
         self.config = self
         self.faculty = [MockFacultyMember(n) for n in names]
+class MockCourse:
+    def __init__(self, faculty):
+        self.faculty = faculty
 
 
 SAMPLE_CSV_CONTENT = """\
@@ -171,7 +174,16 @@ class TestValidateEntryDelete:
     def test_empty_name_returns_false(self, F):
         cfg = MockConfig(["Zoppetti", "Hardy"])
         assert F.validate_entry(cfg, "", "delete") is False
+    def test_delete_cascade_removes_from_courses(self, F):
+        cfg = MockConfig(["Zoppetti"])
 
+        cfg.config.courses = [
+            MockCourse(["Zoppetti", "Hardy"])
+        ]
+
+        F.delete_faculty(cfg, "Zoppetti")
+
+        assert "Zoppetti" not in cfg.config.courses[0].faculty
 
 
 # get_faculty_ids
