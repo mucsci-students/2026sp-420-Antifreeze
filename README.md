@@ -1,4 +1,4 @@
-# Scheduler CLI Application
+# Scheduler Web Application
 ## CMSC420-f26
 
 ## **Contributors**
@@ -11,14 +11,14 @@
 - Zane Weaver
 
 ## **Overview**
-Course-scheduling program with a command-line interface. The CLI allows users to manage faculty, courses, rooms, and labs, as well as generate, display, and save optimized class schedules.
-
+Course-scheduling program with a graphical interface. The graphical interface allows users too load/save Json files adding faculty, course, rooms, and labs to the scheduler using a visual interface. The ability to generate and view different schedules is available. Functionality to load in made schedules using CSV format and reading them in app is also availble.  
 ## **Features**
 - **Faculty Management**: Add, delete, and modify faculty with availability, preferences, and credit limits
 - **Course Management**: Add, delete, and modify courses with credits, faculty, rooms, labs, and conflict resolution
 - **Room Management**:Add, delete, and modify rooms
 - **Lab Management**: Add, delete, and modify labs
 - **Schedule Generation**: Generate, display, and save optimized schedules
+- **CSV Display**: Able to load CSV files and desplay them in application.
 - **Configuration Management**: Load, modify, display, and save configuration files
 
 ## **Prerequisites**
@@ -42,6 +42,13 @@ https://docs.astral.sh/uv/getting-started/installation/. To check your version, 
     ```source .venv/bin/activate```
     - Windows:
     ```.venv\Scripts\activate```
-5. Run the CLI:
-    ```uv run ./2026sp-420-Antifreeze/src/Main.py```
+5. Run the GUI:
+    ```uv run ./2026sp-420-Antifreeze/src/main.py```
+6.Access web app
+    ```In the command line a link should pop up where you can than access the enviornment```
+
+# Design Patterns
+1. Model-View-Controller (MVC):
+   we  used the MVC method of design to seperate our front end code from our backend code, allowing for more readable structure.
+    
     
