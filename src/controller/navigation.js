@@ -46,7 +46,6 @@ const nav_bar = document.querySelector(".nav-bar");
 const top_bar = document.querySelector(".top-bar");
 const team_name = document.querySelector(".team-name");
 const gui_wrapper = document.getElementById("wrapper");
-const gui_body = document.querySelector(".body");
 
 // Popup elements
 const amd_popup = document.getElementById("amd-popup");
@@ -1214,15 +1213,6 @@ team_name.addEventListener("click", () => {
 
 // Keeps field button focused when clicking around in gui_wrapper
 gui_wrapper.addEventListener("click", () => {
-  if (current_field === "Faculty") faculty_button.focus();
-  else if (current_field === "Courses") courses_button.focus();
-  else if (current_field === "Labs") labs_button.focus();
-  else if (current_field === "Rooms") rooms_button.focus();
-  else if (current_field === "Schedule") schedule_button.focus();
-});
-
-// Keeps field button focused when clicking around in gui_body
-gui_body.addEventListener("click", () => {
   if (current_field === "Faculty") faculty_button.focus();
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
