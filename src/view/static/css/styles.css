@@ -384,6 +384,7 @@ main {
 }
 #schedule-generator {
   background-image: none;
+  box-shadow: none;
   background-color: #41b9f2;
   border: outset;
   border-top-color: #dafffd;
@@ -395,13 +396,17 @@ main {
   padding-left: 10px;
   padding-top: 2px;
   padding-bottom: 2px;
+  margin-top: 10px;
+  margin-left: 5px;
   margin-bottom: 10px;
 }
 .schedule-form-line {
+  margin-left: 6px;
   margin-top: 5px;
   display: block;
 }
 .schedule-form-line label {
+  margin-left: 6px;
   width: 160px;
   display: inline-block;
 }
@@ -416,7 +421,7 @@ main {
   padding-bottom: 2px;
   margin-top: 5px;
   margin-bottom: 1px;
-  margin-left: 0;
+  margin-left: 6px;
   border: outset;
   border-top-color: #eeeeee;
   border-left-color: #eeeeee;
@@ -436,10 +441,14 @@ main {
 #schedule-hr {
   display: block;
   margin-right: 9px;
-  margin-left: 0;
+  margin-left: 9px;
   border: 1px solid #bbbbbb;
   margin-top: 15px;
   margin-bottom: 10px;
+}
+#schedule-status {
+  display: block;
+  margin-left: 9px;
 }
 
 /* ----- Footer ----- */
