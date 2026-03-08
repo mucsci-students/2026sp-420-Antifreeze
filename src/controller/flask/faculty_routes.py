@@ -1,5 +1,5 @@
 from flask import request, jsonify
-
+from model.schedule.faculty import faculty
 
 # Registers all faculty REST API routes on the Flask app.
 # All handlers close over `scheduler` for access to the config and faculty model.
@@ -104,6 +104,9 @@ def register_faculty_routes(app, scheduler):
     def modify_faculty(name):
         try:
             data = request.json
+            error = faculty.validate_faculty_data(data)
+            if error:
+                return jsonify({"error": error}), 400
             fac_list = scheduler.config.config.faculty
             target = None
 

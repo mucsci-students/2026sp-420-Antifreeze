@@ -19,15 +19,6 @@ const labs_button = document.getElementById("labs-button");
 const rooms_button = document.getElementById("rooms-button");
 const schedule_button = document.getElementById("schedule-button");
 
-// Disable the buttons until file is loaded
-back_button.disabled = true;
-forward_button.disabled = true;
-add_button.disabled = true;
-modify_button.disabled = true;
-delete_button.disabled = true;
-view_button.disabled = true;
-print_button.disabled = true;
-
 // Images inside buttons
 const back_img = back_button.querySelector("img");
 const forward_img = forward_button.querySelector("img");
@@ -809,7 +800,7 @@ popup_save.addEventListener("click", async () => {
     else if (current_operation === "modify") {
       const original_name = document.getElementById("faculty-select").value;
 
-      await fetch(`/faculty/${encodeURIComponent(original_name)}`, {
+      const res = await fetch(`/faculty/${encodeURIComponent(original_name)}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
@@ -821,16 +812,30 @@ popup_save.addEventListener("click", async () => {
           minimum_credits: parseInt(document.getElementById("faculty-min-credits").value),
           unique_course_limit: parseInt(document.getElementById("faculty-unique-limit").value),
 
-          times: get_dynamic_values("faculty-times"),
-          course_preferences: get_dynamic_values("faculty-course-pref"),
-          room_preferences: get_dynamic_values("faculty-room-pref"),
-          lab_preferences: get_dynamic_values("faculty-lab-pref"),
+          times: build_times_dict(get_dynamic_values("faculty-times")),
+          course_preferences: build_preference_dict(
+            get_dynamic_values("faculty-course-pref")
+          ),
+
+          room_preferences: build_preference_dict(
+            get_dynamic_values("faculty-room-pref")
+          ),
+
+          lab_preferences: build_preference_dict(
+            get_dynamic_values("faculty-lab-pref")
+          ),
           mandatory_days: get_dynamic_values("faculty-mandatory-days")
         })
       });
+        if (!res.ok) {
+        const err = await res.json();
+        alert(err.error || "Modify failed");
+        return;   // STOP here
+      }
     }
-
+    
     await loadFaculty();
+    await populate_faculty_dropdown();
   } else if (current_field === "Courses") {
 
     const idInput = document.getElementById("courses-id");
@@ -1313,13 +1318,47 @@ async function loadSchedule() {
     .addEventListener("click", generateSchedules);
 }
 
-// Renders the schedule table inside popup_form for the given index and group mode.
-// mode is one of: "course", "faculty", "room", "lab".
-// Layout mirrors the room-schedule sheet format: day heading, then rows sorted by
-// time.  The chosen mode adds an optional sub-heading within each day block.
-async function render_schedule_table(index, mode) {
+function populate_faculty_dropdown()
+{
+  const select = document.getElementById("faculty-select");
 
-  const res = await fetch(`/schedule/${index}/view/${mode}`);
+  fetch("/faculty")
+    .then(res => res.json())
+    .then(faculty => {
+
+      select.innerHTML = "";
+
+      faculty.forEach(f => {
+
+        const option = document.createElement("option");
+
+        option.value = f.name;
+        option.textContent = f.name;
+
+        select.appendChild(option);
+
+      });
+
+    });
+}
+
+async function populate_faculty_fields(name)
+{
+  const res = await fetch(`/faculty/${encodeURIComponent(name)}`);
+  const data = await res.json();
+
+  document.getElementById("faculty-name").value = data.name;
+  document.getElementById("faculty-max-credits").value = data.maximum_credits;
+  document.getElementById("faculty-max-days").value = data.maximum_days;
+  document.getElementById("faculty-min-credits").value = data.minimum_credits;
+  document.getElementById("faculty-unique-limit").value = data.unique_course_limit;
+}
+
+async function viewSchedule(index = 0) {
+
+  popup_save.style.display = "none";
+
+  const res = await fetch(`/schedule/${index}`);
   const data = await res.json();
 
   if (data.error) {
@@ -1327,204 +1366,75 @@ async function render_schedule_table(index, mode) {
     return;
   }
 
-  // Remove everything below the two control rows
-  const all_children = Array.from(popup_form.children);
-  const control_rows = popup_form.querySelectorAll(".schedule-control-row");
-  all_children.forEach(child => {
-    if (!child.classList.contains("schedule-control-row")) {
-      child.remove();
-    }
+  popup_title.textContent = `Schedule ${index + 1}`;
+  popup_form.innerHTML = "";
+
+  // ---- schedule selector ----
+  const selector = document.createElement("div");
+  selector.className = "form-line";
+
+  const label = document.createElement("label");
+  label.textContent = "Schedule #:";
+
+  const input = document.createElement("input");
+  input.type = "number";
+  input.min = "1";
+  input.value = index + 1;
+  input.style.width = "60px";
+
+  const button = document.createElement("button");
+  button.textContent = "Load";
+
+  button.addEventListener("click", () => {
+    const newIndex = parseInt(input.value) - 1;
+    viewSchedule(newIndex);
   });
 
-  const MODE_LABEL = { faculty: "Faculty", room: "Room", lab: "Lab" };
+  selector.appendChild(label);
+  selector.appendChild(input);
+  selector.appendChild(button);
 
-  // ---- Column definitions — the grouped-by column is omitted ----
-  const all_cols = [
-    { header: "Time", value: slot => slot.is_lab ? `${slot.time} *` : slot.time },
-    { header: "Course", value: slot => slot.course },
-    { header: "Section", value: slot => slot.section || "—" },
-    { header: "Faculty", value: slot => slot.faculty },
-    { header: "Room", value: slot => slot.room },
-    { header: "Lab", value: slot => slot.lab !== "None" ? slot.lab : "—" },
-  ];
+  popup_form.appendChild(selector);
 
-  // Drop the column that matches the active grouping mode
-  const hidden_col = { faculty: "Faculty", room: "Room", lab: "Lab" }[mode] || null;
-  const col_defs = hidden_col
-    ? all_cols.filter(c => c.header !== hidden_col)
-    : all_cols;
-
-  function make_th(text) {
-    const th = document.createElement("th");
-    th.textContent = text;
-    th.style.borderBottom = "2px solid #989898";
-    th.style.padding = "4px 8px";
-    th.style.textAlign = "left";
-    th.style.fontWeight = "bold";
-    return th;
-  }
-
-  function make_td(text) {
-    const td = document.createElement("td");
-    td.textContent = text;
-    td.style.padding = "3px 8px";
-    td.style.verticalAlign = "top";
-    td.style.borderBottom = "1px solid #e0e0e0";
-    return td;
-  }
-
-  // Outer wrapper so the whole thing scrolls as one
-  const wrapper_div = document.createElement("div");
-  wrapper_div.style.marginTop = "8px";
-
+  // ---- schedule table ----
   const table = document.createElement("table");
   table.style.width = "100%";
   table.style.borderCollapse = "collapse";
 
-  // Global header — only the visible columns
-  const thead = document.createElement("thead");
-  const header_row = document.createElement("tr");
-  col_defs.forEach(c => header_row.appendChild(make_th(c.header)));
-  thead.appendChild(header_row);
-  table.appendChild(thead);
+  const headerRow = document.createElement("tr");
 
-  const tbody = document.createElement("tbody");
+  const headers = ["Course", "Faculty", "Room", "Lab", "Time"];
 
-  data.days.forEach(day_group => {
+  headers.forEach(h => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    th.style.border = "1px solid #989898";
+    th.style.background = "#e6e6e6";
+    th.style.padding = "4px";
+    headerRow.appendChild(th);
+  });
 
-    // ---- Day heading row (e.g. "Monday") ----
-    const day_heading_row = document.createElement("tr");
-    const day_td = document.createElement("td");
-    day_td.colSpan = col_defs.length;
-    day_td.textContent = day_group.day_name;
-    day_td.style.fontWeight = "bold";
-    day_td.style.paddingTop = "12px";
-    day_td.style.paddingBottom = "2px";
-    day_td.style.paddingLeft = "8px";
-    day_td.style.borderBottom = "1px solid #bbb";
-    day_heading_row.appendChild(day_td);
-    tbody.appendChild(day_heading_row);
+  table.appendChild(headerRow);
 
-    day_group.sub_groups.forEach(sub => {
+  data.schedule.forEach(line => {
 
-      // Optional sub-group heading (e.g. "Room: Roddy 140")
-      if (sub.sub_key !== null) {
-        const sub_row = document.createElement("tr");
-        const sub_td = document.createElement("td");
-        sub_td.colSpan = col_defs.length;
-        sub_td.textContent = `${MODE_LABEL[data.mode] || ""}: ${sub.sub_key}`;
-        sub_td.style.fontStyle = "italic";
-        sub_td.style.paddingLeft = "16px";
-        sub_td.style.paddingTop = "6px";
-        sub_td.style.paddingBottom = "2px";
-        sub_td.style.color = "#555";
-        sub_row.appendChild(sub_td);
-        tbody.appendChild(sub_row);
-      }
+    const parts = line.split(",");
 
-      sub.slots.forEach(slot => {
-        const row = document.createElement("tr");
-        col_defs.forEach(c => row.appendChild(make_td(c.value(slot))));
-        tbody.appendChild(row);
-      });
+    const row = document.createElement("tr");
+
+    parts.forEach(cell => {
+      const td = document.createElement("td");
+      td.textContent = cell.trim();
+      td.style.border = "1px solid #989898";
+      td.style.padding = "4px";
+      row.appendChild(td);
     });
+
+    table.appendChild(row);
+
   });
 
-  table.appendChild(tbody);
-
-  // Small legend for lab marker
-  const legend = document.createElement("div");
-  legend.style.fontSize = "0.8em";
-  legend.style.color = "#666";
-  legend.style.marginTop = "6px";
-  legend.textContent = "* = lab session";
-
-  wrapper_div.appendChild(table);
-  wrapper_div.appendChild(legend);
-  popup_form.appendChild(wrapper_div);
-}
-
-async function view_schedule(index = 0) {
-
-  popup_save.style.display = "none";
-
-  popup_title.textContent = `Schedule ${index + 1}`;
-  popup_form.innerHTML = "";
-
-  // ---- Row 1: schedule number selector ----
-  const selector = document.createElement("div");
-  selector.className = "form-line schedule-control-row";
-  selector.style.display = "flex";
-  selector.style.alignItems = "center";
-  selector.style.gap = "6px";
-  selector.style.marginBottom = "4px";
-
-  const sel_label = document.createElement("label");
-  sel_label.textContent = "Schedule number:";
-
-  const num_input = document.createElement("input");
-  num_input.type = "number";
-  num_input.min = "1";
-  num_input.value = index + 1;
-  num_input.style.width = "60px";
-
-  const load_btn = document.createElement("button");
-  load_btn.id = "schedule-load-button";
-  load_btn.textContent = "Load";
-
-  selector.appendChild(sel_label);
-  selector.appendChild(num_input);
-  selector.appendChild(load_btn);
-  popup_form.appendChild(selector);
-
-  // ---- Row 2: group-by selector ----
-  const group_row = document.createElement("div");
-  group_row.className = "form-line schedule-control-row";
-  group_row.style.display = "flex";
-  group_row.style.alignItems = "center";
-  group_row.style.gap = "6px";
-  group_row.style.marginBottom = "8px";
-
-  const group_label = document.createElement("label");
-  group_label.textContent = "Group by:";
-
-  const group_select = document.createElement("select");
-  group_select.id = "schedule-group-by";
-  [
-    { value: "course", label: "Course" },
-    { value: "faculty", label: "Faculty" },
-    { value: "room", label: "Room" },
-    { value: "lab", label: "Lab" },
-  ].forEach(opt => {
-    const o = document.createElement("option");
-    o.value = opt.value;
-    o.textContent = opt.label;
-    group_select.appendChild(o);
-  });
-
-  group_row.appendChild(group_label);
-  group_row.appendChild(group_select);
-  popup_form.appendChild(group_row);
-
-  // ---- Wire up events ----
-  let current_index = index;
-  let current_mode = "course";
-
-  const refresh = () => render_schedule_table(current_index, current_mode);
-
-  load_btn.addEventListener("click", () => {
-    current_index = parseInt(num_input.value) - 1;
-    popup_title.textContent = `Schedule ${current_index + 1}`;
-    refresh();
-  });
-
-  group_select.addEventListener("change", () => {
-    current_mode = group_select.value;
-    refresh();
-  });
-
-  // ---- Initial render ----
-  await refresh();
+  popup_form.appendChild(table);
 
   amd_popup.classList.remove("popup-hidden");
   wrapper.style.pointerEvents = "none";
@@ -1549,4 +1459,54 @@ function clear_field_containers() {
   document.getElementById("rooms").innerHTML = "";
   document.getElementById("labs").innerHTML = "";
   document.getElementById("schedule").innerHTML = "";
+}
+
+function build_times_dict(values)
+{
+  const times = {
+    MON: [],
+    TUE: [],
+    WED: [],
+    THU: [],
+    FRI: []
+  };
+
+  values.forEach(v => {
+
+    const parts = v.split(" ");
+
+    if (parts.length !== 2) return;
+
+    const day = parts[0].toUpperCase();
+    const range = parts[1];
+
+    if (times[day])
+      times[day].push(range);
+
+  });
+
+  return times;
+}
+
+function build_preference_dict(values)
+{
+  const prefs = {};
+
+  values.forEach(v => {
+
+    const parts = v.trim().split(" ");
+
+    if (parts.length === 2)
+    {
+      const key = parts[0] + " " + parts[1];
+      prefs[key] = 5;
+    }
+    else
+    {
+      prefs[v] = 5;
+    }
+
+  });
+
+  return prefs;
 }

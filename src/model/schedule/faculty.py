@@ -226,3 +226,85 @@ class faculty():
                 faculty_schedule[faculty_name].append(entry)
 
         return faculty_schedule
+    def validate_faculty_data(data):
+
+        required = [
+            "maximum_credits",
+            "maximum_days",
+            "minimum_credits",
+            "unique_course_limit",
+            "times",
+            "course_preferences",
+            "room_preferences",
+            "lab_preferences"
+        ]
+
+        # -------- required fields --------
+        for field in required:
+            if field not in data:
+                return f"Missing field: {field}"
+
+        # -------- type checks --------
+        if not isinstance(data["maximum_credits"], int):
+            return "maximum_credits must be an integer"
+
+        if not isinstance(data["minimum_credits"], int):
+            return "minimum_credits must be an integer"
+
+        if not isinstance(data["maximum_days"], int):
+            return "maximum_days must be an integer"
+
+        if not isinstance(data["unique_course_limit"], int):
+            return "unique_course_limit must be an integer"
+
+        if not isinstance(data["times"], dict):
+            return "times must be a dictionary"
+
+        if not isinstance(data["course_preferences"], dict):
+            return "course_preferences must be a dictionary"
+
+        if not isinstance(data["room_preferences"], dict):
+            return "room_preferences must be a dictionary"
+
+        if not isinstance(data["lab_preferences"], dict):
+            return "lab_preferences must be a dictionary"
+
+        # -------- logical checks --------
+        if data["minimum_credits"] > data["maximum_credits"]:
+            return "minimum_credits cannot exceed maximum_credits"
+
+        if data["maximum_days"] < 1 or data["maximum_days"] > 5:
+            return "maximum_days must be between 1 and 5"
+
+        if data["maximum_credits"] < 0:
+            return "maximum_credits cannot be negative"
+
+        if data["unique_course_limit"] < 0:
+            return "unique_course_limit cannot be negative"
+
+        # -------- validate times structure --------
+        required_days = ["MON", "TUE", "WED", "THU", "FRI"]
+
+        for day in required_days:
+            if day not in data["times"]:
+                return f"Missing day in times: {day}"
+
+            if not isinstance(data["times"][day], list):
+                return f"{day} must contain a list of time ranges"
+
+        # -------- ensure at least one slot exists --------
+        total_slots = sum(len(slots) for slots in data["times"].values())
+
+        if total_slots == 0:
+            return "Faculty must have at least one available time slot"
+
+        # -------- optional field handling --------
+        if "mandatory_days" in data:
+            if not isinstance(data["mandatory_days"], list):
+                return "mandatory_days must be a list"
+
+            for d in data["mandatory_days"]:
+                if d not in required_days:
+                    return f"Invalid mandatory day: {d}"
+
+        return None
