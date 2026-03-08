@@ -11,7 +11,7 @@
 - Zane Weaver
 
 ## **Overview**
-Course-scheduling program with a command-line interface. The CLI allows users to manage faculty, courses, rooms, and labs, as well as generate, display, and save optimized class schedules.
+A Flask-based web application for generating course schedules. The system is driven by loading in a JSON configuration file that allows users to manage faculty, courses, rooms, and labs, as well as generate, display, and save optimized class schedules.
 
 ## **Features**
 - **Faculty Management**: Add, delete, and modify faculty with availability, preferences, and credit limits
@@ -19,7 +19,8 @@ Course-scheduling program with a command-line interface. The CLI allows users to
 - **Room Management**:Add, delete, and modify rooms
 - **Lab Management**: Add, delete, and modify labs
 - **Schedule Generation**: Generate, display, and save optimized schedules
-- **Configuration Management**: Load, modify, display, and save configuration files
+- **Configuration Management**: Import configuration files to modify and view them in the Schedule Viewer; export configuration files to save them for later
+- **Schedule Viewer**: View generated schedules by room/lab and by faculty in tabular format
 
 ## **Prerequisites**
 1. Make sure to have Python 3.13 or higher installed. To check your version, run:
@@ -35,7 +36,7 @@ https://docs.astral.sh/uv/getting-started/installation/. To check your version, 
 ```git clone https://github.com/mucsci-students/2026sp-420-Antifreeze```
 2. Navigate to the repository:
 ```cd 2026sp-420-Antifreeze```
-3. Create the python virtual environment:
+3. Create the python virtual environment and install dependencies:
 ```uv sync```
 4. Activate the python virtual environment:
     - Linux/macOS:
@@ -43,5 +44,5 @@ https://docs.astral.sh/uv/getting-started/installation/. To check your version, 
     - Windows:
     ```.venv\Scripts\activate```
 5. Run the CLI:
-    ```uv run ./2026sp-420-Antifreeze/src/Main.py```
+    ```uv run ./src/main.py```
     
