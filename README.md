@@ -38,11 +38,10 @@ https://docs.astral.sh/uv/getting-started/installation/. To check your version, 
 ```cd 2026sp-420-Antifreeze```
 3. Create the python virtual environment and install dependencies:
 ```uv sync```
-4. Activate the python virtual environment:
+4. If the virtual environment isn't already, activate it using:
     - Linux/macOS:
     ```source .venv/bin/activate```
     - Windows:
-    ```.venv\Scripts\activate```
+    ```.\.venv\Scripts\activate```
 5. Run the CLI:
-    ```uv run ./src/main.py```
-    
+    ```uv run python src/main.py```
