@@ -1026,6 +1026,11 @@ popup_save.addEventListener("click", async () => {
 });
 
 print_button.addEventListener("click", () => {
+  console.log(schedules_generated)
+  if (!schedules_generated) {
+    alert("No schedules generated yet.");
+    return;
+  }
 
   window.open("/print_schedules", "_blank");
 
@@ -1258,7 +1263,7 @@ async function generateSchedules() {
     document.getElementById("schedule-optimize").checked;
 
   status.textContent = "Creating schedules...";
-
+  console.log("Sending scheduler request", { limit: count, optimize: optimize });
   const res = await fetch("/run_scheduler", {
     method: "POST",
     headers: {
@@ -1281,7 +1286,8 @@ async function generateSchedules() {
     status.textContent =
       data.count + " schedules generated.";
     view_img.src = "/static/images/view.png";
-    view_button.style.color = "#484848";
+    print_img.src = "/static/images/print.png";
+    
   }
 }
 async function loadSchedule() {
