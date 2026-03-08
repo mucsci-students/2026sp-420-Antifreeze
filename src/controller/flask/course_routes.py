@@ -77,36 +77,44 @@ def register_course_routes(app, scheduler):
     # Returns 404 if the old course_id does not exist.
     # Returns 409 if the new course_id already belongs to a different course.
     # Parameters: course_id - old course ID taken from the URL path
-    @app.route("/courses/<course_id>", methods=["PUT"])
-    def modify_course(course_id):
+    @app.route("/courses/<int:index>", methods=["PUT"])
+    def modify_course(index):
         try:
             data = request.json
-            new_id = data["course_id"]
+            print(data)
+            course = scheduler.config.config.courses[index]
 
-            existing = [c.course_id.upper() for c in scheduler.config.config.courses]
-
-            if course_id.upper() not in existing:
-                return jsonify({"error": f'"{course_id}" was not found. Please check the course ID and try again.'}), 404
-
-            # Only check for collision if the ID is actually changing
-            if new_id.upper() != course_id.upper() and new_id.upper() in existing:
-                return jsonify({"error": f'"{new_id}" already exists. Choose a different course ID.'}), 409
-
-            scheduler.course.modify_course(
-                scheduler.config,
-                course_id,
-                new_id,
-                data["credits"],
-                data["room"],
-                data["lab"],
-                data["conflicts"],
-                data["faculty"]
-            )
+            course.course_id = data["course_id"]
+            course.credits = data["credits"]
+            course.room = data["room"]
+            course.lab = data["lab"]
+            course.conflicts = data["conflicts"]
+            course.faculty = data["faculty"]
 
             return jsonify({"status": "modified"})
 
-        except KeyError as e:
-            return jsonify({"error": f"Missing field: {str(e)}"}), 400
+        except IndexError:
+            return jsonify({"error": "Invalid course index"}), 404
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        
+    @app.route("/courses/<int:index>", methods=["GET"])
+    def get_course(index):
+        try:
+            course = scheduler.config.config.courses[index]
+
+            return jsonify({
+                "course_id": course.course_id,
+                "credits": course.credits,
+                "room": course.room,
+                "lab": course.lab,
+                "conflicts": course.conflicts,
+                "faculty": course.faculty
+            })
+
+        except IndexError:
+            return jsonify({"error": "Invalid course index"}), 404
 
         except Exception as e:
             return jsonify({"error": str(e)}), 500
