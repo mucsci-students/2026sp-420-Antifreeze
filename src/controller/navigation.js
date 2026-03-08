@@ -362,121 +362,106 @@ function edit_popup(action) {
   } else if (action === "Modify") {
     switch (current_field) {
       case "Faculty":
+
         popup_form.innerHTML = `
           <div class="form-line">
-            <label for="faculty-name">Faculty Name:</label>
-            <input type="text" id="faculty-name" placeholder="e.g. Hobbs" />
+            <label for="faculty-select">Select Faculty:</label>
+            <select id="faculty-select"></select>
           </div>
 
           <div class="form-line">
-            <label for="faculty-max-credits">Max Credits:</label>
-            <input type="number" id="faculty-max-credits" placeholder="Must be >= min credits" />
+            <label for="faculty-name">Name:</label>
+            <input type="text" id="faculty-name"/>
           </div>
 
           <div class="form-line">
-            <label for="faculty-min-credits">Min Credits:</label>
-            <input type="number" id="faculty-min-credits" placeholder="Must be <= max credits" />
+            <label for="faculty-max-credits">Maximum Credits:</label>
+            <input type="number" id="faculty-max-credits"/>
           </div>
 
           <div class="form-line">
-            <label for="faculty-unique-course-limit">Unique Course Limit:</label>
-            <input type="number" id="faculty-unique-course-limit" />
+            <label for="faculty-max-days">Maximum Days:</label>
+            <input type="number" id="faculty-max-days"/>
           </div>
 
           <div class="form-line">
-            <label for="faculty-max-days">Max Days:</label>
-            <input type="number" id="faculty-max-days" placeholder="1-5" />
+            <label for="faculty-min-credits">Minimum Credits:</label>
+            <input type="number" id="faculty-min-credits"/>
+          </div>
+
+          <div class="form-line">
+            <label for="faculty-unique-limit">Unique Course Limit:</label>
+            <input type="number" id="faculty-unique-limit"/>
           </div>
 
           <hr />
 
           <div class="form-line">
-            <label>Time Slots:</label>
-            <div id="faculty-time-slots-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="faculty-time-slot" placeholder="e.g. MON 13:00-17:00" />
-              </div>
-            </div>
-            <button type="button" id="add-faculty-time-slots">+</button>
+            <label>Times:</label>
+            <div id="faculty-times-container" class="dynamic-container"></div>
+            <button type="button" id="add-faculty-times">+</button>
           </div>
 
           <div class="form-line">
             <label>Course Preferences:</label>
-            <div id="faculty-course-preferences-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="faculty-course-preference" placeholder="e.g. CMSC 162" />
-              </div>
-            </div>
-            <button type="button" id="add-faculty-course-preferences">+</button>
+            <div id="faculty-course-pref-container" class="dynamic-container"></div>
+            <button type="button" id="add-faculty-course-pref">+</button>
           </div>
 
           <div class="form-line">
             <label>Room Preferences:</label>
-            <div id="faculty-room-preferences-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="faculty-room-preference" placeholder="e.g. Roddy 136" />
-              </div>
-            </div>
-            <button type="button" id="add-faculty-room-preferences">+</button>
+            <div id="faculty-room-pref-container" class="dynamic-container"></div>
+            <button type="button" id="add-faculty-room-pref">+</button>
           </div>
 
           <div class="form-line">
             <label>Lab Preferences:</label>
-            <div id="faculty-lab-preferences-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="faculty-lab-preference" placeholder="e.g. Mac" />
-              </div>
-            </div>
-            <button type="button" id="add-faculty-lab-preferences">+</button>
+            <div id="faculty-lab-pref-container" class="dynamic-container"></div>
+            <button type="button" id="add-faculty-lab-pref">+</button>
           </div>
 
           <div class="form-line">
             <label>Mandatory Days:</label>
-            <div id="faculty-mandatory-days-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="faculty-mandatory-day" placeholder="e.g. MON/TUE/WED/THU/FRI" />
-              </div>
-            </div>
+            <div id="faculty-mandatory-days-container" class="dynamic-container"></div>
             <button type="button" id="add-faculty-mandatory-days">+</button>
           </div>
         `;
+        populate_faculty_dropdown();
 
-        // Setup dynamic inputs
         setup_dynamic_fields([
           {
-            button_id: "add-faculty-time-slots",
-            container_id: "faculty-time-slots-container",
-            name: "faculty-time-slot",
+            button_id: "add-faculty-times",
+            container_id: "faculty-times-container",
+            name: "faculty-times",
             placeholder: "e.g. TUE 09:00-12:00",
           },
           {
-            button_id: "add-faculty-course-preferences",
-            container_id: "faculty-course-preferences-container",
-            name: "faculty-course-preference",
+            button_id: "add-faculty-course-pref",
+            container_id: "faculty-course-pref-container",
+            name: "faculty-course-pref",
             placeholder: "e.g. CMSC 162",
           },
           {
-            button_id: "add-faculty-room-preferences",
-            container_id: "faculty-room-preferences-container",
-            name: "faculty-room-preference",
+            button_id: "add-faculty-room-pref",
+            container_id: "faculty-room-pref-container",
+            name: "faculty-room-pref",
             placeholder: "e.g. Roddy 136",
           },
           {
-            button_id: "add-faculty-lab-preferences",
-            container_id: "faculty-lab-preferences-container",
-            name: "faculty-lab-preference",
+            button_id: "add-faculty-lab-pref",
+            container_id: "faculty-lab-pref-container",
+            name: "faculty-lab-pref",
             placeholder: "e.g. Mac",
           },
           {
             button_id: "add-faculty-mandatory-days",
             container_id: "faculty-mandatory-days-container",
-            name: "faculty-mandatory-day",
+            name: "faculty-mandatory-days",
             placeholder: "e.g. TUE",
-          },
+          }
         ]);
+        
         break;
-
-     
       case "Courses":
         popup_form.innerHTML = `
           <div class="form-line">
@@ -813,31 +798,27 @@ popup_save.addEventListener("click", async () => {
     }
 
     else if (current_operation === "modify") {
+      const original_name = document.getElementById("faculty-select").value;
 
-      const max_credits = parseInt(
-        document.getElementById("faculty-max-credits").value
-      );
-
-      const data = {
-        maximum_credits: max_credits,
-        maximum_days: 4,
-        minimum_credits: 0,
-        unique_course_limit: 1,
-        times: {},
-        course_preferences: {},
-        room_preferences: {},
-        lab_preferences: {},
-        mandatory_days: []
-      };
-
-      await fetch(`/faculty/${encodeURIComponent(name)}`, {
+      await fetch(`/faculty/${encodeURIComponent(original_name)}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(data)
-      });
+        body: JSON.stringify({
+          name: document.getElementById("faculty-name").value,
+          maximum_credits: parseInt(document.getElementById("faculty-max-credits").value),
+          maximum_days: parseInt(document.getElementById("faculty-max-days").value),
+          minimum_credits: parseInt(document.getElementById("faculty-min-credits").value),
+          unique_course_limit: parseInt(document.getElementById("faculty-unique-limit").value),
 
+          times: get_dynamic_values("faculty-times"),
+          course_preferences: get_dynamic_values("faculty-course-pref"),
+          room_preferences: get_dynamic_values("faculty-room-pref"),
+          lab_preferences: get_dynamic_values("faculty-lab-pref"),
+          mandatory_days: get_dynamic_values("faculty-mandatory-days")
+        })
+      });
     }
 
     await loadFaculty();
@@ -1320,6 +1301,42 @@ async function loadSchedule() {
   document
     .getElementById("generate-schedules")
     .addEventListener("click", generateSchedules);
+}
+
+function populate_faculty_dropdown()
+{
+  const select = document.getElementById("faculty-select");
+
+  fetch("/faculty")
+    .then(res => res.json())
+    .then(faculty => {
+
+      select.innerHTML = "";
+
+      faculty.forEach(f => {
+
+        const option = document.createElement("option");
+
+        option.value = f.name;
+        option.textContent = f.name;
+
+        select.appendChild(option);
+
+      });
+
+    });
+}
+
+async function populate_faculty_fields(name)
+{
+  const res = await fetch(`/faculty/${encodeURIComponent(name)}`);
+  const data = await res.json();
+
+  document.getElementById("faculty-name").value = data.name;
+  document.getElementById("faculty-max-credits").value = data.maximum_credits;
+  document.getElementById("faculty-max-days").value = data.maximum_days;
+  document.getElementById("faculty-min-credits").value = data.minimum_credits;
+  document.getElementById("faculty-unique-limit").value = data.unique_course_limit;
 }
 
 async function viewSchedule(index = 0) {
