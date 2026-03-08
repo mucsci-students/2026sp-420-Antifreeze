@@ -1559,7 +1559,7 @@ popup_close.addEventListener("click", () => {
   else if (current_field === "Schedule") schedule_button.focus();
 });
 
-// POSTs a new faculty member to the API and logs the response.
+// posts a new faculty member to the API and logs the response.
 // Parameters: form_data - object containing faculty fields
 async function add_faculty(form_data) {
   const res = await fetch("/faculty", {
