@@ -1,4 +1,4 @@
-# Scheduler CLI Application
+# Scheduler GUI Application
 ## CMSC420-f26
 
 ## **Contributors**
