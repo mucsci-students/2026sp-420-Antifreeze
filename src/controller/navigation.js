@@ -27,6 +27,11 @@ modify_button.disabled= true;
 delete_button.disabled = true;
 view_button.disabled = true;
 print_button.disabled = true;
+faculty_button.disabled = true;
+courses_button.disabled = true;
+labs_button.disabled = true;
+rooms_button.disabled = true;
+schedule_button.disabled = true;
 
 // Images inside buttons
 const back_img = back_button.querySelector("img");
@@ -1529,10 +1534,10 @@ print_button.addEventListener("click", () => {
 
 });
 
-// Listens for file selection on the load input, uploads the file to /load_config,
-// and logs the server response.
 const file_input = document.getElementById("load");
 
+// Listens for file selection on the load input, uploads the file to /load_config,
+// and logs the server response.
 file_input.addEventListener("change", async function () {
   const file = file_input.files[0];
 
@@ -1546,6 +1551,15 @@ file_input.addEventListener("change", async function () {
 
   const data = await res.json();
   console.log(data);
+
+  if (res.ok) {
+    faculty_button.disabled = false;
+    courses_button.disabled = false;
+    labs_button.disabled = false;
+    rooms_button.disabled = false;
+    schedule_button.disabled = false;
+    view_button.disabled = false;
+  }
 });
 
 // Close button: clears and hides the popup, restores pointer events, refocuses active field.
