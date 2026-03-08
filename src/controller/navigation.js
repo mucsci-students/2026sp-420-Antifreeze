@@ -23,7 +23,7 @@ const schedule_button = document.getElementById("schedule-button");
 back_button.disabled = true;
 forward_button.disabled = true;
 add_button.disabled = true;
-modify_button.disabled= true;
+modify_button.disabled = true;
 delete_button.disabled = true;
 view_button.disabled = true;
 print_button.disabled = true;
@@ -1732,11 +1732,13 @@ async function load_schedule() {
     .addEventListener("click", generate_schedules);
 }
 
-async function view_schedule(index = 0) {
+// Renders the schedule table inside popup_form for the given index and group mode.
+// mode is one of: "course", "faculty", "room", "lab".
+// Layout mirrors the room-schedule sheet format: day heading, then rows sorted by
+// time.  The chosen mode adds an optional sub-heading within each day block.
+async function render_schedule_table(index, mode) {
 
-  popup_save.style.display = "none";
-
-  const res = await fetch(`/schedule/${index}`);
+  const res = await fetch(`/schedule/${index}/view/${mode}`);
   const data = await res.json();
 
   if (data.error) {
@@ -1744,76 +1746,204 @@ async function view_schedule(index = 0) {
     return;
   }
 
-  popup_title.textContent = `Schedule ${index + 1}`;
-  popup_form.innerHTML = "";
-
-  // ---- schedule selector ----
-  const selector = document.createElement("div");
-  selector.className = "form-line";
-
-  const label = document.createElement("label");
-  label.textContent = "Schedule number:";
-
-  const input = document.createElement("input");
-  input.type = "number";
-  input.min = "1";
-  input.value = index + 1;
-  input.style.width = "60px";
-
-  const button = document.createElement("button");
-  button.id = "schedule-load-button";
-  button.textContent = "Load";
-
-  button.addEventListener("click", () => {
-    const new_index = parseInt(input.value) - 1;
-    view_schedule(new_index);
+  // Remove everything below the two control rows
+  const all_children = Array.from(popup_form.children);
+  const control_rows = popup_form.querySelectorAll(".schedule-control-row");
+  all_children.forEach(child => {
+    if (!child.classList.contains("schedule-control-row")) {
+      child.remove();
+    }
   });
 
-  selector.appendChild(label);
-  selector.appendChild(input);
-  selector.appendChild(button);
+  const MODE_LABEL = { faculty: "Faculty", room: "Room", lab: "Lab" };
 
-  popup_form.appendChild(selector);
+  // ---- Column definitions — the grouped-by column is omitted ----
+  const all_cols = [
+    { header: "Time", value: slot => slot.is_lab ? `${slot.time} *` : slot.time },
+    { header: "Course", value: slot => slot.course },
+    { header: "Section", value: slot => slot.section || "—" },
+    { header: "Faculty", value: slot => slot.faculty },
+    { header: "Room", value: slot => slot.room },
+    { header: "Lab", value: slot => slot.lab !== "None" ? slot.lab : "—" },
+  ];
 
-  // ---- schedule table ----
+  // Drop the column that matches the active grouping mode
+  const hidden_col = { faculty: "Faculty", room: "Room", lab: "Lab" }[mode] || null;
+  const col_defs = hidden_col
+    ? all_cols.filter(c => c.header !== hidden_col)
+    : all_cols;
+
+  function make_th(text) {
+    const th = document.createElement("th");
+    th.textContent = text;
+    th.style.borderBottom = "2px solid #989898";
+    th.style.padding = "4px 8px";
+    th.style.textAlign = "left";
+    th.style.fontWeight = "bold";
+    return th;
+  }
+
+  function make_td(text) {
+    const td = document.createElement("td");
+    td.textContent = text;
+    td.style.padding = "3px 8px";
+    td.style.verticalAlign = "top";
+    td.style.borderBottom = "1px solid #e0e0e0";
+    return td;
+  }
+
+  // Outer wrapper so the whole thing scrolls as one
+  const wrapper_div = document.createElement("div");
+  wrapper_div.style.marginTop = "8px";
+
   const table = document.createElement("table");
   table.style.width = "100%";
   table.style.borderCollapse = "collapse";
 
+  // Global header — only the visible columns
+  const thead = document.createElement("thead");
   const header_row = document.createElement("tr");
+  col_defs.forEach(c => header_row.appendChild(make_th(c.header)));
+  thead.appendChild(header_row);
+  table.appendChild(thead);
 
-  const headers = ["Course", "Faculty", "Room", "Lab", "Time"];
+  const tbody = document.createElement("tbody");
 
-  headers.forEach(h => {
-    const th = document.createElement("th");
-    th.textContent = h;
-    th.style.border = "1px solid #989898";
-    th.style.background = "#e6e6e6";
-    th.style.padding = "4px";
-    header_row.appendChild(th);
-  });
+  data.days.forEach(day_group => {
 
-  table.appendChild(header_row);
+    // ---- Day heading row (e.g. "Monday") ----
+    const day_heading_row = document.createElement("tr");
+    const day_td = document.createElement("td");
+    day_td.colSpan = col_defs.length;
+    day_td.textContent = day_group.day_name;
+    day_td.style.fontWeight = "bold";
+    day_td.style.paddingTop = "12px";
+    day_td.style.paddingBottom = "2px";
+    day_td.style.paddingLeft = "8px";
+    day_td.style.borderBottom = "1px solid #bbb";
+    day_heading_row.appendChild(day_td);
+    tbody.appendChild(day_heading_row);
 
-  data.schedule.forEach(line => {
+    day_group.sub_groups.forEach(sub => {
 
-    const parts = line.split(",");
+      // Optional sub-group heading (e.g. "Room: Roddy 140")
+      if (sub.sub_key !== null) {
+        const sub_row = document.createElement("tr");
+        const sub_td = document.createElement("td");
+        sub_td.colSpan = col_defs.length;
+        sub_td.textContent = `${MODE_LABEL[data.mode] || ""}: ${sub.sub_key}`;
+        sub_td.style.fontStyle = "italic";
+        sub_td.style.paddingLeft = "16px";
+        sub_td.style.paddingTop = "6px";
+        sub_td.style.paddingBottom = "2px";
+        sub_td.style.color = "#555";
+        sub_row.appendChild(sub_td);
+        tbody.appendChild(sub_row);
+      }
 
-    const row = document.createElement("tr");
-
-    parts.forEach(cell => {
-      const td = document.createElement("td");
-      td.textContent = cell.trim();
-      td.style.border = "1px solid #989898";
-      td.style.padding = "4px";
-      row.appendChild(td);
+      sub.slots.forEach(slot => {
+        const row = document.createElement("tr");
+        col_defs.forEach(c => row.appendChild(make_td(c.value(slot))));
+        tbody.appendChild(row);
+      });
     });
-
-    table.appendChild(row);
-
   });
 
-  popup_form.appendChild(table);
+  table.appendChild(tbody);
+
+  // Small legend for lab marker
+  const legend = document.createElement("div");
+  legend.style.fontSize = "0.8em";
+  legend.style.color = "#666";
+  legend.style.marginTop = "6px";
+  legend.textContent = "* = lab session";
+
+  wrapper_div.appendChild(table);
+  wrapper_div.appendChild(legend);
+  popup_form.appendChild(wrapper_div);
+}
+
+async function view_schedule(index = 0) {
+
+  popup_save.style.display = "none";
+
+  popup_title.textContent = `Schedule ${index + 1}`;
+  popup_form.innerHTML = "";
+
+  // ---- Row 1: schedule number selector ----
+  const selector = document.createElement("div");
+  selector.className = "form-line schedule-control-row";
+  selector.style.display = "flex";
+  selector.style.alignItems = "center";
+  selector.style.gap = "6px";
+  selector.style.marginBottom = "4px";
+
+  const sel_label = document.createElement("label");
+  sel_label.textContent = "Schedule number:";
+
+  const num_input = document.createElement("input");
+  num_input.type = "number";
+  num_input.min = "1";
+  num_input.value = index + 1;
+  num_input.style.width = "60px";
+
+  const load_btn = document.createElement("button");
+  load_btn.id = "schedule-load-button";
+  load_btn.textContent = "Load";
+
+  selector.appendChild(sel_label);
+  selector.appendChild(num_input);
+  selector.appendChild(load_btn);
+  popup_form.appendChild(selector);
+
+  // ---- Row 2: group-by selector ----
+  const group_row = document.createElement("div");
+  group_row.className = "form-line schedule-control-row";
+  group_row.style.display = "flex";
+  group_row.style.alignItems = "center";
+  group_row.style.gap = "6px";
+  group_row.style.marginBottom = "8px";
+
+  const group_label = document.createElement("label");
+  group_label.textContent = "Group by:";
+
+  const group_select = document.createElement("select");
+  group_select.id = "schedule-group-by";
+  [
+    { value: "course", label: "Course" },
+    { value: "faculty", label: "Faculty" },
+    { value: "room", label: "Room" },
+    { value: "lab", label: "Lab" },
+  ].forEach(opt => {
+    const o = document.createElement("option");
+    o.value = opt.value;
+    o.textContent = opt.label;
+    group_select.appendChild(o);
+  });
+
+  group_row.appendChild(group_label);
+  group_row.appendChild(group_select);
+  popup_form.appendChild(group_row);
+
+  // ---- Wire up events ----
+  let current_index = index;
+  let current_mode = "course";
+
+  const refresh = () => render_schedule_table(current_index, current_mode);
+
+  load_btn.addEventListener("click", () => {
+    current_index = parseInt(num_input.value) - 1;
+    popup_title.textContent = `Schedule ${current_index + 1}`;
+    refresh();
+  });
+
+  group_select.addEventListener("change", () => {
+    current_mode = group_select.value;
+    refresh();
+  });
+
+  // ---- Initial render ----
+  await refresh();
 
   amd_popup.classList.remove("popup-hidden");
   wrapper.style.pointerEvents = "none";
