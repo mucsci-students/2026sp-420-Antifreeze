@@ -11,7 +11,7 @@ const modify_button = document.getElementById("modify-button");
 const delete_button = document.getElementById("delete-button");
 const view_button = document.getElementById("view-button");
 const print_button = document.getElementById("print-button");
-
+const config_name = document.getElementById("config-name");
 // Fields Buttons
 const faculty_button = document.getElementById("faculty-button");
 const courses_button = document.getElementById("courses-button");
@@ -1032,6 +1032,7 @@ const fileInput = document.getElementById("load");
 
 fileInput.addEventListener("change", async function () {
   const file = fileInput.files[0];
+  config_name.textContent = `Config loaded: ${file.name}`;
 
   const formData = new FormData();
   formData.append("file", file);
