@@ -68,7 +68,7 @@ let schedules_generated = false;
 // History stacks
 let back_stack = [];
 let forward_stack = [];
-let current_content = navigator_div.innerHTML;
+let current_content = null;
 
 // Adds a single dynamic input row to a container when its associated button is clicked.
 // Each row contains a text input and a remove button.
@@ -136,16 +136,25 @@ function update_button_images() {
 // Navigates to new content by pushing the current view onto the back stack.
 // Clears the forward stack on new navigation. Updates button images.
 // Parameters: content - HTML string to display in navigator_div
-function navigate_to(content) {
-  if (current_content !== content) {
+function navigate_to(field) {
+  if (current_content !== field) {
     back_stack.push(current_content);
-    current_content = content;
-    navigator_div.innerHTML = current_content;
-
-    // Clear forward stack on new navigation
+    current_content = field;
     forward_stack = [];
     update_button_images();
   }
+}
+
+async function go_to_field(field) {
+  if (field === null) {
+    navigator_div.innerHTML = "";
+    current_field = null;
+    update_amd_images();
+  } else if (field === "Faculty") await load_faculty();
+  else if (field === "Courses") await load_courses();
+  else if (field === "Labs") await load_labs();
+  else if (field === "Rooms") await load_rooms();
+  else if (field === "Schedule") await load_schedule();
 }
 
 // Displays an inline error message directly below a given input element.
@@ -1012,7 +1021,6 @@ function update_amd_images() {
 // Fields event listeners
 faculty_button.addEventListener("click", () => {
   current_field = "Faculty";
-  navigate_to("Existing faculty would be printed here");
   load_faculty();
   update_amd_images();
   popup_form.style.height = "540px";
@@ -1021,7 +1029,6 @@ faculty_button.addEventListener("click", () => {
 
 courses_button.addEventListener("click", () => {
   current_field = "Courses";
-  navigate_to("Existing courses would be printed here");
   load_courses();
   update_amd_images();
   popup_form.style.height = "540px";
@@ -1031,7 +1038,6 @@ courses_button.addEventListener("click", () => {
 
 labs_button.addEventListener("click", () => {
   current_field = "Labs";
-  navigate_to("Existing labs would be printed here");
   load_labs();
   update_amd_images();
   popup_form.style.height = "540px";
@@ -1041,7 +1047,6 @@ labs_button.addEventListener("click", () => {
 
 rooms_button.addEventListener("click", () => {
   current_field = "Rooms";
-  navigate_to(`Existing ${current_field} would be printed here`);
   load_rooms();
   update_amd_images();
   popup_form.style.height = "540px";
@@ -1051,7 +1056,6 @@ rooms_button.addEventListener("click", () => {
 
 schedule_button.addEventListener("click", () => {
   current_field = "Schedule";
-  navigate_to("Schedule generator");
   load_schedule();
   update_amd_images();
   popup_form.style.height = "605px";
@@ -1060,21 +1064,20 @@ schedule_button.addEventListener("click", () => {
 });
 
 // Back button
-back_button.addEventListener("click", () => {
+back_button.addEventListener("click", async () => {
   if (back_stack.length > 0) {
     forward_stack.push(current_content);
     current_content = back_stack.pop();
-    navigator_div.innerHTML = current_content;
+    await go_to_field(current_content);
     update_button_images();
   }
 });
-
-// Forward button
-forward_button.addEventListener("click", () => {
+ // Forward button
+forward_button.addEventListener("click", async () => {
   if (forward_stack.length > 0) {
     back_stack.push(current_content);
     current_content = forward_stack.pop();
-    navigator_div.innerHTML = current_content;
+    await go_to_field(current_content);
     update_button_images();
   }
 });
@@ -1575,161 +1578,143 @@ async function add_faculty(form_data) {
 }
 
 
-async function load_courses() {
-  clear_field_containers();
-  navigator_div.innerHTML = "";
-  const res = await fetch("/courses");
-  const courses = await res.json();
-
-  console.log("courses response:", courses);
-
-  const container = document.getElementById("courses");
-  container.innerHTML = "";
-
-  courses.forEach(c => {
-    const div = document.createElement("div");
-    div.textContent = `${c.course_id} (${c.credits})`;
-    container.appendChild(div);
-  });
-
-}
-
 async function load_faculty() {
-  clear_field_containers();
-  navigator_div.innerHTML = "";
   const res = await fetch("/faculty");
   const faculty = await res.json();
-
-  const container = document.getElementById("faculty");
-  container.innerHTML = "";
-
-  faculty.forEach(f => {
-    const div = document.createElement("div");
-    div.textContent = f.name;
-    container.appendChild(div);
-  });
-
+  let html = "<ul>";
+  faculty.forEach(f => { html += `<li>${f.name}</li>`; });
+  html += "</ul>";
+  navigator_div.innerHTML = html;
+  navigate_to("Faculty");
 }
 
+async function load_courses() {
+  try {
+    const res = await fetch("/courses");
+    if (!res.ok) throw new Error("Failed to load courses");
+    const courses = await res.json();
+    let html = "<ul>";
+    courses.forEach(c => { html += `<li>${c.course_id} (${c.credits} credits)</li>`; });
+    html += "</ul>";
+    navigator_div.innerHTML = html;
+    navigate_to("Courses");
+  } catch (err) {
+    navigator_div.innerHTML = `<p style="color:red;">Error loading courses: ${err.message}</p>`;
+    navigate_to("Courses");
+  }
+}
 
 async function load_rooms() {
-  clear_field_containers();
-  navigator_div.innerHTML = "";
-  const res = await fetch("/rooms");
-  const rooms = await res.json();
-
-  console.log("rooms response:", rooms);
-
-  const container = document.getElementById("rooms");
-  container.innerHTML = "";
-
-  rooms.forEach(r => {
-    const div = document.createElement("div");
-    div.textContent = r.name;
-    container.appendChild(div);
-  });
+  try {
+    const res = await fetch("/rooms");
+    if (!res.ok) throw new Error("Failed to load rooms");
+    const rooms = await res.json();
+    let html = "<ul>";
+    rooms.forEach(r => { html += `<li>${r.name}</li>`; });
+    html += "</ul>";
+    navigator_div.innerHTML = html;
+    navigate_to("Rooms");
+  } catch (err) {
+    navigator_div.innerHTML = `<p style="color:red;">Error loading rooms: ${err.message}</p>`;
+    navigate_to("Rooms");
+  }
 }
 
 async function load_labs() {
-  clear_field_containers();
-  navigator_div.innerHTML = "";
-  const res = await fetch("/labs");
-  const labs = await res.json();
-
-  console.log("labs response:", labs);
-
-  const container = document.getElementById("labs");
-  container.innerHTML = "";
-
-  labs.forEach(l => {
-    const div = document.createElement("div");
-    div.textContent = l.name;
-    container.appendChild(div);
-  });
+  try {
+    const res = await fetch("/labs");
+    if (!res.ok) throw new Error("Failed to load labs");
+    const labs = await res.json();
+    let html = "<ul>";
+    labs.forEach(l => { html += `<li>${l.name}</li>`; });
+    html += "</ul>";
+    navigator_div.innerHTML = html;
+    navigate_to("Labs");
+  } catch (err) {
+    navigator_div.innerHTML = `<p style="color:red;">Error loading labs: ${err.message}</p>`;
+    navigate_to("Labs");
+  }
 }
 
 async function generate_schedules() {
+  const count = parseInt(document.getElementById("schedule-count").value);
+  const optimize = document.getElementById("schedule-optimize").checked;
 
-  const status = document.getElementById("schedule-status");
+  function build_schedule_html(status_message) {
+    return `
+      <h3 id="schedule-generator">Schedule Generator</h3>
+      <div class="schedule-form-line">
+        <label>Number of schedules:</label>
+        <input id="schedule-count" type="number" value="${count}" min="1">
+      </div>
+      <div class="schedule-form-line">
+        <label>Optimize schedules:</label>
+        <input id="schedule-optimize" type="checkbox" ${optimize ? "checked" : ""}>
+      </div>
+      <div class="schedule-form-line">
+        <button id="generate-schedules">Generate</button>
+      </div>
+      <hr id="schedule-hr"/>
+      <div id="schedule-status">${status_message}</div>
+    `;
+  }
 
-  const count = parseInt(
-    document.getElementById("schedule-count").value
-  );
+  function attach_listener() {
+    const btn = document.getElementById("generate-schedules");
+    if (btn) btn.addEventListener("click", generate_schedules);
+  }
 
-  const optimize =
-    document.getElementById("schedule-optimize").checked;
-
-  status.textContent = "Creating schedules...";
+  navigator_div.innerHTML = build_schedule_html("Creating schedules...");
+  attach_listener();
 
   const res = await fetch("/run_scheduler", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      limit: count,
-      optimize: optimize
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ limit: count, optimize: optimize })
   });
 
   const data = await res.json();
-  console.log(data);
 
+  let status_message;
   if (data.error || data.count === undefined) {
-    status.textContent =
-      "Config file is empty, cannot generate schedules, please load a config file.";
-  }
-  else if (data.count === 0) {
-    status.textContent =
-      "No valid schedules. Please modify config.";
-  }
-  else {
+    status_message = "Config file is empty, cannot generate schedules, please load a config file.";
+  } else if (data.count === 0) {
+    status_message = "No valid schedules. Please modify config.";
+  } else {
     schedules_generated = true;
-    status.textContent =
-      data.count + " schedules generated.";
+    status_message = data.count + " schedules generated.";
     view_img.src = "/static/images/view.png";
     print_img.src = "/static/images/print.png";
     print_button.style.color = "#484848";
     view_button.style.color = "#484848";
-
-    // allow printing of schedules now
     view_button.disabled = false;
     print_button.disabled = false;
   }
+
+  navigator_div.innerHTML = build_schedule_html(status_message);
+  attach_listener();
 }
 
 async function load_schedule() {
-  clear_field_containers();
-
-  const container = document.getElementById("schedule");
-
-  container.innerHTML = `
+  const html = `
     <h3 id="schedule-generator">Schedule Generator</h3>
-
     <div class="schedule-form-line">
       <label>Number of schedules:</label>
       <input id="schedule-count" type="number" value="10" min="1">
     </div>
-
     <div class="schedule-form-line">
       <label>Optimize schedules:</label>
       <input id="schedule-optimize" type="checkbox" checked>
     </div>
-
     <div class="schedule-form-line">
       <button id="generate-schedules">Generate</button>
     </div>
-
     <hr id="schedule-hr"/>
-
-    <div id="schedule-status">
-      Waiting to generate schedules...
-    </div>
+    <div id="schedule-status">Waiting to generate schedules...</div>
   `;
-
-  document
-    .getElementById("generate-schedules")
-    .addEventListener("click", generate_schedules);
+  navigator_div.innerHTML = html;
+  document.getElementById("generate-schedules").addEventListener("click", generate_schedules);
+  navigate_to("Schedule");
 }
 
 async function view_schedule(index = 0) {
