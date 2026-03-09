@@ -126,6 +126,345 @@ function navigate_to(content) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Inline error helpers (display/handling from doc 2)
+// ---------------------------------------------------------------------------
+
+// Displays an inline error message directly below a given input element.
+// Highlights the input border red and inserts an error span after it.
+// Clears any pre-existing error on that input first.
+// Parameters: input_el - the input DOM element, message - error string to display
+function show_field_error(input_el, message) {
+  if (!input_el) return;
+
+  clear_field_error(input_el);
+
+  input_el.style.borderColor = "#cc0000";
+
+  const error_span = document.createElement("span");
+  error_span.className = "field-error";
+  error_span.style.color = "#cc0000";
+  error_span.style.fontSize = "0.82em";
+  error_span.style.display = "block";
+  error_span.style.marginTop = "2px";
+  error_span.textContent = message;
+
+  input_el.insertAdjacentElement("afterend", error_span);
+}
+
+// Removes the inline error state (red border + error span) from a given input element.
+// Parameters: input_el - the input DOM element
+function clear_field_error(input_el) {
+  if (!input_el) return;
+  input_el.style.borderColor = "";
+  const next = input_el.nextElementSibling;
+  if (next && next.classList.contains("field-error")) {
+    next.remove();
+  }
+}
+
+// Clears all inline field errors currently visible in the popup form.
+function clear_all_errors() {
+  popup_form.querySelectorAll(".field-error").forEach(el => el.remove());
+  popup_form.querySelectorAll("input").forEach(el => (el.style.borderColor = ""));
+}
+
+// Returns the identifying input element for the current field (used for error display).
+function get_current_id_input() {
+  if (current_field === "Faculty") return document.getElementById("faculty-name");
+  if (current_field === "Courses") return document.getElementById("courses-id");
+  if (current_field === "Labs") return document.getElementById("labs-name");
+  if (current_field === "Rooms") return document.getElementById("rooms-name");
+  return null;
+}
+
+// Reads the response body text, extracts any error message, and displays it on
+// the identifying input for the current field. Returns true if an error was shown,
+// false if no error was found and the operation can proceed.
+// Parameters: res - the fetch Response object, fallback - shown if body has no error
+async function check_response_error(res, fallback) {
+  const input_el = get_current_id_input();
+
+  let raw_text = "";
+  try {
+    raw_text = await res.text();
+  } catch (_) {
+    show_field_error(input_el, fallback);
+    return true;
+  }
+
+  let message = null;
+  try {
+    const body = JSON.parse(raw_text);
+    if (body && typeof body.error === "string" && body.error.trim() !== "") {
+      message = body.error;
+    } else if (body && typeof body.message === "string" && body.message.trim() !== "") {
+      message = body.message;
+    }
+  } catch (_) {
+    if (raw_text.trim() !== "") {
+      message = raw_text.trim();
+    }
+  }
+
+  if (message) {
+    show_field_error(input_el, message);
+    return true;
+  }
+
+  if (!res.ok) {
+    show_field_error(input_el, fallback);
+    return true;
+  }
+
+  return false;
+}
+
+// ---------------------------------------------------------------------------
+// Validation functions (from doc 2)
+// ---------------------------------------------------------------------------
+
+// Validates all inputs for the Faculty Add/Modify form.
+// Returns true if all fields are valid, false if any errors were shown.
+// Parameters: is_add - boolean, true when adding (all fields required)
+function validate_faculty_form(is_add) {
+  clear_all_errors();
+  let valid = true;
+
+  const name_input = document.getElementById("faculty-name");
+  const max_credits_input = document.getElementById("faculty-max-credits");
+  const min_credits_input = document.getElementById("faculty-min-credits");
+  // Add form uses "faculty-unique-course-limit"; modify form uses "faculty-unique-limit"
+  const unique_limit_input = document.getElementById("faculty-unique-course-limit")
+    || document.getElementById("faculty-unique-limit");
+  const max_days_input = document.getElementById("faculty-max-days");
+
+  const name = name_input ? name_input.value.trim() : "";
+  const max_credits = max_credits_input ? max_credits_input.value.trim() : "";
+  const min_credits = min_credits_input ? min_credits_input.value.trim() : "";
+  const unique_limit = unique_limit_input ? unique_limit_input.value.trim() : "";
+  const max_days = max_days_input ? max_days_input.value.trim() : "";
+
+  // Faculty name: required always; letters/spaces/hyphens/apostrophes only
+  if (!name) {
+    show_field_error(name_input, "Faculty name is required.");
+    valid = false;
+  } else if (!/^[A-Za-z\s'\-]+$/.test(name)) {
+    show_field_error(name_input, "Faculty name must contain only letters, spaces, hyphens, or apostrophes.");
+    valid = false;
+  }
+
+  // Max credits: required on add; must be a non-negative integer if provided
+  if (is_add || max_credits !== "") {
+    if (max_credits === "") {
+      show_field_error(max_credits_input, "Max credits is required.");
+      valid = false;
+    } else if (isNaN(max_credits) || !Number.isInteger(parseFloat(max_credits)) || parseInt(max_credits) < 0) {
+      show_field_error(max_credits_input, "Max credits must be a non-negative whole number.");
+      valid = false;
+    }
+  }
+
+  // Min credits: required on add; must be a non-negative integer if provided
+  if (is_add || min_credits !== "") {
+    if (min_credits === "") {
+      show_field_error(min_credits_input, "Min credits is required.");
+      valid = false;
+    } else if (isNaN(min_credits) || !Number.isInteger(parseFloat(min_credits)) || parseInt(min_credits) < 0) {
+      show_field_error(min_credits_input, "Min credits must be a non-negative whole number.");
+      valid = false;
+    }
+  }
+
+  // Cross-field check: min credits must not exceed max credits
+  if (
+    valid &&
+    max_credits !== "" && min_credits !== "" &&
+    !isNaN(max_credits) && !isNaN(min_credits) &&
+    parseInt(min_credits) > parseInt(max_credits)
+  ) {
+    show_field_error(min_credits_input, "Min credits must be less than or equal to max credits.");
+    valid = false;
+  }
+
+  // Unique course limit: required on add; must be a positive integer if provided
+  if (is_add || unique_limit !== "") {
+    if (unique_limit === "") {
+      show_field_error(unique_limit_input, "Unique course limit is required.");
+      valid = false;
+    } else if (isNaN(unique_limit) || !Number.isInteger(parseFloat(unique_limit)) || parseInt(unique_limit) < 1) {
+      show_field_error(unique_limit_input, "Unique course limit must be a whole number of at least 1.");
+      valid = false;
+    }
+  }
+
+  // Max days: required on add; must be 1–5 if provided
+  if (is_add || max_days !== "") {
+    if (max_days === "") {
+      show_field_error(max_days_input, "Max days is required.");
+      valid = false;
+    } else if (isNaN(max_days) || !Number.isInteger(parseFloat(max_days)) || parseInt(max_days) < 1 || parseInt(max_days) > 5) {
+      show_field_error(max_days_input, "Max days must be a whole number between 1 and 5.");
+      valid = false;
+    }
+  }
+
+  // Time slots: optional, but if filled must match "DAY HH:MM-HH:MM"
+  const time_slot_pattern = /^(MON|TUE|WED|THU|FRI)\s+([01]\d|2[0-3]):[0-5]\d-([01]\d|2[0-3]):[0-5]\d$/;
+  document.querySelectorAll('input[name="faculty-time-slot"]').forEach(input => {
+    const val = input.value.trim();
+    if (val !== "" && !time_slot_pattern.test(val)) {
+      show_field_error(input, "Time slot must be in the format: MON 09:00-12:00");
+      valid = false;
+    }
+  });
+
+  // Mandatory days: optional, but if filled must be a valid abbreviation
+  const day_pattern = /^(MON|TUE|WED|THU|FRI)$/;
+  document.querySelectorAll('input[name="faculty-mandatory-day"]').forEach(input => {
+    const val = input.value.trim();
+    if (val !== "" && !day_pattern.test(val)) {
+      show_field_error(input, "Day must be one of: MON, TUE, WED, THU, FRI");
+      valid = false;
+    }
+  });
+
+  return valid;
+}
+
+// Validates the Faculty Delete form (name only).
+// Returns true if valid, false otherwise.
+function validate_faculty_delete_form() {
+  clear_all_errors();
+  let valid = true;
+
+  const name_input = document.getElementById("faculty-name");
+  const name = name_input ? name_input.value.trim() : "";
+
+  if (!name) {
+    show_field_error(name_input, "Faculty name is required.");
+    valid = false;
+  } else if (!/^[A-Za-z\s'\-]+$/.test(name)) {
+    show_field_error(name_input, "Faculty name must contain only letters, spaces, hyphens, or apostrophes.");
+    valid = false;
+  }
+
+  return valid;
+}
+
+// Validates all inputs for the Courses Add/Modify form.
+// Returns true if all fields are valid, false if any errors were shown.
+// Parameters: is_add - boolean, true when adding (stricter required checks)
+function validate_courses_form(is_add) {
+  clear_all_errors();
+  let valid = true;
+
+  const id_input = document.getElementById("courses-id");
+  const credits_input = document.getElementById("courses-credits");
+
+  const course_id = id_input ? id_input.value.trim() : "";
+  const credits = credits_input ? credits_input.value.trim() : "";
+
+  // Course ID: required always; must match format like "CMSC 420"
+  const course_id_pattern = /^[A-Z]{2,6}\s+\d{3,4}$/;
+  if (!course_id) {
+    show_field_error(id_input, "Course ID is required.");
+    valid = false;
+  } else if (!course_id_pattern.test(course_id)) {
+    show_field_error(id_input, "Course ID must be in the format: CMSC 420 (uppercase letters, space, then 3–4 digits).");
+    valid = false;
+  }
+
+  // Credits: required on add; must be a positive integer if provided
+  if (is_add || credits !== "") {
+    if (credits === "") {
+      show_field_error(credits_input, "Credits is required.");
+      valid = false;
+    } else if (isNaN(credits) || !Number.isInteger(parseFloat(credits)) || parseInt(credits) < 1) {
+      show_field_error(credits_input, "Credits must be a whole number greater than 0.");
+      valid = false;
+    }
+  }
+
+  // Rooms: at least one non-empty entry required when adding
+  if (is_add) {
+    const room_inputs = [...document.querySelectorAll('input[name="courses-room"]')];
+    const filled_rooms = room_inputs.filter(i => i.value.trim() !== "");
+    if (room_inputs.length > 0 && filled_rooms.length === 0) {
+      show_field_error(room_inputs[0], "At least one room is required.");
+      valid = false;
+    }
+  }
+
+  return valid;
+}
+
+// Validates the Courses Delete form (course ID only).
+// Returns true if valid, false otherwise.
+function validate_courses_delete_form() {
+  clear_all_errors();
+  let valid = true;
+
+  const id_input = document.getElementById("courses-id");
+  const course_id = id_input ? id_input.value.trim() : "";
+
+  const course_id_pattern = /^[A-Z]{2,6}\s+\d{3,4}$/;
+  if (!course_id) {
+    show_field_error(id_input, "Course ID is required.");
+    valid = false;
+  } else if (!course_id_pattern.test(course_id)) {
+    show_field_error(id_input, "Course ID must be in the format: CMSC 420 (uppercase letters, space, then 3–4 digits).");
+    valid = false;
+  }
+
+  return valid;
+}
+
+// Validates the Labs Add/Modify/Delete form (name only).
+// Returns true if valid, false otherwise.
+function validate_labs_form() {
+  clear_all_errors();
+  let valid = true;
+
+  const name_input = document.getElementById("labs-name");
+  const name = name_input ? name_input.value.trim() : "";
+
+  if (!name) {
+    show_field_error(name_input, "Lab name is required.");
+    valid = false;
+  } else if (name.length > 64) {
+    show_field_error(name_input, "Lab name must be 64 characters or fewer.");
+    valid = false;
+  }
+
+  return valid;
+}
+
+// Validates the Rooms Add/Modify/Delete form (name only).
+// Returns true if valid, false otherwise.
+function validate_rooms_form() {
+  clear_all_errors();
+  let valid = true;
+
+  const name_input = document.getElementById("rooms-name");
+  const name = name_input ? name_input.value.trim() : "";
+  const room_pattern = /^[A-Za-z][\w\s\-]*$/;
+
+  if (!name) {
+    show_field_error(name_input, "Room name is required.");
+    valid = false;
+  } else if (!room_pattern.test(name)) {
+    show_field_error(name_input, "Room name must start with a letter and contain only letters, numbers, spaces, or hyphens.");
+    valid = false;
+  }
+
+  return valid;
+}
+
+// ---------------------------------------------------------------------------
+// Popup forms (doc 1 structure, verbatim)
+// ---------------------------------------------------------------------------
+
 // Opens the add/modify/delete popup for the currently selected field.
 // Shows an error if no field is selected. Renders the appropriate form
 // fields for each combination of action and current_field.
@@ -460,7 +799,7 @@ function edit_popup(action) {
             placeholder: "e.g. TUE",
           }
         ]);
-        
+
         break;
       case "Courses":
         popup_form.innerHTML = `
@@ -512,8 +851,7 @@ function edit_popup(action) {
 
         const course_select = document.getElementById("courses-select");
 
-        course_select.addEventListener("change", async function ()
-        {
+        course_select.addEventListener("change", async function () {
           const index = this.value;
 
           const res = await fetch(`/courses/${index}`);
@@ -534,19 +872,29 @@ function edit_popup(action) {
       case "Labs":
         popup_form.innerHTML = `
           <div class="form-line">
-            <label for="labs-name">Lab Name:</label>
+            <label for="labs-select">Select Lab:</label>
+            <select id="labs-select"></select>
+          </div>
+          <div class="form-line">
+            <label for="labs-name">New Lab Name:</label>
             <input type="text" id="labs-name" placeholder="e.g. Mac" />
           </div>
         `;
+        populate_labs_dropdown();
         break;
 
       case "Rooms":
         popup_form.innerHTML = `
           <div class="form-line">
-            <label for="rooms-name">Room Name:</label>
+            <label for="rooms-select">Select Room:</label>
+            <select id="rooms-select"></select>
+          </div>
+          <div class="form-line">
+            <label for="rooms-name">New Room Name:</label>
             <input type="text" id="rooms-name" placeholder="e.g. Roddy 147" />
           </div>
         `;
+        populate_rooms_dropdown();
         break;
     }
   } else if (action === "Delete") {
@@ -669,7 +1017,7 @@ forward_button.addEventListener("click", () => {
 view_button.addEventListener("click", () => {
 
   if (!schedules_generated) {
-    return; 
+    return;
   }
 
   viewSchedule(0);
@@ -749,18 +1097,17 @@ delete_button.addEventListener("click", () => {
   edit_popup("Delete");
 });
 
-// Save button: reads form inputs and POSTs to the appropriate API route
-// based on current_field and current_operation. Refreshes faculty list on success.
+// Save button: validates inputs and POSTs to the appropriate API route based on
+// current_field and current_operation. Uses inline errors instead of alerts.
 popup_save.addEventListener("click", async () => {
   console.log("SAVE CLICKED", current_field, current_operation);
   if (current_field === "Faculty") {
 
-    const name = document.getElementById("faculty-name").value.trim();
+    if (current_operation === "add" && !validate_faculty_form(true)) return;
+    if (current_operation === "modify" && !validate_faculty_form(false)) return;
+    if (current_operation === "delete" && !validate_faculty_delete_form()) return;
 
-    if (!name) {
-      alert("Enter a faculty name");
-      return;
-    }
+    const name = document.getElementById("faculty-name").value.trim();
 
     if (current_operation === "add") {
 
@@ -768,7 +1115,7 @@ popup_save.addEventListener("click", async () => {
         document.getElementById("faculty-max-credits").value
       );
 
-      await fetch("/faculty", {
+      const add_res = await fetch("/faculty", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -787,20 +1134,24 @@ popup_save.addEventListener("click", async () => {
         })
       });
 
+      if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
+
     }
 
     else if (current_operation === "delete") {
 
-      await fetch(`/faculty/${encodeURIComponent(name)}`, {
+      const del_res = await fetch(`/faculty/${encodeURIComponent(name)}`, {
         method: "DELETE"
       });
+
+      if (await check_response_error(del_res, `"${name}" was not found.`)) return;
 
     }
 
     else if (current_operation === "modify") {
       const original_name = document.getElementById("faculty-select").value;
 
-      const res = await fetch(`/faculty/${encodeURIComponent(original_name)}`, {
+      const mod_res = await fetch(`/faculty/${encodeURIComponent(original_name)}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
@@ -827,16 +1178,17 @@ popup_save.addEventListener("click", async () => {
           mandatory_days: get_dynamic_values("faculty-mandatory-days")
         })
       });
-        if (!res.ok) {
-        const err = await res.json();
-        alert(err.error || "Modify failed");
-        return;   // STOP here
-      }
+
+      if (await check_response_error(mod_res, `"${original_name}" could not be modified.`)) return;
     }
-    
+
     await loadFaculty();
     await populate_faculty_dropdown();
   } else if (current_field === "Courses") {
+
+    if (current_operation === "add" && !validate_courses_form(true)) return;
+    if (current_operation === "modify" && !validate_courses_form(false)) return;
+    if (current_operation === "delete" && !validate_courses_delete_form()) return;
 
     const idInput = document.getElementById("courses-id");
 
@@ -868,7 +1220,7 @@ popup_save.addEventListener("click", async () => {
 
     if (current_operation === "add") {
 
-      await fetch("/courses", {
+      const add_res = await fetch("/courses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -883,13 +1235,17 @@ popup_save.addEventListener("click", async () => {
         })
       });
 
+      if (await check_response_error(add_res, `"${course_id}" could not be added.`)) return;
+
     }
 
     else if (current_operation === "delete") {
 
-      await fetch(`/courses/${encodeURIComponent(course_id)}`, {
+      const del_res = await fetch(`/courses/${encodeURIComponent(course_id)}`, {
         method: "DELETE"
       });
+
+      if (await check_response_error(del_res, `"${course_id}" was not found.`)) return;
 
     }
 
@@ -897,7 +1253,7 @@ popup_save.addEventListener("click", async () => {
 
       const course_index = document.getElementById("courses-select").value;
 
-      await fetch(`/courses/${course_index}`, {
+      const mod_res = await fetch(`/courses/${course_index}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
@@ -911,6 +1267,8 @@ popup_save.addEventListener("click", async () => {
           faculty: get_dynamic_values("courses-faculty")
         })
       });
+
+      if (await check_response_error(mod_res, `"${course_id}" could not be modified.`)) return;
       await populate_course_dropdown();
     }
 
@@ -926,14 +1284,11 @@ popup_save.addEventListener("click", async () => {
 
     const name = nameInput.value.trim();
 
-    if (!name) {
-      alert("Enter a lab name");
-      return;
-    }
-
     if (current_operation === "add") {
 
-      await fetch("/labs", {
+      if (!validate_labs_form()) return;
+
+      const add_res = await fetch("/labs", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -943,20 +1298,67 @@ popup_save.addEventListener("click", async () => {
         })
       });
 
+      if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
+
     }
 
     else if (current_operation === "delete") {
 
-      await fetch(`/labs/${encodeURIComponent(name)}`, {
+      if (!validate_labs_form()) return;
+
+      const del_res = await fetch(`/labs/${encodeURIComponent(name)}`, {
         method: "DELETE"
       });
+
+      if (await check_response_error(del_res, `"${name}" was not found.`)) return;
 
     }
 
     else if (current_operation === "modify") {
 
-      await fetch(`/labs/${encodeURIComponent(name)}`, {
+      const select = document.getElementById("labs-select");
+      if (!select || select.options.length === 0) { alert("No lab selected"); return; }
+      const old_name = select.value;
+      const new_name = nameInput.value.trim();
+
+      if (!new_name) {
+        show_field_error(nameInput, "New lab name is required.");
+        return;
+      }
+
+      const mod_res = await fetch(`/labs/${encodeURIComponent(old_name)}`, {
         method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: new_name
+        })
+      });
+
+      if (await check_response_error(mod_res, `"${old_name}" could not be modified.`)) return;
+      populate_labs_dropdown();
+
+    }
+
+    await loadLabs();
+  } else if (current_field === "Rooms") {
+
+    const nameInput = document.getElementById("rooms-name");
+
+    if (!nameInput) {
+      console.error("Room name input not found");
+      return;
+    }
+
+    const name = nameInput.value.trim();
+
+    if (current_operation === "add") {
+
+      if (!validate_rooms_form()) return;
+
+      const add_res = await fetch("/rooms", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
@@ -965,63 +1367,51 @@ popup_save.addEventListener("click", async () => {
         })
       });
 
+      if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
+
     }
 
-    await loadLabs();
-  } else if (current_field === "Rooms") {
+    else if (current_operation === "delete") {
 
-  const nameInput = document.getElementById("rooms-name");
+      if (!validate_rooms_form()) return;
 
-  if (!nameInput) {
-    console.error("Room name input not found");
-    return;
+      const del_res = await fetch(`/rooms/${encodeURIComponent(name)}`, {
+        method: "DELETE"
+      });
+
+      if (await check_response_error(del_res, `"${name}" was not found.`)) return;
+
+    }
+
+    else if (current_operation === "modify") {
+
+      const select = document.getElementById("rooms-select");
+      if (!select || select.options.length === 0) { alert("No room selected"); return; }
+      const old_name = select.value;
+      const new_name = nameInput.value.trim();
+
+      if (!new_name) {
+        show_field_error(nameInput, "New room name is required.");
+        return;
+      }
+
+      const mod_res = await fetch(`/rooms/${encodeURIComponent(old_name)}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: new_name
+        })
+      });
+
+      if (await check_response_error(mod_res, `"${old_name}" could not be modified.`)) return;
+      populate_rooms_dropdown();
+
+    }
+
+    await loadRooms();
   }
-
-  const name = nameInput.value.trim();
-
-  if (!name) {
-    alert("Enter a room name");
-    return;
-  }
-
-  if (current_operation === "add") {
-
-    await fetch("/rooms", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        name: name
-      })
-    });
-
-  }
-
-  else if (current_operation === "delete") {
-
-    await fetch(`/rooms/${encodeURIComponent(name)}`, {
-      method: "DELETE"
-    });
-
-  }
-
-  else if (current_operation === "modify") {
-
-    await fetch(`/rooms/${encodeURIComponent(name)}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        name: name
-      })
-    });
-
-  }
-
-  await loadRooms();
-}
 
 });
 
@@ -1061,32 +1451,13 @@ popup_close.addEventListener("click", () => {
   popup_form.innerHTML = "";
   amd_popup.classList.add("popup-hidden");
   wrapper.style.pointerEvents = "all";
-  popup_save.style.display = "block"; 
+  popup_save.style.display = "block";
 
   if (current_field === "Faculty") faculty_button.focus();
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
   else if (current_field === "Rooms") rooms_button.focus();
 });
-
-
-
-// Fetches all faculty from the API and renders each name as a div in the faculty container.
-async function loadFaculty() {
-
-  const res = await fetch("/faculty");
-  const faculty = await res.json();
-
-  const container = document.getElementById("faculty");
-  container.innerHTML = "";
-
-  faculty.forEach(f => {
-    const div = document.createElement("div");
-    div.textContent = f.name;
-    container.appendChild(div);
-  });
-
-}
 
 // POSTs a new faculty member to the API and logs the response.
 // Parameters: formData - object containing faculty fields
@@ -1159,8 +1530,7 @@ async function loadRooms() {
   });
 
 }
-function populate_dynamic_container(container_id, values, name)
-{
+function populate_dynamic_container(container_id, values, name) {
   const container = document.getElementById(container_id);
   container.innerHTML = "";
 
@@ -1178,8 +1548,7 @@ function populate_dynamic_container(container_id, values, name)
     container.appendChild(wrapper);
   });
 }
-function setup_course_dynamic_fields()
-{
+function setup_course_dynamic_fields() {
   setup_dynamic_fields([
     {
       button_id: "add-courses-rooms",
@@ -1207,8 +1576,7 @@ function setup_course_dynamic_fields()
     }
   ]);
 }
-function populate_course_dropdown()
-{
+function populate_course_dropdown() {
   const select = document.getElementById("courses-select");
 
   if (!select) return;
@@ -1287,7 +1655,7 @@ async function generateSchedules() {
       data.count + " schedules generated.";
     view_img.src = "/static/images/view.png";
     print_img.src = "/static/images/print.png";
-    
+
   }
 }
 async function loadSchedule() {
@@ -1324,8 +1692,7 @@ async function loadSchedule() {
     .addEventListener("click", generateSchedules);
 }
 
-function populate_faculty_dropdown()
-{
+function populate_faculty_dropdown() {
   const select = document.getElementById("faculty-select");
 
   fetch("/faculty")
@@ -1348,8 +1715,57 @@ function populate_faculty_dropdown()
     });
 }
 
-async function populate_faculty_fields(name)
-{
+function populate_labs_dropdown() {
+  const select = document.getElementById("labs-select");
+  if (!select) return;
+
+  fetch("/labs")
+    .then(res => res.json())
+    .then(labs => {
+
+      select.innerHTML = "";
+
+      labs.forEach(l => {
+
+        const option = document.createElement("option");
+
+        option.value = l.name;
+        option.textContent = l.name;
+
+        select.appendChild(option);
+
+      });
+
+    })
+    .catch(err => console.error("failed to load labs:", err));
+}
+
+function populate_rooms_dropdown() {
+  const select = document.getElementById("rooms-select");
+  if (!select) return;
+
+  fetch("/rooms")
+    .then(res => res.json())
+    .then(rooms => {
+
+      select.innerHTML = "";
+
+      rooms.forEach(r => {
+
+        const option = document.createElement("option");
+
+        option.value = r.name;
+        option.textContent = r.name;
+
+        select.appendChild(option);
+
+      });
+
+    })
+    .catch(err => console.error("failed to load rooms:", err));
+}
+
+async function populate_faculty_fields(name) {
   const res = await fetch(`/faculty/${encodeURIComponent(name)}`);
   const data = await res.json();
 
@@ -1445,8 +1861,7 @@ async function viewSchedule(index = 0) {
   amd_popup.classList.remove("popup-hidden");
   wrapper.style.pointerEvents = "none";
 }
-function get_dynamic_values(name)
-{
+function get_dynamic_values(name) {
   const inputs = document.querySelectorAll(`input[name="${name}"]`);
 
   const values = [];
@@ -1467,8 +1882,7 @@ function clear_field_containers() {
   document.getElementById("schedule").innerHTML = "";
 }
 
-function build_times_dict(values)
-{
+function build_times_dict(values) {
   const times = {
     MON: [],
     TUE: [],
@@ -1494,21 +1908,18 @@ function build_times_dict(values)
   return times;
 }
 
-function build_preference_dict(values)
-{
+function build_preference_dict(values) {
   const prefs = {};
 
   values.forEach(v => {
 
     const parts = v.trim().split(" ");
 
-    if (parts.length === 2)
-    {
+    if (parts.length === 2) {
       const key = parts[0] + " " + parts[1];
       prefs[key] = 5;
     }
-    else
-    {
+    else {
       prefs[v] = 5;
     }
 
