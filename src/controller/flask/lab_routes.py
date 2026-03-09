@@ -76,11 +76,11 @@ def register_lab_routes(app, scheduler):
 
             labs = scheduler.config.config.labs
 
-            if lab_name not in labs:
-                return jsonify({"error": f'"{lab_name}" was not found. Please check the name and try again.'}), 404
-
             # Converting to upper case to add case insensitivity
             upper_case_labs = [lab.upper() for lab in labs]
+
+            if lab_name.upper() not in upper_case_labs:
+                return jsonify({"error": f'"{lab_name}" was not found. Please check the name and try again.'}), 404
 
             if new_name.upper() in upper_case_labs:
                 return jsonify({"error": f'"{new_name}" already exists. Choose a different name.'}), 409
