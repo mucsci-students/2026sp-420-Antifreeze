@@ -47,7 +47,7 @@ const nav_bar = document.querySelector(".nav-bar");
 const top_bar = document.querySelector(".top-bar");
 const team_name = document.querySelector(".team-name");
 const gui_wrapper = document.getElementById("wrapper");
-
+const config_name = document.getElementById("config-name");
 // Popup elements
 const amd_popup = document.getElementById("amd-popup");
 const popup_save = document.getElementById("popup-save");
@@ -1611,6 +1611,12 @@ file_input.addEventListener("change", async function () {
     rooms_button.disabled = false;
     schedule_button.disabled = false;
     view_button.disabled = false;
+
+    const timestamp = new Date().toLocaleTimeString();
+    config_name.textContent = `✔ Config loaded: "${file.name}" at ${timestamp}`;
+    config_name.classList.remove("visible");
+    void config_name.offsetWidth;
+    config_name.classList.add("visible");
   }
 });
 

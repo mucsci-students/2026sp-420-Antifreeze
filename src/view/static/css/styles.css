@@ -5,6 +5,7 @@ body {
   font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
     "Lucida Sans", Arial, sans-serif;
 }
+
 #wrapper {
   margin-top: 30px;
   margin-bottom: 30px;
@@ -35,18 +36,17 @@ header {
   padding-right: 5px;
   padding-bottom: 8px;
 }
+
 h3 {
   margin: 0;
-  background-image: linear-gradient(
-    to right,
-    rgba(254, 82, 58, 1),
-    rgba(254, 179, 86, 1),
-    rgba(255, 240, 77, 1),
-    rgba(88, 190, 62, 0.75),
-    rgba(82, 134, 254, 0.5),
-    rgba(200, 92, 255, 0.25),
-    rgba(255, 0, 0, 0)
-  );
+  background-image: linear-gradient(to right,
+      rgba(254, 82, 58, 1),
+      rgba(254, 179, 86, 1),
+      rgba(255, 240, 77, 1),
+      rgba(88, 190, 62, 0.75),
+      rgba(82, 134, 254, 0.5),
+      rgba(200, 92, 255, 0.25),
+      rgba(255, 0, 0, 0));
   width: 98%;
   height: 100%;
   padding-top: 5px;
@@ -72,6 +72,7 @@ nav {
   color: #484848;
   font-size: medium;
 }
+
 button {
   font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
     "Lucida Sans", Arial, sans-serif;
@@ -82,6 +83,7 @@ button {
   background-color: #e6e6e6;
   cursor: pointer;
 }
+
 hr {
   display: block;
   border: 1px solid #989898;
@@ -98,22 +100,27 @@ hr {
   padding: 2px;
   cursor: pointer;
 }
+
 .top-bar button:hover {
   background-color: #e6e6e6;
   color: #808080;
 }
+
 #load-button label {
   cursor: pointer;
 }
+
 #load {
   visibility: hidden;
   display: none;
   cursor: pointer;
 }
+
 #save-button a {
   text-decoration: none;
   color: #484848;
 }
+
 #save-button a:hover {
   color: #808080;
 }
@@ -123,16 +130,19 @@ button:disabled {
   cursor: not-allowed;
   pointer-events: none;
 }
+
 .edit-bar button {
   align-content: center;
   text-align: center;
   border: none;
   margin-bottom: 6px;
 }
+
 .edit-bar button img {
   display: block;
   width: 48px;
 }
+
 #vertical-line {
   display: inline-block;
   border-left: 2px solid #989898;
@@ -143,39 +153,46 @@ button:disabled {
   margin-top: 5px;
   margin-bottom: 5px;
 }
+
 #back-button {
   color: #808080;
   text-shadow: 1px 1px #ffffff;
   margin-left: 20px;
   margin-right: 10px;
 }
+
 #forward-button {
   color: #808080;
   text-shadow: 1px 1px #ffffff;
   margin-left: 10px;
   margin-right: 0px;
 }
+
 #add-button {
   margin-right: 10px;
   padding: 5px;
   color: #808080;
 }
+
 #modify-button {
   margin-left: 10px;
   margin-right: 10px;
   padding: 5px;
   color: #808080;
 }
+
 #delete-button {
   margin-left: 10px;
   padding: 5px;
   color: #808080;
 }
+
 #view-button {
   margin-right: 10px;
   padding: 5px;
   color: #808080;
 }
+
 #print-button {
   margin-left: 10px;
   color: #808080;
@@ -185,11 +202,13 @@ button:disabled {
 .selection-bar {
   display: flex;
 }
+
 .selection-bar p {
   margin-left: 10px;
   margin-bottom: 5px;
   margin-top: 2px;
 }
+
 .selection-bar button {
   border: none;
   border-radius: 0;
@@ -211,6 +230,7 @@ button:disabled {
   border-right-color: #cd3329;
   border-width: 3px;
 }
+
 #faculty-button:hover {
   text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
   background-color: #ff887f;
@@ -219,6 +239,7 @@ button:disabled {
   border-bottom-color: #ec584e;
   border-right-color: #ec584e;
 }
+
 #faculty-button:focus {
   background-color: #ed4134;
   border: inset;
@@ -239,6 +260,7 @@ button:disabled {
   border-right-color: #e97e26;
   border-width: 3px;
 }
+
 #courses-button:hover {
   text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
   background-color: #ffbe74;
@@ -247,6 +269,7 @@ button:disabled {
   border-bottom-color: #ff953f;
   border-right-color: #ff953f;
 }
+
 #courses-button:focus {
   background-color: #f18e1d;
   border: inset;
@@ -267,6 +290,7 @@ button:disabled {
   border-right-color: #e1ba11;
   border-width: 3px;
 }
+
 #labs-button:hover {
   text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
   background-color: #ffee8f;
@@ -275,6 +299,7 @@ button:disabled {
   border-bottom-color: #fed520;
   border-right-color: #fed520;
 }
+
 #labs-button:focus {
   background-color: #f5d312;
   border: inset;
@@ -294,6 +319,7 @@ button:disabled {
   border-bottom-color: #21a442;
   border-right-color: #21a442;
 }
+
 #rooms-button:hover {
   text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
   background-color: #44e394;
@@ -302,6 +328,7 @@ button:disabled {
   border-bottom-color: #34c257;
   border-right-color: #34c257;
 }
+
 #rooms-button:focus {
   background-color: #21a362;
   border: inset;
@@ -322,6 +349,7 @@ button:disabled {
   border-right-color: #1394d1;
   border-width: 3px;
 }
+
 #schedule-button:hover {
   text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
   background-color: #6bd0ff;
@@ -330,6 +358,7 @@ button:disabled {
   border-bottom-color: #2bb1ef;
   border-right-color: #2bb1ef;
 }
+
 #schedule-button:focus {
   background-color: #2daae4;
   border: inset;
@@ -355,6 +384,7 @@ main {
   min-height: 405px;
   max-height: 1080px;
 }
+
 .navigator {
   display: block;
   cursor: pointer;
@@ -380,20 +410,24 @@ main {
   margin-left: 5px;
   margin-bottom: 10px;
 }
+
 .schedule-form-line {
   margin-left: 6px;
   margin-top: 5px;
   display: block;
 }
+
 .schedule-form-line label {
   margin-left: 6px;
   width: 160px;
   display: inline-block;
 }
+
 .schedule-form-line input {
   display: inline-block;
   width: 100px;
 }
+
 #generate-schedules {
   padding-left: 5px;
   padding-right: 5px;
@@ -409,6 +443,7 @@ main {
   border-right-color: #bbbbbb;
   border-width: 3px;
 }
+
 #generate-schedules:hover {
   color: #808080;
   text-shadow: -1px -1px #ffffff;
@@ -418,6 +453,7 @@ main {
   border-bottom-color: #eeeeee;
   border-right-color: #eeeeee;
 }
+
 #schedule-hr {
   display: block;
   margin-right: 9px;
@@ -426,18 +462,17 @@ main {
   margin-top: 15px;
   margin-bottom: 10px;
 }
+
 #schedule-status {
   display: block;
   margin-left: 9px;
 }
 
-/* ----- Footer ----- */
-footer {
+footer#config-name {
   background-color: #e6e6e6;
   color: #484848;
   font-size: small;
-  padding-top: 8px;
-  padding-bottom: 10px;
+  padding: 6px 10px;
   margin-top: 4px;
   margin-left: 2px;
   margin-right: 4px;
@@ -448,4 +483,25 @@ footer {
   border-bottom-color: #ffffff;
   border-right-color: #ffffff;
   border-width: 2px;
+  border-left: 4px solid #2bb971;
+  opacity: 0;
+  box-sizing: border-box;
+}
+
+footer#config-name.visible {
+  animation: footer-fade 10.3s ease forwards;
+}
+
+@keyframes footer-fade {
+  0% {
+    opacity: 1;
+  }
+
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
