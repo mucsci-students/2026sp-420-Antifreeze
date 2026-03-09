@@ -362,26 +362,6 @@ main {
 }
 
 /* ----- Fields Display ----- */
-#faculty {
-  margin-left: 10px;
-  margin-top: 10px;
-}
-#courses {
-  margin-left: 10px;
-  margin-top: 0;
-}
-#labs {
-  margin-left: 10px;
-  margin-top: 0;
-}
-#rooms {
-  margin-left: 10px;
-  margin-top: 0;
-}
-#schedule {
-  margin-left: 10px;
-  margin-top: 0;
-}
 #schedule-generator {
   background-image: none;
   box-shadow: none;
