@@ -27,11 +27,7 @@ modify_button.disabled = true;
 delete_button.disabled = true;
 view_button.disabled = true;
 print_button.disabled = true;
-faculty_button.disabled = true;
-courses_button.disabled = true;
-labs_button.disabled = true;
-rooms_button.disabled = true;
-schedule_button.disabled = true;
+
 
 // Images inside buttons
 const back_img = back_button.querySelector("img");
@@ -140,7 +136,7 @@ function update_button_images() {
 
 // Navigates to new content by pushing the current view onto the back stack.
 // Clears the forward stack on new navigation. Updates button images.
-// Parameters: content - HTML string to display in navigator_div
+// Parameters: field - field name string
 function navigate_to(field) {
   if (current_content !== field) {
     back_stack.push(current_content);
@@ -161,6 +157,10 @@ async function go_to_field(field) {
   else if (field === "Rooms") await load_rooms();
   else if (field === "Schedule") await load_schedule();
 }
+
+// ---------------------------------------------------------------------------
+// Inline error helpers
+// ---------------------------------------------------------------------------
 
 // Displays an inline error message directly below a given input element.
 // Highlights the input border red and inserts an error span after it.
@@ -221,12 +221,10 @@ async function check_response_error(res, fallback) {
   try {
     raw_text = await res.text();
   } catch (_) {
-    // Could not read body at all — show fallback
     show_field_error(input_el, fallback);
     return true;
   }
 
-  // Try to extract an error string from the body
   let message = null;
   try {
     const body = JSON.parse(raw_text);
@@ -236,7 +234,6 @@ async function check_response_error(res, fallback) {
       message = body.message;
     }
   } catch (_) {
-    // Body was plain text, not JSON
     if (raw_text.trim() !== "") {
       message = raw_text.trim();
     }
@@ -254,6 +251,10 @@ async function check_response_error(res, fallback) {
 
   return false;
 }
+
+// ---------------------------------------------------------------------------
+// Validation functions
+// ---------------------------------------------------------------------------
 
 // Validates all inputs for the Faculty Add/Modify form.
 // Returns true if all fields are valid, false if any errors were shown.
@@ -327,7 +328,7 @@ function validate_faculty_form(is_add) {
     }
   }
 
-  // Max days: required on add; must be 1–5 if provided
+  // Max days: required on add; must be 1-5 if provided
   if (is_add || max_days !== "") {
     if (max_days === "") {
       show_field_error(max_days_input, "Max days is required.");
@@ -400,7 +401,7 @@ function validate_courses_form(is_add) {
     show_field_error(id_input, "Course ID is required.");
     valid = false;
   } else if (!course_id_pattern.test(course_id)) {
-    show_field_error(id_input, "Course ID must be in the format: CMSC 420 (uppercase letters, space, then 3–4 digits).");
+    show_field_error(id_input, "Course ID must be in the format: CMSC 420 (uppercase letters, space, then 3-4 digits).");
     valid = false;
   }
 
@@ -442,7 +443,7 @@ function validate_courses_delete_form() {
     show_field_error(id_input, "Course ID is required.");
     valid = false;
   } else if (!course_id_pattern.test(course_id)) {
-    show_field_error(id_input, "Course ID must be in the format: CMSC 420 (uppercase letters, space, then 3–4 digits).");
+    show_field_error(id_input, "Course ID must be in the format: CMSC 420 (uppercase letters, space, then 3-4 digits).");
     valid = false;
   }
 
@@ -477,9 +478,8 @@ function validate_rooms_form() {
 
   const name_input = document.getElementById("rooms-name");
   const name = name_input ? name_input.value.trim() : "";
-
-  // Room name must start with a letter; may contain letters, digits, spaces, hyphens
   const room_pattern = /^[A-Za-z][\w\s\-]*$/;
+
   if (!name) {
     show_field_error(name_input, "Room name is required.");
     valid = false;
@@ -490,6 +490,10 @@ function validate_rooms_form() {
 
   return valid;
 }
+
+// ---------------------------------------------------------------------------
+// Popup forms
+// ---------------------------------------------------------------------------
 
 // Opens the add/modify/delete popup for the currently selected field.
 // Shows an error if no field is selected. Renders the appropriate form
@@ -1003,7 +1007,6 @@ function update_amd_images() {
     modify_button.style.color = "#808080";
     delete_button.style.color = "#808080";
 
-    // Disable the buttons
     add_button.disabled = true;
     modify_button.disabled = true;
     delete_button.disabled = true;
@@ -1016,7 +1019,6 @@ function update_amd_images() {
     modify_button.style.color = "#484848";
     delete_button.style.color = "#484848";
 
-    // Disable the buttons
     add_button.disabled = false;
     modify_button.disabled = false;
     delete_button.disabled = false;
@@ -1077,7 +1079,8 @@ back_button.addEventListener("click", async () => {
     update_button_images();
   }
 });
- // Forward button
+
+// Forward button
 forward_button.addEventListener("click", async () => {
   if (forward_stack.length > 0) {
     back_stack.push(current_content);
@@ -1229,7 +1232,7 @@ gui_wrapper.addEventListener("click", () => {
 });
 
 // Save button: validates form inputs, then POSTs to the appropriate API route
-// based on current_field and current_operation. Refreshes the list on success.
+// based on current_field and current_operation. Uses inline errors throughout.
 popup_save.addEventListener("click", async () => {
   console.log("SAVE CLICKED", current_field, current_operation);
 
@@ -1247,7 +1250,7 @@ popup_save.addEventListener("click", async () => {
         document.getElementById("faculty-max-credits").value
       );
 
-      await fetch("/faculty", {
+      const add_res = await fetch("/faculty", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -1266,6 +1269,8 @@ popup_save.addEventListener("click", async () => {
         })
       });
 
+      if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
+
     } else if (current_operation === "delete") {
 
       const del_res = await fetch(`/faculty/${encodeURIComponent(name)}`, {
@@ -1280,24 +1285,23 @@ popup_save.addEventListener("click", async () => {
         document.getElementById("faculty-max-credits").value
       );
 
-      const data = {
-        maximum_credits: max_credits,
-        maximum_days: 4,
-        minimum_credits: 0,
-        unique_course_limit: 1,
-        times: {},
-        course_preferences: {},
-        room_preferences: {},
-        lab_preferences: {},
-        mandatory_days: []
-      };
-
       const mod_res = await fetch(`/faculty/${encodeURIComponent(name)}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          name: name,
+          maximum_credits: max_credits,
+          maximum_days: 4,
+          minimum_credits: 0,
+          unique_course_limit: 1,
+          times: {},
+          course_preferences: {},
+          room_preferences: {},
+          lab_preferences: {},
+          mandatory_days: []
+        })
       });
 
       if (await check_response_error(mod_res, `"${name}" was not found. Please check the name and try again.`)) return;
@@ -1342,7 +1346,7 @@ popup_save.addEventListener("click", async () => {
 
     if (current_operation === "add") {
 
-      await fetch("/courses", {
+      const add_res = await fetch("/courses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -1356,6 +1360,8 @@ popup_save.addEventListener("click", async () => {
           faculty: faculty
         })
       });
+
+      if (await check_response_error(add_res, `"${course_id}" could not be added.`)) return;
 
     } else if (current_operation === "delete") {
 
@@ -1576,7 +1582,7 @@ popup_close.addEventListener("click", () => {
   else if (current_field === "Schedule") schedule_button.focus();
 });
 
-// posts a new faculty member to the API and logs the response.
+// Posts a new faculty member to the API and logs the response.
 // Parameters: form_data - object containing faculty fields
 async function add_faculty(form_data) {
   const res = await fetch("/faculty", {
@@ -1590,7 +1596,6 @@ async function add_faculty(form_data) {
   const data = await res.json();
   console.log(data);
 }
-
 
 async function load_faculty() {
   const res = await fetch("/faculty");
@@ -1733,8 +1738,6 @@ async function load_schedule() {
 
 // Renders the schedule table inside popup_form for the given index and group mode.
 // mode is one of: "course", "faculty", "room", "lab".
-// Layout mirrors the room-schedule sheet format: day heading, then rows sorted by
-// time.  The chosen mode adds an optional sub-heading within each day block.
 async function render_schedule_table(index, mode) {
 
   const res = await fetch(`/schedule/${index}/view/${mode}`);
@@ -1747,7 +1750,6 @@ async function render_schedule_table(index, mode) {
 
   // Remove everything below the two control rows
   const all_children = Array.from(popup_form.children);
-  const control_rows = popup_form.querySelectorAll(".schedule-control-row");
   all_children.forEach(child => {
     if (!child.classList.contains("schedule-control-row")) {
       child.remove();
@@ -1756,7 +1758,7 @@ async function render_schedule_table(index, mode) {
 
   const MODE_LABEL = { faculty: "Faculty", room: "Room", lab: "Lab" };
 
-  // ---- Column definitions — the grouped-by column is omitted ----
+  // Column definitions — the grouped-by column is omitted
   const all_cols = [
     { header: "Time", value: slot => slot.is_lab ? `${slot.time} *` : slot.time },
     { header: "Course", value: slot => slot.course },
@@ -1766,7 +1768,6 @@ async function render_schedule_table(index, mode) {
     { header: "Lab", value: slot => slot.lab !== "None" ? slot.lab : "—" },
   ];
 
-  // Drop the column that matches the active grouping mode
   const hidden_col = { faculty: "Faculty", room: "Room", lab: "Lab" }[mode] || null;
   const col_defs = hidden_col
     ? all_cols.filter(c => c.header !== hidden_col)
@@ -1791,7 +1792,6 @@ async function render_schedule_table(index, mode) {
     return td;
   }
 
-  // Outer wrapper so the whole thing scrolls as one
   const wrapper_div = document.createElement("div");
   wrapper_div.style.marginTop = "8px";
 
@@ -1799,7 +1799,6 @@ async function render_schedule_table(index, mode) {
   table.style.width = "100%";
   table.style.borderCollapse = "collapse";
 
-  // Global header — only the visible columns
   const thead = document.createElement("thead");
   const header_row = document.createElement("tr");
   col_defs.forEach(c => header_row.appendChild(make_th(c.header)));
@@ -1810,7 +1809,7 @@ async function render_schedule_table(index, mode) {
 
   data.days.forEach(day_group => {
 
-    // ---- Day heading row (e.g. "Monday") ----
+    // Day heading row
     const day_heading_row = document.createElement("tr");
     const day_td = document.createElement("td");
     day_td.colSpan = col_defs.length;
@@ -1825,7 +1824,7 @@ async function render_schedule_table(index, mode) {
 
     day_group.sub_groups.forEach(sub => {
 
-      // Optional sub-group heading (e.g. "Room: Roddy 140")
+      // Optional sub-group heading
       if (sub.sub_key !== null) {
         const sub_row = document.createElement("tr");
         const sub_td = document.createElement("td");
@@ -1850,7 +1849,6 @@ async function render_schedule_table(index, mode) {
 
   table.appendChild(tbody);
 
-  // Small legend for lab marker
   const legend = document.createElement("div");
   legend.style.fontSize = "0.8em";
   legend.style.color = "#666";
@@ -1869,7 +1867,7 @@ async function view_schedule(index = 0) {
   popup_title.textContent = `Schedule ${index + 1}`;
   popup_form.innerHTML = "";
 
-  // ---- Row 1: schedule number selector ----
+  // Row 1: schedule number selector
   const selector = document.createElement("div");
   selector.className = "form-line schedule-control-row";
   selector.style.display = "flex";
@@ -1895,7 +1893,7 @@ async function view_schedule(index = 0) {
   selector.appendChild(load_btn);
   popup_form.appendChild(selector);
 
-  // ---- Row 2: group-by selector ----
+  // Row 2: group-by selector
   const group_row = document.createElement("div");
   group_row.className = "form-line schedule-control-row";
   group_row.style.display = "flex";
@@ -1924,7 +1922,7 @@ async function view_schedule(index = 0) {
   group_row.appendChild(group_select);
   popup_form.appendChild(group_row);
 
-  // ---- Wire up events ----
+  // Wire up events
   let current_index = index;
   let current_mode = "course";
 
@@ -1941,7 +1939,7 @@ async function view_schedule(index = 0) {
     refresh();
   });
 
-  // ---- Initial render ----
+  // Initial render
   await refresh();
 
   amd_popup.classList.remove("popup-hidden");
