@@ -61,18 +61,18 @@ const popup_header = document.getElementById("popup-header");
 // let init = true;
 // if (init) {
 //   const file = "2026sp-420-Antifreeze\src\model\schedule\empty.json";
-
+//
 //   const form_data = new FormData();
 //   form_data.append("file", file);
-
+//
 //   const res = await fetch("/load_config", {
 //     method: "POST",
 //     body: form_data
 //   });
-
+//
 //   const data = await res.json();
 //   console.log(data);
-
+//
 //   if (res.ok) {
 //     faculty_button.disabled = false;
 //     courses_button.disabled = false;
@@ -1591,10 +1591,10 @@ const file_input = document.getElementById("load");
 file_input.addEventListener("change", async function () {
   const file = file_input.files[0];
   console.log(file)
-  print(file)
+  // print(file)
   const form_data = new FormData();
   form_data.append("file", file);
-  print(form_data)
+  // print(form_data)
   console.log(form_data)
   const res = await fetch("/load_config", {
     method: "POST",
