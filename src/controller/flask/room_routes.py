@@ -76,11 +76,11 @@ def register_room_routes(app, scheduler):
 
             rooms = scheduler.config.config.rooms
 
-            if room_name not in rooms:
-                return jsonify({"error": f'"{room_name}" was not found. Please check the name and try again.'}), 404
-
             # Converting to upper case to add case insensitivity
             upper_case_rooms = [room.upper() for room in rooms]
+
+            if room_name.upper() not in upper_case_rooms:
+                return jsonify({"error": f'"{room_name}" was not found. Please check the name and try again.'}), 404
 
             if new_name.upper() in upper_case_rooms:
                 return jsonify({"error": f'"{new_name}" already exists. Choose a different name.'}), 409
