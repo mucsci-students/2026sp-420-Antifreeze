@@ -33,7 +33,7 @@ class Schedule():
     # Sets up conflict, course, faculty, lab, and room handlers
     def __init__(self):
         base_dir = os.path.dirname(__file__)
-        empty_path = os.path.join(base_dir, "empty.json")
+        empty_path = os.path.join(base_dir, "../../view/static/empty.json")
         self.conflict = conflict()
         self.course = course()
         self.faculty = faculty()

@@ -57,6 +57,33 @@ const popup_close = document.getElementById("popup-close");
 const popup_box = document.querySelector(".popup-box");
 const popup_header = document.getElementById("popup-header");
 
+
+// let init = true;
+// if (init) {
+//   const file = "2026sp-420-Antifreeze\src\model\schedule\empty.json";
+
+//   const form_data = new FormData();
+//   form_data.append("file", file);
+
+//   const res = await fetch("/load_config", {
+//     method: "POST",
+//     body: form_data
+//   });
+
+//   const data = await res.json();
+//   console.log(data);
+
+//   if (res.ok) {
+//     faculty_button.disabled = false;
+//     courses_button.disabled = false;
+//     labs_button.disabled = false;
+//     rooms_button.disabled = false;
+//     schedule_button.disabled = false;
+//     view_button.disabled = false;
+//     init = false
+//   }
+// }
+
 // Holds contents of loaded file
 let loaded_file_content = null;
 let loaded_file_extension = null;
@@ -101,6 +128,23 @@ function add_dynamic_input(button_id, container_id, name, placeholder) {
     container.appendChild(wrapper);
   });
 }
+
+window.addEventListener("DOMContentLoaded", async () => {
+
+  const res = await fetch("../static/empty.json");
+  const blob = await res.blob();
+
+  const formData = new FormData();
+  formData.append("file", blob, "empty.json");
+
+  await fetch("/load_config", {
+    method: "POST",
+    body: formData
+  });
+
+  config_name.textContent = "Config loaded: empty.json";
+
+});
 
 // Sets up multiple dynamic input fields by calling add_dynamic_input for each.
 // Parameters: fields - array of { button_id, container_id, name, placeholder }
@@ -1546,10 +1590,12 @@ const file_input = document.getElementById("load");
 // and logs the server response.
 file_input.addEventListener("change", async function () {
   const file = file_input.files[0];
-
+  console.log(file)
+  print(file)
   const form_data = new FormData();
   form_data.append("file", file);
-
+  print(form_data)
+  console.log(form_data)
   const res = await fetch("/load_config", {
     method: "POST",
     body: form_data
