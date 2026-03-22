@@ -368,6 +368,36 @@ button:disabled {
   border-right-color: #ffffff;
 }
 
+/* ----- Time Slots Tab ----- */
+#time-slots-button {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #ac86ff;
+  border: outset;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #956CEE;
+  border-right-color: #956CEE;
+  border-width: 3px;
+}
+
+#time-slots-button:hover {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #c4a8ff;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #ac86ff;
+  border-right-color: #ac86ff;
+}
+
+#time-slots-button:focus {
+  background-color: #956CEE;
+  border: inset;
+  border-top-color: #8d63e6;
+  border-left-color: #8d63e6;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
+}
+
 /* ----- Main Body ----- */
 main {
   background-color: #ffffff;
