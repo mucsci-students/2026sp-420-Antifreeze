@@ -10,9 +10,9 @@ jobs:
       - run: echo "uv sync "
       - run: echo "source .venv/bin/activate"
       - run: echo "uv run python src/main.py"
-      - name: Check out repository code
-        uses: actions/checkout@v5
-      - run: echo "The workflow is now ready to test your code on the runner."
+      - name: Run pytest
+        uses: actions/pygame@v5
+      - run: uv run pytest
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
