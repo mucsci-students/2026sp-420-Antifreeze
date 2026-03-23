@@ -1,5 +1,5 @@
 name: GitHub Actions Demo
-run-name: ${{ github.actor}} is testing out GitHub Actions
+run-name: ${{ github.actor }} is testing out GitHub Actions
 on: [push]
 jobs:
   Explore-GitHub-Actions:
@@ -11,8 +11,7 @@ jobs:
       - run: echo "source .venv/bin/activate"
       - run: echo "uv run python src/main.py"
       - name: Run pytest
-        uses: actions/pygame@v5
-      - run: uv run pytest
+        run: uv run pytest
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
