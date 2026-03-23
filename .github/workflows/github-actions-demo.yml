@@ -2,17 +2,20 @@ name: GitHub Actions Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  Run-Unit-Testing:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          cd ${{ github.workspace }}
-      - run: echo "uv sync "
-      - run: echo "source .venv/bin/activate"
-      - run: echo "uv run python src/main.py"
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v2
+      
+      - run: uv sync
+      - run: source .venv/bin/activate
+      - run: uv run python src/main.py
+      
       - name: Run pytest
         run: uv run pytest
+        
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
-      - run: echo "THis job's status is ${{ job.status }}."
+      - run: echo "This job's status is ${{ job.status }}."
