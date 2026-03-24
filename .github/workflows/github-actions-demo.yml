@@ -1,0 +1,19 @@
+name: Run Unit Tests
+run-name: Running Unit Tests
+on: [push]
+jobs:
+  Run-Unit-Testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v2
+      
+      - run: uv sync
+      
+      - name: Run pytest
+        run: uv run pytest
+        
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - run: echo "This job's status is ${{ job.status }}."
