@@ -1,5 +1,5 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions
+name: Run Unit Tests
+run-name: Running Unit Tests
 on: [push]
 jobs:
   Run-Unit-Testing:
@@ -9,8 +9,6 @@ jobs:
       - uses: astral-sh/setup-uv@v2
       
       - run: uv sync
-      - run: source .venv/bin/activate
-      - run: uv run python src/main.py
       
       - name: Run pytest
         run: uv run pytest
