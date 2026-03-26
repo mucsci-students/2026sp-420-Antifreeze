@@ -1,88 +1,5 @@
-// index.html elements
-const wrapper = document.getElementById("wrapper");
+import * as DOM from "./dom.js";
 
-// Navigation Buttons
-const load_button = document.getElementById("load-button");
-const save_button = document.getElementById("save-button");
-const back_button = document.getElementById("back-button");
-const forward_button = document.getElementById("forward-button");
-const add_button = document.getElementById("add-button");
-const modify_button = document.getElementById("modify-button");
-const delete_button = document.getElementById("delete-button");
-const view_button = document.getElementById("view-button");
-const print_button = document.getElementById("print-button");
-
-// Fields Buttons
-const faculty_button = document.getElementById("faculty-button");
-const courses_button = document.getElementById("courses-button");
-const labs_button = document.getElementById("labs-button");
-const rooms_button = document.getElementById("rooms-button");
-const schedule_button = document.getElementById("schedule-button");
-
-// Disable the buttons until file is loaded
-back_button.disabled = true;
-forward_button.disabled = true;
-add_button.disabled = true;
-modify_button.disabled = true;
-delete_button.disabled = true;
-view_button.disabled = true;
-print_button.disabled = true;
-
-
-// Images inside buttons
-const back_img = back_button.querySelector("img");
-const forward_img = forward_button.querySelector("img");
-const add_img = add_button.querySelector("img");
-const modify_img = modify_button.querySelector("img");
-const delete_img = delete_button.querySelector("img");
-const view_img = view_button.querySelector("img");
-const print_img = print_button.querySelector("img");
-
-// Whitespace where information is printed
-const navigator_div = document.querySelector(".navigator");
-const main = document.querySelector(".main");
-
-// Navigation bar and outer assets
-const nav_bar = document.querySelector(".nav-bar");
-const top_bar = document.querySelector(".top-bar");
-const team_name = document.querySelector(".team-name");
-const gui_wrapper = document.getElementById("wrapper");
-const config_name = document.getElementById("config-name");
-// Popup elements
-const amd_popup = document.getElementById("amd-popup");
-const popup_save = document.getElementById("popup-save");
-const popup_title = document.getElementById("popup-title");
-const popup_form = document.getElementById("popup-form");
-const popup_close = document.getElementById("popup-close");
-const popup_box = document.querySelector(".popup-box");
-const popup_header = document.getElementById("popup-header");
-
-
-// let init = true;
-// if (init) {
-//   const file = "2026sp-420-Antifreeze\src\model\schedule\empty.json";
-//
-//   const form_data = new FormData();
-//   form_data.append("file", file);
-//
-//   const res = await fetch("/load_config", {
-//     method: "POST",
-//     body: form_data
-//   });
-//
-//   const data = await res.json();
-//   console.log(data);
-//
-//   if (res.ok) {
-//     faculty_button.disabled = false;
-//     courses_button.disabled = false;
-//     labs_button.disabled = false;
-//     rooms_button.disabled = false;
-//     schedule_button.disabled = false;
-//     view_button.disabled = false;
-//     init = false
-//   }
-// }
 
 // Holds contents of loaded file
 let loaded_file_content = null;
@@ -1037,7 +954,7 @@ function edit_popup(action) {
   }
 
   amd_popup.classList.remove("popup-hidden");
-  wrapper.style.pointerEvents = "none";
+    DOM.wrapper.style.pointerEvents = "none";
 }
 
 // Updates add/modify/delete button images and colors based on whether a field is selected.
@@ -1267,7 +1184,7 @@ team_name.addEventListener("click", () => {
 });
 
 // Keeps field button focused when clicking around in gui_wrapper
-gui_wrapper.addEventListener("click", () => {
+DOM.gui_wrapper.addEventListener("click", () => {
   if (current_field === "Faculty") faculty_button.focus();
   else if (current_field === "Courses") courses_button.focus();
   else if (current_field === "Labs") labs_button.focus();
@@ -1624,7 +1541,7 @@ file_input.addEventListener("change", async function () {
 popup_close.addEventListener("click", () => {
   popup_form.innerHTML = "";
   amd_popup.classList.add("popup-hidden");
-  wrapper.style.pointerEvents = "all";
+  DOM.wrapper.style.pointerEvents = "all";
   popup_save.style.display = "block";
 
   if (current_field === "Faculty") faculty_button.focus();
@@ -1995,7 +1912,7 @@ async function view_schedule(index = 0) {
   await refresh();
 
   amd_popup.classList.remove("popup-hidden");
-  wrapper.style.pointerEvents = "none";
+  DOM.wrapper.style.pointerEvents = "none";
 }
 
 function clear_field_containers() {
