@@ -4,6 +4,7 @@
     <title>Team Antifreeze: Scheduler GUI</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/progress_bar.css') }}" />
   </head>
   <body class="body">
     <div id="wrapper">
@@ -67,6 +68,7 @@
         <div id="labs" class="navigator"></div>
         <div id="rooms" class="navigator"></div>
         <div id="schedule" class="navigator"></div>
+        <div id="time-slots" class="navigator"></div>
       </main>
       <footer id="config-name"></footer>
     </div>
@@ -82,7 +84,7 @@
         </div>
       </div>
     </div>
-    <script type="module" src="/controller/navigation-controller.js" defer></script>
+    <script type="module" src="/controller/navigation_controller.js" defer></script>
   </body>
 </html>
 
