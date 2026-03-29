@@ -383,6 +383,10 @@ async function generate_schedules() {
   const count = parseInt(document.getElementById("schedule-count").value);
   const optimize = document.getElementById("schedule-optimize").checked;
 
+  // New generation replaces any previously-loaded CSV
+  Model.set_csv_mode(false);
+  Model.set_csv_schedules([]);
+
   View.render_schedule_status(count, optimize, "Creating schedules...");
   View.render_progress_bar(count, "Creating schedules...");
   document.getElementById("generate-schedules").addEventListener("click", generate_schedules);
@@ -414,8 +418,13 @@ async function view_schedule(index = 0) {
   let current_index = index;
   let current_mode = "course";
 
+  // When viewing a loaded CSV, use the local parser instead of the backend API.
+  const schedule_count = Model.csv_mode ? Model.csv_schedules.length : null;
+
   const refresh = async () => {
-    const data = await Model.api_get_schedule_view(current_index, current_mode);
+    const data = Model.csv_mode
+      ? Model.get_csv_schedule_view(current_index, current_mode)
+      : await Model.api_get_schedule_view(current_index, current_mode);
     if (data.error) {
       alert(data.error);
       return;
@@ -433,7 +442,8 @@ async function view_schedule(index = 0) {
     (new_mode) => {
       current_mode = new_mode;
       refresh();
-    }
+    },
+    schedule_count
   );
 
   await refresh();
@@ -662,21 +672,8 @@ function load_file_content(input) {
 // ---------------------------------------------------------------------------
 
 window.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const res = await Model.api_load_empty_config();
-    if (res && res.ok) {
-      View.faculty_button.disabled = false;
-      View.courses_button.disabled = false;
-      View.labs_button.disabled = false;
-      View.rooms_button.disabled = false;
-      View.schedule_button.disabled = false;
-      View.config_name.textContent = "Config loaded: empty.json";
-    } else {
-      View.config_name.textContent = "⚠ Failed to load default config. Please load a file manually.";
-    }
-  } catch (err) {
-    View.config_name.textContent = "⚠ Failed to load default config. Please load a file manually.";
-  }
+  await Model.api_load_empty_config();
+  View.config_name.textContent = "Config loaded: empty.json";
 });
 
 View.faculty_button.addEventListener("click", () => {
@@ -775,25 +772,54 @@ View.save_button.addEventListener("click", async (e) => {
 // Load file input
 View.file_input.addEventListener("change", async function () {
   const file = View.file_input.files[0];
-  console.log(file);
-  console.log(new FormData());
-  const res = await Model.api_load_config(file);
-  const data = await res.json();
-  console.log(data);
+  if (!file) return;
 
-  if (res.ok) {
-    View.faculty_button.disabled = false;
-    View.courses_button.disabled = false;
-    View.labs_button.disabled = false;
-    View.rooms_button.disabled = false;
-    View.schedule_button.disabled = false;
-    View.view_button.disabled = false;
+  const ext = file.name.split(".").pop().toLowerCase();
+
+  if (ext === "csv") {
+    // ---- Load a previously-exported CSV schedule ----
+    const text = await file.text();
+    const schedules = Model.parse_csv_schedules(text);
+
+    if (schedules.length === 0) {
+      View.config_name.textContent = "⚠ No schedules found in the CSV file.";
+      return;
+    }
+
+    Model.set_csv_schedules(schedules);
+    Model.set_csv_mode(true);
+    Model.set_schedules_generated(true);
+    View.render_schedules_generated_buttons();
 
     const timestamp = new Date().toLocaleTimeString();
-    View.config_name.textContent = `✔ Config loaded: "${file.name}" at ${timestamp}`;
+    const label = schedules.length === 1 ? "1 schedule" : `${schedules.length} schedules`;
+    View.config_name.textContent = `✔ Schedule loaded: "${file.name}" (${label}) at ${timestamp}`;
     View.config_name.classList.remove("visible");
     void View.config_name.offsetWidth;
     View.config_name.classList.add("visible");
+
+  } else {
+    // ---- Load a JSON config file ----
+    Model.set_csv_mode(false);
+
+    const res = await Model.api_load_config(file);
+    const data = await res.json();
+    console.log(data);
+
+    if (res.ok) {
+      View.faculty_button.disabled = false;
+      View.courses_button.disabled = false;
+      View.labs_button.disabled = false;
+      View.rooms_button.disabled = false;
+      View.schedule_button.disabled = false;
+      View.view_button.disabled = false;
+
+      const timestamp = new Date().toLocaleTimeString();
+      View.config_name.textContent = `✔ Config loaded: "${file.name}" at ${timestamp}`;
+      View.config_name.classList.remove("visible");
+      void View.config_name.offsetWidth;
+      View.config_name.classList.add("visible");
+    }
   }
 });
 
@@ -820,8 +846,64 @@ View.delete_button.addEventListener("click", () => {
 
 // Print button
 View.print_button.addEventListener("click", () => {
-  window.open("/print_schedules", "_blank");
+  if (Model.csv_mode) {
+    print_csv_schedules_pdf();
+  } else {
+    window.open("/print_schedules", "_blank");
+  }
 });
+
+// Generates and downloads a PDF from the in-memory parsed CSV schedules.
+// Mirrors the layout produced by the backend's export_schedules_pdf().
+function print_csv_schedules_pdf() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: "landscape" });
+
+  const DAY_ORDER = ["MON", "TUE", "WED", "THU", "FRI"];
+
+  Model.csv_schedules.forEach((schedule, i) => {
+    if (i > 0) doc.addPage();
+
+    doc.setFontSize(14);
+    doc.setFont(undefined, "bold");
+    doc.text(`Schedule ${i + 1}`, 14, 16);
+
+    // Build rows sorted by day then time, matching the Course view mode
+    const rows = [];
+    for (const entry of schedule) {
+      for (const m of entry.meetings) {
+        rows.push({
+          day: m.day,
+          time: m.time_range + (m.is_lab ? " *" : ""),
+          course: entry.course_id,
+          section: entry.section,
+          faculty: entry.faculty,
+          room: entry.room,
+          lab: entry.lab === "None" ? "—" : entry.lab
+        });
+      }
+    }
+    rows.sort((a, b) => {
+      const d = DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day);
+      return d !== 0 ? d : a.time.localeCompare(b.time);
+    });
+
+    const table_rows = rows.map(r => [r.time, r.course, r.section, r.faculty, r.room, r.lab]);
+
+    doc.autoTable({
+      startY: 22,
+      head: [["Time", "Course", "Section", "Faculty", "Room", "Lab"]],
+      body: table_rows,
+      styles: { fontSize: 9, cellPadding: 3 },
+      headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: "bold" },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
+      foot: [["* = lab session"]],
+      footStyles: { fillColor: 255, textColor: 120, fontStyle: "italic", fontSize: 8 }
+    });
+  });
+
+  doc.save("schedules.pdf");
+}
 
 // Popup save button
 View.popup_save.addEventListener("click", handle_popup_save);
