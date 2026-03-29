@@ -4,7 +4,7 @@
 // ---------------------------------------------------------------------------
 
 import * as Model from "./navigation_model.js";
-import * as View  from "./navigation_view.js";
+import * as View from "./navigation_view.js";
 
 // ---------------------------------------------------------------------------
 // Validation functions
@@ -172,7 +172,7 @@ function validate_courses_form(is_add) {
 
   // Rooms: at least one non-empty entry required when adding
   if (is_add) {
-    const room_inputs  = [...document.querySelectorAll('input[name="courses-room"]')];
+    const room_inputs = [...document.querySelectorAll('input[name="courses-room"]')];
     const filled_rooms = room_inputs.filter(i => i.value.trim() !== "");
     if (room_inputs.length > 0 && filled_rooms.length === 0) {
       View.show_field_error(room_inputs[0], "At least one room is required.");
@@ -284,14 +284,14 @@ async function check_response_error(res, fallback) {
     if (raw_text.trim() !== "") message = raw_text.trim();
   }
 
-  if (message) { 
-    View.show_field_error(input_el, message); 
-    return true; 
+  if (message) {
+    View.show_field_error(input_el, message);
+    return true;
   }
 
-  if (!res.ok) { 
-    View.show_field_error(input_el, fallback); 
-    return true; 
+  if (!res.ok) {
+    View.show_field_error(input_el, fallback);
+    return true;
   }
 
   return false;
@@ -318,7 +318,7 @@ async function go_to_field(field) {
     View.render_navigator_empty();
     Model.set_current_field(null);
     View.render_amd_images(null);
-  } 
+  }
   else if (field === "Faculty") await load_faculty();
   else if (field === "Courses") await load_courses();
   else if (field === "Labs") await load_labs();
@@ -416,9 +416,9 @@ async function view_schedule(index = 0) {
 
   const refresh = async () => {
     const data = await Model.api_get_schedule_view(current_index, current_mode);
-    if (data.error) { 
-      alert(data.error); 
-      return; 
+    if (data.error) {
+      alert(data.error);
+      return;
     }
     View.render_schedule_table(data, current_index, current_mode);
   };
@@ -427,7 +427,7 @@ async function view_schedule(index = 0) {
     index,
     (new_index) => {
       current_index = new_index;
-      View.popup_title.textContent = `Schedule ${ current_index + 1 }`;
+      View.popup_title.textContent = `Schedule ${current_index + 1}`;
       refresh();
     },
     (new_mode) => {
@@ -464,14 +464,14 @@ async function handle_popup_save() {
         unique_course_limit: 1, times: {}, course_preferences: {},
         room_preferences: {}, lab_preferences: {}, mandatory_days: []
       });
-      
+
       if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
 
     } else if (Model.current_operation === "delete") {
 
       const del_res = await Model.api_delete_faculty(name);
 
-      if (await check_response_error(del_res, `"${ name }" was not found. Please check the name and try again.`)) return;
+      if (await check_response_error(del_res, `"${name}" was not found. Please check the name and try again.`)) return;
 
     } else if (Model.current_operation === "modify") {
 
@@ -483,7 +483,7 @@ async function handle_popup_save() {
         room_preferences: {}, lab_preferences: {}, mandatory_days: []
       });
 
-      if (await check_response_error(mod_res, `"${ name }" was not found. Please check the name and try again.`)) return;
+      if (await check_response_error(mod_res, `"${name}" was not found. Please check the name and try again.`)) return;
     }
 
     await load_faculty();
@@ -496,9 +496,9 @@ async function handle_popup_save() {
 
     const id_input = document.getElementById("courses-id");
 
-    if (!id_input) { 
-      console.error("Course ID input not found"); 
-      return; 
+    if (!id_input) {
+      console.error("Course ID input not found");
+      return;
     }
 
     const course_id = id_input.value.trim();
@@ -507,8 +507,8 @@ async function handle_popup_save() {
     const credits = credits_input ? parseInt(credits_input.value) : null;
 
     const rooms = [...document.querySelectorAll('input[name="courses-room"]')]
-    .map(i => i.value.trim())
-    .filter(v => v !== "");
+      .map(i => i.value.trim())
+      .filter(v => v !== "");
 
     const labs = [...document.querySelectorAll('input[name="courses-lab"]')]
       .map(i => i.value.trim())
@@ -528,19 +528,19 @@ async function handle_popup_save() {
 
       const add_res = await Model.api_add_course(course_data);
 
-      if (await check_response_error(add_res, `"${ course_id }" could not be added.`)) return;
+      if (await check_response_error(add_res, `"${course_id}" could not be added.`)) return;
 
     } else if (Model.current_operation === "delete") {
 
       const del_res = await Model.api_delete_course(course_id);
 
-      if (await check_response_error(del_res, `"${ course_id }" was not found. Please check the course ID and try again.`)) return;
+      if (await check_response_error(del_res, `"${course_id}" was not found. Please check the course ID and try again.`)) return;
 
     } else if (Model.current_operation === "modify") {
 
       const mod_res = await Model.api_modify_course(course_id, course_data);
 
-      if (await check_response_error(mod_res, `"${ course_id }" was not found. Please check the course ID and try again.`)) return;
+      if (await check_response_error(mod_res, `"${course_id}" was not found. Please check the course ID and try again.`)) return;
     }
 
     await load_courses();
@@ -549,9 +549,9 @@ async function handle_popup_save() {
 
     const name_input = document.getElementById("labs-name");
 
-    if (!name_input) { 
-      console.error("Lab name input not found"); 
-      return; 
+    if (!name_input) {
+      console.error("Lab name input not found");
+      return;
     }
 
     const name = name_input.value.trim();
@@ -562,7 +562,7 @@ async function handle_popup_save() {
 
       const add_res = await Model.api_add_lab(name);
 
-      if (await check_response_error(add_res, `"${ name }" could not be added.`)) return;
+      if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
 
     } else if (Model.current_operation === "delete") {
 
@@ -570,26 +570,26 @@ async function handle_popup_save() {
 
       const del_res = await Model.api_delete_lab(name);
 
-      if (await check_response_error(del_res, `"${ name }" was not found. Please check the name and try again.`)) return;
+      if (await check_response_error(del_res, `"${name}" was not found. Please check the name and try again.`)) return;
 
     } else if (Model.current_operation === "modify") {
 
-      if (!name) { 
-        View.show_field_error(name_input, "Current lab name is required."); 
-        return; 
+      if (!name) {
+        View.show_field_error(name_input, "Current lab name is required.");
+        return;
       }
 
       const new_name_input = document.getElementById("labs-new-name");
       const new_name = new_name_input ? new_name_input.value.trim() : "";
 
-      if (!new_name) { 
-        View.show_field_error(new_name_input, "New lab name is required."); 
-        return; 
+      if (!new_name) {
+        View.show_field_error(new_name_input, "New lab name is required.");
+        return;
       }
 
       const mod_res = await Model.api_modify_lab(name, new_name);
 
-      if (await check_response_error(mod_res, `"${ name }" was not found. Please check the name and try again.`)) return;
+      if (await check_response_error(mod_res, `"${name}" was not found. Please check the name and try again.`)) return;
     }
 
     await load_labs();
@@ -597,10 +597,10 @@ async function handle_popup_save() {
   } else if (Model.current_field === "Rooms") {
 
     const name_input = document.getElementById("rooms-name");
-    
-    if (!name_input) { 
-      console.error("Room name input not found"); 
-      return; 
+
+    if (!name_input) {
+      console.error("Room name input not found");
+      return;
     }
 
     const name = name_input.value.trim();
@@ -610,33 +610,33 @@ async function handle_popup_save() {
 
       const add_res = await Model.api_add_room(name);
 
-      if (await check_response_error(add_res, `"${ name }" could not be added.`)) return;
+      if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
 
     } else if (Model.current_operation === "delete") {
       if (!validate_rooms_form()) return;
 
       const del_res = await Model.api_delete_room(name);
 
-      if (await check_response_error(del_res, `"${ name }" was not found. Please check the name and try again.`)) return;
+      if (await check_response_error(del_res, `"${name}" was not found. Please check the name and try again.`)) return;
 
     } else if (Model.current_operation === "modify") {
 
-      if (!name) { 
-        View.show_field_error(name_input, "Current room name is required."); 
-        return; 
+      if (!name) {
+        View.show_field_error(name_input, "Current room name is required.");
+        return;
       }
 
       const new_name_input = document.getElementById("rooms-new-name");
       const new_name = new_name_input ? new_name_input.value.trim() : "";
 
-      if (!new_name) { 
-        View.show_field_error(new_name_input, "New room name is required."); 
-        return; 
+      if (!new_name) {
+        View.show_field_error(new_name_input, "New room name is required.");
+        return;
       }
 
       const mod_res = await Model.api_modify_room(name, new_name);
 
-      if (await check_response_error(mod_res, `"${ name }" was not found. Please check the name and try again.`)) return;
+      if (await check_response_error(mod_res, `"${name}" was not found. Please check the name and try again.`)) return;
     }
 
     await load_rooms();
@@ -662,8 +662,21 @@ function load_file_content(input) {
 // ---------------------------------------------------------------------------
 
 window.addEventListener("DOMContentLoaded", async () => {
-  await Model.api_load_empty_config();
-  View.config_name.textContent = "Config loaded: empty.json";
+  try {
+    const res = await Model.api_load_empty_config();
+    if (res && res.ok) {
+      View.faculty_button.disabled = false;
+      View.courses_button.disabled = false;
+      View.labs_button.disabled = false;
+      View.rooms_button.disabled = false;
+      View.schedule_button.disabled = false;
+      View.config_name.textContent = "Config loaded: empty.json";
+    } else {
+      View.config_name.textContent = "⚠ Failed to load default config. Please load a file manually.";
+    }
+  } catch (err) {
+    View.config_name.textContent = "⚠ Failed to load default config. Please load a file manually.";
+  }
 });
 
 View.faculty_button.addEventListener("click", () => {
