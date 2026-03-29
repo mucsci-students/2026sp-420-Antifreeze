@@ -209,34 +209,34 @@ export function render_amd_images(current_field) {
 
 export function render_faculty_list(faculty) {
   let html = "<ul>";
-  faculty.forEach(f => {html += `<li>${ f.name }</li>`;});
+  faculty.forEach(f => { html += `<li>${f.name}</li>`; });
   html += "</ul>";
   navigator_div.innerHTML = html;
 }
 
 export function render_courses_list(courses) {
   let html = "<ul>";
-  courses.forEach(c => {html += `<li>${ c.course_id } (${ c.credits } credits)</li>`;});
+  courses.forEach(c => { html += `<li>${c.course_id} (${c.credits} credits)</li>`; });
   html += "</ul>";
   navigator_div.innerHTML = html;
 }
 
 export function render_rooms_list(rooms) {
   let html = "<ul>";
-  rooms.forEach(r => {html += `<li>${ r.name }</li>`;});
+  rooms.forEach(r => { html += `<li>${r.name}</li>`; });
   html += "</ul>";
   navigator_div.innerHTML = html;
 }
 
 export function render_labs_list(labs) {
   let html = "<ul>";
-  labs.forEach(l => {html += `<li>${ l.name }</li>`;});
+  labs.forEach(l => { html += `<li>${l.name}</li>`; });
   html += "</ul>";
   navigator_div.innerHTML = html;
 }
 
 export function render_load_error(field, message) {
-  navigator_div.innerHTML = `<p style="color:red;">Error loading ${ field }: ${ message }</p>`;
+  navigator_div.innerHTML = `<p style="color:red;">Error loading ${field}: ${message}</p>`;
 }
 
 export function render_navigator_empty() {
@@ -260,11 +260,11 @@ export function render_schedule_form(count = 10, optimize = true) {
     <h3 id="schedule-generator">Schedule Generator</h3>
     <div class="schedule-form-line">
       <label>Number of schedules:</label>
-      <input id="schedule-count" type="number" value="${ count }" min="1">
+      <input id="schedule-count" type="number" value="${count}" min="1">
     </div>
     <div class="schedule-form-line">
       <label>Optimize schedules:</label>
-      <input id="schedule-optimize" type="checkbox" ${ optimize ? "checked" : "" }>
+      <input id="schedule-optimize" type="checkbox" ${optimize ? "checked" : ""}>
     </div>
     <div class="schedule-form-line">
       <button id="generate-schedules">Generate</button>
@@ -279,17 +279,17 @@ export function render_schedule_status(count, optimize, status_message) {
     <h3 id="schedule-generator">Schedule Generator</h3>
     <div class="schedule-form-line">
       <label>Number of schedules:</label>
-      <input id="schedule-count" type="number" value="${ count }" min="1">
+      <input id="schedule-count" type="number" value="${count}" min="1">
     </div>
     <div class="schedule-form-line">
       <label>Optimize schedules:</label>
-      <input id="schedule-optimize" type="checkbox" ${ optimize ? "checked" : "" }>
+      <input id="schedule-optimize" type="checkbox" ${optimize ? "checked" : ""}>
     </div>
     <div class="schedule-form-line">
       <button id="generate-schedules">Generate</button>
     </div>
     <hr id="schedule-hr"/>
-    <div id="schedule-status">${ status_message }</div>
+    <div id="schedule-status">${status_message}</div>
     <div class="progress-bar-container">
       <div id="progress-bar" class="w3-container w3-green">0%</div>
     </div>
@@ -301,13 +301,13 @@ export function render_progress_bar(count, status_message) {
   var width = 0;
   var id;
 
-  if (count <= 2) {id = setInterval(frame, 100);}
-  if (count <= 4) {id = setInterval(frame, 150);}
-  if (count <= 6) {id = setInterval(frame, 200);}
-  if (count <= 8) {id = setInterval(frame, 250);}
-  if (count <= 10) {id = setInterval(frame, 300);}
-  if (count > 10) {id = setInterval(frame, 400);}
-  
+  if (count <= 2) { id = setInterval(frame, 100); }
+  if (count <= 4) { id = setInterval(frame, 150); }
+  if (count <= 6) { id = setInterval(frame, 200); }
+  if (count <= 8) { id = setInterval(frame, 250); }
+  if (count <= 10) { id = setInterval(frame, 300); }
+  if (count > 10) { id = setInterval(frame, 400); }
+
   function frame() {
     if (status_message.localeCompare("Creating schedules...") == 0) {
       if (width >= 99) {
@@ -329,8 +329,8 @@ export function render_schedules_generated_buttons() {
   view_img.src = "/static/images/view.png";
   print_img.src = "/static/images/print.png";
   print_button.style.color = "#484848";
-  view_button.style.color  = "#484848";
-  view_button.disabled  = false;
+  view_button.style.color = "#484848";
+  view_button.disabled = false;
   print_button.disabled = false;
 }
 
@@ -346,11 +346,11 @@ export function render_schedule_table(data, index, mode) {
     }
   });
 
-  const MODE_LABEL = {faculty: "Faculty", room: "Room", lab: "Lab"};
+  const MODE_LABEL = { faculty: "Faculty", room: "Room", lab: "Lab" };
 
   // Column definitions — the grouped-by column is omitted
   const all_cols = [
-    { header: "Time", value: slot => slot.is_lab ? `${ slot.time } *` : slot.time },
+    { header: "Time", value: slot => slot.is_lab ? `${slot.time} *` : slot.time },
     { header: "Course", value: slot => slot.course },
     { header: "Section", value: slot => slot.section || "—" },
     { header: "Faculty", value: slot => slot.faculty },
@@ -415,7 +415,7 @@ export function render_schedule_table(data, index, mode) {
         const sub_row = document.createElement("tr");
         const sub_td = document.createElement("td");
         sub_td.colSpan = col_defs.length;
-        sub_td.textContent = `${ MODE_LABEL[data.mode] || "" }: ${ sub.sub_key }`;
+        sub_td.textContent = `${MODE_LABEL[data.mode] || ""}: ${sub.sub_key}`;
         sub_td.style.fontStyle = "italic";
         sub_td.style.paddingLeft = "16px";
         sub_td.style.paddingTop = "6px";
@@ -447,10 +447,11 @@ export function render_schedule_table(data, index, mode) {
 }
 
 // Builds the schedule view popup with number selector and group-by controls.
-// Parameters: index - 0-based schedule index, on_load_click(newIndex), on_group_change(newMode)
-export function render_view_schedule_popup(index, on_load_click, on_group_change) {
+// Parameters: index - 0-based schedule index, on_load_click(newIndex), on_group_change(newMode),
+//             schedule_count - optional total number of schedules (shows "of N" label when provided)
+export function render_view_schedule_popup(index, on_load_click, on_group_change, schedule_count = null) {
   popup_save.style.display = "none";
-  popup_title.textContent = `Schedule ${ index + 1 }`;
+  popup_title.textContent = `Schedule ${index + 1}`;
   popup_form.innerHTML = "";
 
   // Row 1: schedule number selector
@@ -469,6 +470,14 @@ export function render_view_schedule_popup(index, on_load_click, on_group_change
   num_input.min = "1";
   num_input.value = index + 1;
   num_input.style.width = "60px";
+  if (schedule_count !== null) num_input.max = String(schedule_count);
+
+  const of_label = document.createElement("span");
+  if (schedule_count !== null) {
+    of_label.textContent = `of ${schedule_count}`;
+    of_label.style.color = "#666";
+    of_label.style.fontSize = "0.9em";
+  }
 
   const load_btn = document.createElement("button");
   load_btn.id = "schedule-load-button";
@@ -476,6 +485,7 @@ export function render_view_schedule_popup(index, on_load_click, on_group_change
 
   selector.appendChild(sel_label);
   selector.appendChild(num_input);
+  if (schedule_count !== null) selector.appendChild(of_label);
   selector.appendChild(load_btn);
   popup_form.appendChild(selector);
 
