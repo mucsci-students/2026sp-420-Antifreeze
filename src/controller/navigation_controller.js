@@ -1112,13 +1112,37 @@ async function send_message() {
         chat_box.innerHTML += `<div class="chat-msg chat-ai"><b>AI:</b> ${format_response(data.result)}</div>`;
         chat_box.scrollTop = chat_box.scrollHeight;
 
+        await refresh_current_field();
+
     } catch (err) {
         chat_box.innerHTML += `<div class="chat-msg chat-ai">Error: ${err}</div>`;
     }
 }
 
+async function refresh_current_field() {
+    // Refresh whichever list tab is active
+    if (Model.current_field === "Faculty") await load_faculty();
+    else if (Model.current_field === "Courses") await load_courses();
+    else if (Model.current_field === "Labs") await load_labs();
+    else if (Model.current_field === "Rooms") await load_rooms();
+    else if (Model.current_field === "Schedule") await load_schedule();
+
+    // Check if the AI just generated (or re-generated) schedules
+    const { count } = await Model.api_get_schedule_count();
+    if (count > 0) {
+        Model.set_schedules_generated(true);
+        if (Model.current_field !== "Schedule") {
+            Model.set_current_field("Schedule");
+            await load_schedule();
+        }
+        View.render_schedules_generated_buttons();
+    }
+}
+
 function format_response(res) {
-    if (res?.error) return res.error;
-    if (res?.status) return res.status;
-    return JSON.stringify(res);
+    const clean = s => s.replace(/\\"/g, '"');
+    if (typeof res === "string") return clean(res);
+    if (res?.error) return clean(res.error);
+    if (res?.status) return clean(res.status);
+    return clean(JSON.stringify(res));
 }

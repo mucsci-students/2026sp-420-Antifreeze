@@ -206,6 +206,11 @@ export async function api_get_schedule_view(index, mode) {
   return await res.json();
 }
 
+export async function api_get_schedule_count() {
+  const res = await fetch("/schedule/count");
+  return await res.json();
+}
+
 // ---------------------------------------------------------------------------
 // CSV schedule loading
 // ---------------------------------------------------------------------------

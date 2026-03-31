@@ -421,7 +421,6 @@ main {
   border-right-color: #ffffff;
   min-width: 92%;
   max-width: 2048px;
-  min-height: 405px;
   max-height: 1080px;
 }
 
@@ -511,10 +510,20 @@ footer#config-name {
   background-color: #e6e6e6;
   color: #484848;
   font-size: small;
-  padding: 6px 10px;
-  margin-top: 4px;
   margin-left: 2px;
   margin-right: 4px;
+  height: 0;
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  opacity: 0;
+  box-sizing: border-box;
+}
+
+footer#config-name.visible {
+  height: auto;
+  padding: 6px 10px;
+  margin-top: 4px;
   margin-bottom: 5px;
   border: inset;
   border-top-color: #bbbbbb;
@@ -523,11 +532,6 @@ footer#config-name {
   border-right-color: #ffffff;
   border-width: 2px;
   border-left: 4px solid #808080;
-  opacity: 0;
-  box-sizing: border-box;
-}
-
-footer#config-name.visible {
   animation: footer-fade 10.3s ease forwards;
 }
 
@@ -546,58 +550,51 @@ footer#config-name.visible {
 
 }
 
-/* =========================
-   CHAT LAYOUT
-
+/* ----- Chat Side Panel ----- */
 #main-container {
   display: flex;
+  align-items: stretch;
 }
 
-/* Wrapper around main */
 #main-content {
   flex: 1;
-  transition: all 0.3s ease;
+  min-width: 0;
 }
 
-/* Chat panel (hidden by default) */
-/* Chat container (outer frame like your UI) */
 #chat-container {
   width: 0;
   overflow: hidden;
-  background-color: #e6e6e6;
-  border-left: 2px solid #989898;
   display: flex;
   flex-direction: column;
-  transition: width 0.3s ease;
-
-  /* 👇 match your UI style */
+  background-color: #e6e6e6;
   border: inset;
   border-top-color: #bbbbbb;
   border-left-color: #bbbbbb;
   border-bottom-color: #ffffff;
   border-right-color: #ffffff;
+  transition: width 0.2s ease;
+  flex-shrink: 0;
 }
 
-/* Inner chat log window */
+.chat-open #chat-container {
+  width: 320px;
+}
+
 #chat-box {
-  flex: 1;
+  height: 400px;
   margin: 6px;
   background-color: #ffffff;
-
-  /* 👇 same as main window */
   border: inset;
   border-top-color: #bbbbbb;
   border-left-color: #bbbbbb;
   border-bottom-color: #bbbbbb;
   border-right-color: #ffffff;
-
   overflow-y: auto;
   padding: 6px;
-  font-family: monospace;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
   font-size: 13px;
 }
 
-/* Input row styled like footer bar */
 #chat-input-row {
   display: flex;
   margin: 6px;
@@ -608,7 +605,6 @@ footer#config-name.visible {
   border-right-color: #ffffff;
 }
 
-/* Input field */
 #chat-input {
   flex: 1;
   border: none;
@@ -616,14 +612,12 @@ footer#config-name.visible {
   background-color: #ffffff;
 }
 
-/* Send button (match your buttons) */
 #chat-send {
   border: none;
   padding: 6px 10px;
   background-color: #e6e6e6;
 }
 
-/* Messages */
 .chat-msg {
   margin-bottom: 6px;
 }
@@ -634,41 +628,6 @@ footer#config-name.visible {
 
 .chat-ai {
   color: #2BB971;
-}
-
-/* When chat is open */
-.chat-open #chat-container {
-  width: 320px;
-}
-
-.chat-open #main-content {
-  flex: 0 0 calc(100% - 320px);
-}
-
-/* Chat content */
-#chat-box {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px;
-  font-family: monospace;
-  font-size: 13px;
-}
-
-/* Input row */
-#chat-input-row {
-  display: flex;
-  border-top: 2px solid #989898;
-}
-
-#chat-input {
-  flex: 1;
-  border: none;
-  padding: 6px;
-}
-
-#chat-send {
-  padding: 6px 10px;
-}
 }
 
 /* ----- Navigator List Items ----- */

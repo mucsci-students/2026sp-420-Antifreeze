@@ -15,10 +15,27 @@ def _clean_list(values):
 
 
 def _normalize_name(name: str):
-    name = name.lower().strip()
-    name = name.replace(" lab", "")
-    name = name.replace(" room", "")
-    return name
+    return name.strip()
+
+
+def _to_set(val):
+    """Coerce any value (list, set, None, str) into a set of strings."""
+    if val is None:
+        return set()
+    if isinstance(val, set):
+        return val
+    if isinstance(val, str):
+        return {val.strip()} if val.strip() else set()
+    return {str(v).strip() for v in val if str(v).strip()}
+
+
+def _find_in_list(name: str, lst: list):
+    """Case-insensitive lookup — returns the actual stored value or None."""
+    name = name.strip()
+    for item in lst:
+        if item.upper() == name.upper():
+            return item
+    return None
 
 
 # -------------------------
@@ -49,21 +66,30 @@ def add_faculty(
     course_preferences = course_preferences or {}
     room_preferences = room_preferences or {}
     lab_preferences = lab_preferences or {}
-    mandatory_days = mandatory_days or set()
+    mandatory_days = _to_set(mandatory_days)
 
-    scheduler.faculty.add_faculty(
-        scheduler.config,
-        name,
-        maximum_credits,
-        maximum_days,
-        minimum_credits,
-        unique_course_limit,
-        times,
-        course_preferences,
-        room_preferences,
-        lab_preferences,
-        mandatory_days
-    )
+    try:
+        scheduler.faculty.add_faculty(
+            scheduler.config,
+            name,
+            maximum_credits,
+            maximum_days,
+            minimum_credits,
+            unique_course_limit,
+            times,
+            course_preferences,
+            room_preferences,
+            lab_preferences,
+            mandatory_days
+        )
+    except Exception as e:
+        msg = str(e)
+        import re
+        m = re.search(r"Mandatory days \[([^\]]+)\] must be present in the availability times", msg)
+        if m:
+            missing = m.group(1)
+            return {"error": f"Mandatory day(s) {missing} must have an availability time set. Please ask the user to provide time slots for those days (e.g. '09:00-09:50') before setting them as mandatory."}
+        return {"error": msg}
 
     return {"status": "added", "faculty": name}
 
@@ -103,22 +129,31 @@ def modify_faculty(
     course_preferences = course_preferences or {}
     room_preferences = room_preferences or {}
     lab_preferences = lab_preferences or {}
-    mandatory_days = mandatory_days or set()
+    mandatory_days = _to_set(mandatory_days)
 
-    scheduler.faculty.modify_faculty(
-        scheduler.config,
-        old_name,
-        new_name,
-        maximum_credits,
-        maximum_days,
-        minimum_credits,
-        unique_course_limit,
-        times,
-        course_preferences,
-        room_preferences,
-        lab_preferences,
-        mandatory_days
-    )
+    try:
+        scheduler.faculty.modify_faculty(
+            scheduler.config,
+            old_name,
+            new_name,
+            maximum_credits,
+            maximum_days,
+            minimum_credits,
+            unique_course_limit,
+            times,
+            course_preferences,
+            room_preferences,
+            lab_preferences,
+            mandatory_days
+        )
+    except Exception as e:
+        msg = str(e)
+        import re
+        m = re.search(r"Mandatory days \[([^\]]+)\] must be present in the availability times", msg)
+        if m:
+            missing = m.group(1)
+            return {"error": f"Mandatory day(s) {missing} must have an availability time set. Please ask the user to provide time slots for those days (e.g. '09:00-09:50') before setting them as mandatory."}
+        return {"error": msg}
 
     return {"status": "modified", "faculty": new_name}
 
@@ -138,6 +173,24 @@ def list_faculty(scheduler):
     return {
         "faculty": [{"name": f.name} for f in scheduler.config.config.faculty]
     }
+
+
+def get_faculty_details(scheduler, name: str):
+    for f in scheduler.config.config.faculty:
+        if f.name.upper() == name.upper():
+            return {
+                "name": f.name,
+                "maximum_credits": f.maximum_credits,
+                "minimum_credits": f.minimum_credits,
+                "maximum_days": f.maximum_days,
+                "unique_course_limit": f.unique_course_limit,
+                "times": {str(day): [str(t) for t in times] for day, times in f.times.items()},
+                "course_preferences": {str(k): v for k, v in f.course_preferences.items()},
+                "room_preferences": {str(k): v for k, v in f.room_preferences.items()},
+                "lab_preferences": {str(k): v for k, v in f.lab_preferences.items()},
+                "mandatory_days": [str(d) for d in f.mandatory_days],
+            }
+    return {"error": f'"{name}" not found.'}
 
 
 # -------------------------
@@ -177,6 +230,21 @@ def add_course(scheduler, course_id: str, credits: int, room, lab, conflicts, fa
     )
 
     return {"status": "added", "course": course_id}
+
+
+def get_course_details(scheduler, course_id: str):
+    for i, c in enumerate(scheduler.config.config.courses):
+        if c.course_id.upper() == course_id.upper():
+            return {
+                "index": i,
+                "course_id": c.course_id,
+                "credits": c.credits,
+                "room": list(c.room),
+                "lab": list(c.lab),
+                "conflicts": list(c.conflicts),
+                "faculty": list(c.faculty),
+            }
+    return {"error": f'"{course_id}" not found.'}
 
 
 def delete_course(scheduler, course_id: str):
@@ -241,35 +309,34 @@ def add_lab(scheduler, name: str):
 def delete_lab(scheduler, name: str):
     labs = scheduler.config.config.labs
 
-    name = _normalize_name(name)
-
-    if name not in labs:
+    actual = _find_in_list(name, labs)
+    if actual is None:
         return {"error": f'"{name}" not found.'}
 
-    labs.remove(name)
+    labs.remove(actual)
 
     for course in scheduler.config.config.courses:
-        course.lab = [l for l in course.lab if l != name]
+        course.lab = [l for l in course.lab if l != actual]
 
-    return {"status": "deleted", "lab": name}
+    return {"status": "deleted", "lab": actual}
 
 
 def modify_lab(scheduler, old_name: str, new_name: str):
     labs = scheduler.config.config.labs
 
-    old_name = _normalize_name(old_name)
-    new_name = _normalize_name(new_name)
-
-    if old_name not in labs:
+    actual_old = _find_in_list(old_name, labs)
+    if actual_old is None:
         return {"error": f'"{old_name}" not found.'}
 
-    if new_name in labs:
+    new_name = _normalize_name(new_name)
+
+    if _find_in_list(new_name, labs) is not None:
         return {"error": f'"{new_name}" already exists.'}
 
-    labs[labs.index(old_name)] = new_name
+    labs[labs.index(actual_old)] = new_name
 
     for course in scheduler.config.config.courses:
-        course.lab = [new_name if l == old_name else l for l in course.lab]
+        course.lab = [new_name if l == actual_old else l for l in course.lab]
 
     return {"status": "modified", "lab": new_name}
 
@@ -294,35 +361,34 @@ def add_room(scheduler, name: str):
 def delete_room(scheduler, name: str):
     rooms = scheduler.config.config.rooms
 
-    name = _normalize_name(name)
-
-    if name not in rooms:
+    actual = _find_in_list(name, rooms)
+    if actual is None:
         return {"error": f'"{name}" not found.'}
 
-    rooms.remove(name)
+    rooms.remove(actual)
 
     for course in scheduler.config.config.courses:
-        course.room = [r for r in course.room if r != name]
+        course.room = [r for r in course.room if r != actual]
 
-    return {"status": "deleted", "room": name}
+    return {"status": "deleted", "room": actual}
 
 
 def modify_room(scheduler, old_name: str, new_name: str):
     rooms = scheduler.config.config.rooms
 
-    old_name = _normalize_name(old_name)
-    new_name = _normalize_name(new_name)
-
-    if old_name not in rooms:
+    actual_old = _find_in_list(old_name, rooms)
+    if actual_old is None:
         return {"error": f'"{old_name}" not found.'}
 
-    if new_name in rooms:
+    new_name = _normalize_name(new_name)
+
+    if _find_in_list(new_name, rooms) is not None:
         return {"error": f'"{new_name}" already exists.'}
 
-    rooms[rooms.index(old_name)] = new_name
+    rooms[rooms.index(actual_old)] = new_name
 
     for course in scheduler.config.config.courses:
-        course.room = [new_name if r == old_name else r for r in course.room]
+        course.room = [new_name if r == actual_old else r for r in course.room]
 
     return {"status": "modified", "room": new_name}
 
