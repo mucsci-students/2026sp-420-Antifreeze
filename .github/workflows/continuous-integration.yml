@@ -1,5 +1,5 @@
 name: Run Unit Tests
-run-name: Running Unit Tests
+run-name: Continuous Integration
 on: [push]
 jobs:
   continuous_integration:
