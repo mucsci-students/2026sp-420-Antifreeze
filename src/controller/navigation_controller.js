@@ -924,5 +924,60 @@ const focus_containers = [
   View.gui_wrapper,
 ];
 focus_containers.forEach(el => {
-  el.addEventListener("click", () => View.focus_field_button(Model.current_field));
+  el.addEventListener("click", (e) => {
+
+    if (e.target.closest("#chat-container")) return;
+
+    View.focus_field_button(Model.current_field);
+  });
 });
+
+
+const chat_button = View.get_chat_button();
+
+chat_button.addEventListener("click", () => {
+  document.body.classList.toggle("chat-open");
+});
+
+const chat_send = document.getElementById("chat-send");
+const chat_input = document.getElementById("chat-input");
+const chat_box = document.getElementById("chat-box");
+
+chat_send.addEventListener("click", send_message);
+
+chat_input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") send_message();
+});
+
+async function send_message() {
+    const message = chat_input.value.trim();
+    if (!message) return;
+
+    // show user message
+    chat_box.innerHTML += `<div class="chat-msg chat-user"><b>You:</b> ${message}</div>`;
+    chat_input.value = "";
+
+    try {
+        const res = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ message })
+        });
+
+        const data = await res.json();
+
+        chat_box.innerHTML += `<div class="chat-msg chat-ai"><b>AI:</b> ${format_response(data.result)}</div>`;
+        chat_box.scrollTop = chat_box.scrollHeight;
+
+    } catch (err) {
+        chat_box.innerHTML += `<div class="chat-msg chat-ai">Error: ${err}</div>`;
+    }
+}
+
+function format_response(res) {
+    if (res?.error) return res.error;
+    if (res?.status) return res.status;
+    return JSON.stringify(res);
+}

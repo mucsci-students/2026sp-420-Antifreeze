@@ -20,7 +20,9 @@ export const modify_button = document.getElementById("modify-button");
 export const delete_button = document.getElementById("delete-button");
 export const view_button = document.getElementById("view-button");
 export const print_button = document.getElementById("print-button");
-
+export function get_chat_button() {
+    return document.getElementById("chat-toggle");
+}
 // Field Buttons
 export const faculty_button = document.getElementById("faculty-button");
 export const courses_button = document.getElementById("courses-button");
