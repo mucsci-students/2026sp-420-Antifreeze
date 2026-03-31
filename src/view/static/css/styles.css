@@ -370,6 +370,7 @@ button:disabled {
 
 /* ----- Time Slots Tab ----- */
 #time-slots-button {
+  width: 115px;
   text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
   background-color: #ac86ff;
   border: outset;
