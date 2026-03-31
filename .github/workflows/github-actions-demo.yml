@@ -2,13 +2,35 @@ name: Run Unit Tests
 run-name: Running Unit Tests
 on: [push]
 jobs:
-  Run-Unit-Testing:
+  continuous_integration:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v2
+    permissions:
+      issues: write
+      contents: read
       
-      - run: uv sync
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Sync uv
+        uses: astral-sh/setup-uv@v1
+
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13.12"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run linter
+        run: uv run ruff check .
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Run type checker
+        run: uv run ty check
       
       - name: Run pytest
         run: uv run pytest
