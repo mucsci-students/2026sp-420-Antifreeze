@@ -4,6 +4,7 @@ from .faculty_routes import register_faculty_routes
 from .course_routes import register_course_routes
 from .lab_routes import register_lab_routes
 from .room_routes import register_room_routes
+from .chat_routes import register_chat_route
 def register_routes(app, scheduler):
 
     @app.route("/")
@@ -19,3 +20,4 @@ def register_routes(app, scheduler):
     register_course_routes(app, scheduler)
     register_lab_routes(app, scheduler)
     register_room_routes(app, scheduler)
+    register_chat_route(app, scheduler)

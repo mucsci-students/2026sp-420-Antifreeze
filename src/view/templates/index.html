@@ -52,6 +52,9 @@
         <button id="print-button">
           <img src="/static/images/print_shadow.png" alt="Print" />Print
         </button>
+        <button id="chat-toggle" class="push-right">
+          Chat
+        </button>
       </div>
       <hr />
       <div class="selection-bar">
@@ -64,14 +67,29 @@
         <button id="time-slots-button">TIME SLOTS</button>
       </div>
     </nav>
-    <main class="main">
-      <div id="faculty" class="navigator"></div>
-      <div id="courses" class="navigator"></div>
-      <div id="labs" class="navigator"></div>
-      <div id="rooms" class="navigator"></div>
-      <div id="schedule" class="navigator"></div>
-      <div id="time-slots" class="navigator"></div>
-    </main>
+    <div id="main-container">
+      <div id="main-content">
+        <main class="main">
+          <div id="faculty" class="navigator"></div>
+          <div id="courses" class="navigator"></div>
+          <div id="labs" class="navigator"></div>
+          <div id="rooms" class="navigator"></div>
+          <div id="schedule" class="navigator"></div>
+          <div id="time-slots" class="navigator"></div>
+        </main>
+      </div>
+
+      <!-- Chat Panel -->
+      <div id="chat-container">
+        <div id="chat-box"></div>
+
+        <div id="chat-input-row">
+          <input id="chat-input" type="text" placeholder="Type a command..." />
+          <button id="chat-send">Send</button>
+        </div>
+      </div>
+
+    </div>
     <footer id="config-name"></footer>
   </div>
   <div id="amd-popup" class="popup-hidden">
