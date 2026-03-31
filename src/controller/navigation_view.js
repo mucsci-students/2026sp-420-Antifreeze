@@ -208,6 +208,7 @@ export function render_amd_images(current_field) {
 // ---------------------------------------------------------------------------
 
 export function render_faculty_list(faculty) {
+  main.classList.remove("schedule-view-expanded");
   let html = "<ul>";
   faculty.forEach(f => { html += `<li>${f.name}</li>`; });
   html += "</ul>";
@@ -215,6 +216,7 @@ export function render_faculty_list(faculty) {
 }
 
 export function render_courses_list(courses) {
+  main.classList.remove("schedule-view-expanded");
   let html = "<ul>";
   courses.forEach(c => { html += `<li>${c.course_id} (${c.credits} credits)</li>`; });
   html += "</ul>";
@@ -222,6 +224,7 @@ export function render_courses_list(courses) {
 }
 
 export function render_rooms_list(rooms) {
+  main.classList.remove("schedule-view-expanded");
   let html = "<ul>";
   rooms.forEach(r => { html += `<li>${r.name}</li>`; });
   html += "</ul>";
@@ -229,6 +232,7 @@ export function render_rooms_list(rooms) {
 }
 
 export function render_labs_list(labs) {
+  main.classList.remove("schedule-view-expanded");
   let html = "<ul>";
   labs.forEach(l => { html += `<li>${l.name}</li>`; });
   html += "</ul>";
@@ -256,6 +260,7 @@ export function clear_field_containers() {
 // ---------------------------------------------------------------------------
 
 export function render_schedule_form(count = 10, optimize = true) {
+  main.classList.remove("schedule-view-expanded");
   navigator_div.innerHTML = `
     <h3 id="schedule-generator">Schedule Generator</h3>
     <div class="schedule-form-line">
@@ -520,6 +525,270 @@ export function render_view_schedule_popup(index, on_load_click, on_group_change
 
   load_btn.addEventListener("click", () => on_load_click(parseInt(num_input.value) - 1));
   group_select.addEventListener("change", () => on_group_change(group_select.value));
+}
+
+// ---------------------------------------------------------------------------
+// Inline schedule view renderers
+// ---------------------------------------------------------------------------
+
+// Renders the schedule viewer controls (schedule selector + group-by) directly
+// into navigator_div, replacing whatever was there. Appends an empty
+// #schedule-calendar-container div where render_schedule_calendar() will write.
+// Parameters: same as render_view_schedule_popup
+export function render_schedule_view_inline(index, on_load_click, on_group_change, schedule_count = null) {
+  const max_attr = schedule_count !== null ? ` max="${schedule_count}"` : "";
+  const of_html = schedule_count !== null
+    ? `<span class="schedule-of-label">of ${schedule_count}</span>` : "";
+
+  main.classList.add("schedule-view-expanded");
+
+  navigator_div.innerHTML = `
+    <h3 id="schedule-generator">Schedule Viewer</h3>
+    <div class="schedule-control-row">
+      <label>Schedule number:</label>
+      <input type="number" id="schedule-num-input" min="1" value="${index + 1}"${max_attr} style="width:60px">
+      ${of_html}
+      <button id="schedule-load-btn">Load</button>
+    </div>
+    <div class="schedule-control-row">
+      <label>Group by:</label>
+      <select id="schedule-group-by">
+        <option value="faculty">Faculty</option>
+        <option value="room">Room</option>
+        <option value="lab">Lab</option>
+        <option value="course">Course</option>
+      </select>
+    </div>
+    <div id="schedule-calendar-container"></div>
+  `;
+
+  document.getElementById("schedule-load-btn").addEventListener("click", () => {
+    const val = parseInt(document.getElementById("schedule-num-input").value);
+    on_load_click(isNaN(val) ? 0 : val - 1);
+  });
+  document.getElementById("schedule-group-by").addEventListener("change", () => {
+    on_group_change(document.getElementById("schedule-group-by").value);
+  });
+}
+
+// Renders calendar grids into #schedule-calendar-container.
+// For faculty/room/lab modes: one card per entity with a Mon–Fri grid.
+// For course mode: a single grid with all courses.
+// Parameters: data - schedule view object from API or get_csv_schedule_view,
+//             index - 0-based schedule index, mode - grouping mode string
+export function render_schedule_calendar(data, index, mode) {
+  const container = document.getElementById("schedule-calendar-container");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const { groups, time_slots, DAY_ABBREVS, DAY_LABELS } = _transform_to_calendar(data);
+
+  if (groups.length === 0 || time_slots.length === 0) {
+    container.textContent = "No schedule data to display.";
+    return;
+  }
+
+  const MODE_TITLE = { faculty: "Faculty", room: "Rooms", lab: "Lab", course: "Course" };
+  const section_title = document.createElement("h4");
+  section_title.className = "schedule-section-title";
+  section_title.textContent = `Schedule ${index + 1} — grouped by ${MODE_TITLE[mode] || mode}`;
+  container.appendChild(section_title);
+
+  const grid_wrap = document.createElement("div");
+  grid_wrap.className = "schedule-calendar-grid";
+  container.appendChild(grid_wrap);
+
+  // Assign a pastel color per course ID
+  const PALETTE = [
+    "#b8deff", "#b8f0d8", "#ffeab8", "#ffc8d0", "#dac8ff",
+    "#b8f0f0", "#ffd8b8", "#c8e8b8", "#ffd0f0", "#c8d8ff",
+  ];
+  const course_colors = {};
+  let color_idx = 0;
+  for (const group of groups) {
+    for (const day_slots of Object.values(group.day_map)) {
+      for (const slot_list of Object.values(day_slots)) {
+        for (const slot of slot_list) {
+          if (!course_colors[slot.course]) {
+            course_colors[slot.course] = PALETTE[color_idx % PALETTE.length];
+            color_idx++;
+          }
+        }
+      }
+    }
+  }
+
+  groups.forEach(group => {
+    const card = document.createElement("div");
+    card.className = "schedule-calendar-card";
+
+    if (group.name !== null) {
+      const title = document.createElement("div");
+      title.className = "calendar-card-title";
+      title.textContent = group.name;
+      card.appendChild(title);
+    }
+
+    const table = document.createElement("table");
+    table.className = "calendar-table";
+
+    // Only show days that have at least one event for this group
+    const active_days = DAY_ABBREVS.filter(d =>
+      group.day_map[d] && Object.keys(group.day_map[d]).length > 0
+    );
+    const display_days = active_days.length > 0 ? active_days : DAY_ABBREVS;
+
+    // Header row
+    const thead = document.createElement("thead");
+    const head_row = document.createElement("tr");
+    const blank_th = document.createElement("th");
+    blank_th.className = "cal-time-header";
+    head_row.appendChild(blank_th);
+    display_days.forEach(day => {
+      const th = document.createElement("th");
+      th.className = "cal-day-header";
+      th.textContent = DAY_LABELS[day];
+      head_row.appendChild(th);
+    });
+    thead.appendChild(head_row);
+    table.appendChild(thead);
+
+    // One row per unique time slot
+    const tbody = document.createElement("tbody");
+    time_slots.forEach(time => {
+      const row = document.createElement("tr");
+
+      const time_td = document.createElement("td");
+      time_td.className = "cal-time-cell";
+      time_td.textContent = time.split("-")[0].trim();
+      row.appendChild(time_td);
+
+      display_days.forEach(day => {
+        const cell_td = document.createElement("td");
+        cell_td.className = "cal-day-cell";
+
+        const slots = (group.day_map[day] && group.day_map[day][time]) || [];
+        slots.forEach(slot => {
+          const block = document.createElement("div");
+          block.className = "cal-course-block";
+          block.style.backgroundColor = course_colors[slot.course] || "#e0e0e0";
+
+          const id_line = document.createElement("div");
+          id_line.className = "cal-course-id";
+          id_line.textContent = slot.section ? `${slot.course}.${slot.section}` : slot.course;
+          block.appendChild(id_line);
+
+          // Secondary detail depends on group mode
+          const detail = mode === "faculty" ? slot.room
+                       : mode === "room"    ? slot.faculty
+                       : mode === "lab"     ? slot.faculty
+                       :                      slot.faculty;
+          if (detail && detail !== "None" && detail !== "—") {
+            const detail_line = document.createElement("div");
+            detail_line.className = "cal-course-detail";
+            detail_line.textContent = detail;
+            block.appendChild(detail_line);
+          }
+
+          const time_line = document.createElement("div");
+          time_line.className = "cal-course-time";
+          time_line.textContent = time;
+          block.appendChild(time_line);
+
+          if (slot.is_lab) {
+            const badge = document.createElement("span");
+            badge.className = "cal-lab-badge";
+            badge.textContent = "LAB";
+            block.appendChild(badge);
+          }
+
+          cell_td.appendChild(block);
+        });
+
+        row.appendChild(cell_td);
+      });
+
+      tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    card.appendChild(table);
+    grid_wrap.appendChild(card);
+  });
+}
+
+// Transforms API schedule data { mode, days } into calendar-grid format.
+// Returns { groups, time_slots, DAY_ABBREVS, DAY_LABELS }.
+function _transform_to_calendar(data) {
+  const DAY_ABBREVS = ["MON", "TUE", "WED", "THU", "FRI"];
+  const DAY_LABELS = { MON: "Monday", TUE: "Tuesday", WED: "Wednesday", THU: "Thursday", FRI: "Friday" };
+  // Reverse lookup used when day_group only has day_name (CSV mode)
+  const DAY_NAME_TO_ABBREV = { Monday: "MON", Tuesday: "TUE", Wednesday: "WED", Thursday: "THU", Friday: "FRI" };
+
+  // Flatten all slots, injecting the day abbreviation from the parent day_group.
+  // The backend includes day_group.day ("MON"); the CSV path uses day_group.day_name ("Monday").
+  // Individual slot objects from the backend do NOT carry a day field.
+  const all_slots = [];
+  for (const day_group of data.days) {
+    const day_abbrev = day_group.day || DAY_NAME_TO_ABBREV[day_group.day_name] || "";
+    for (const sg of day_group.sub_groups) {
+      for (const slot of sg.slots) {
+        all_slots.push({ ...slot, day: slot.day || day_abbrev });
+      }
+    }
+  }
+
+  // Unique time strings sorted by start time
+  const time_set = new Set(all_slots.map(s => s.time));
+  const time_slots = [...time_set].sort((a, b) =>
+    _parse_time_minutes(a.split("-")[0].trim()) - _parse_time_minutes(b.split("-")[0].trim())
+  );
+
+  const mode = data.mode;
+  let groups;
+  if (mode === "course") {
+    groups = [{ name: null, day_map: _build_day_time_map(all_slots) }];
+  } else {
+    const key_fn = mode === "faculty" ? s => s.faculty
+                 : mode === "room"    ? s => s.room
+                 :                      s => s.lab;
+    const group_map = {};
+    for (const slot of all_slots) {
+      const key = key_fn(slot);
+      if (!group_map[key]) group_map[key] = [];
+      group_map[key].push(slot);
+    }
+    groups = Object.entries(group_map)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([name, slots]) => ({ name, day_map: _build_day_time_map(slots) }));
+  }
+
+  return { groups, time_slots, DAY_ABBREVS, DAY_LABELS };
+}
+
+// Builds a nested { day: { time: [slots] } } map from a flat slots array.
+function _build_day_time_map(slots) {
+  const day_map = {};
+  for (const slot of slots) {
+    if (!day_map[slot.day]) day_map[slot.day] = {};
+    if (!day_map[slot.day][slot.time]) day_map[slot.day][slot.time] = [];
+    day_map[slot.day][slot.time].push(slot);
+  }
+  return day_map;
+}
+
+// Parses a time string to minutes since midnight.
+// Handles "9:00", "09:00", "9:00AM", "10:00AM" formats.
+function _parse_time_minutes(t) {
+  const is_pm = /PM/i.test(t);
+  const is_am = /AM/i.test(t);
+  const clean = t.replace(/[APMapm\s]/g, "");
+  const parts = clean.split(":");
+  let hours = parseInt(parts[0]) || 0;
+  const mins = parseInt(parts[1]) || 0;
+  if (is_pm && hours < 12) hours += 12;
+  if (is_am && hours === 12) hours = 0;
+  return hours * 60 + mins;
 }
 
 // ---------------------------------------------------------------------------
