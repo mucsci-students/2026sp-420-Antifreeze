@@ -416,7 +416,7 @@ async function generate_schedules() {
 
 async function view_schedule(index = 0) {
   let current_index = index;
-  let current_mode = "course";
+  let current_mode = "faculty";
 
   // When viewing a loaded CSV, use the local parser instead of the backend API.
   const schedule_count = Model.csv_mode ? Model.csv_schedules.length : null;
@@ -429,14 +429,13 @@ async function view_schedule(index = 0) {
       alert(data.error);
       return;
     }
-    View.render_schedule_table(data, current_index, current_mode);
+    View.render_schedule_calendar(data, current_index, current_mode);
   };
 
-  View.render_view_schedule_popup(
+  View.render_schedule_view_inline(
     index,
     (new_index) => {
       current_index = new_index;
-      View.popup_title.textContent = `Schedule ${current_index + 1}`;
       refresh();
     },
     (new_mode) => {
@@ -447,7 +446,6 @@ async function view_schedule(index = 0) {
   );
 
   await refresh();
-  View.show_popup();
 }
 
 // ---------------------------------------------------------------------------
@@ -924,5 +922,9 @@ const focus_containers = [
   View.gui_wrapper,
 ];
 focus_containers.forEach(el => {
-  el.addEventListener("click", () => View.focus_field_button(Model.current_field));
+  el.addEventListener("click", (e) => {
+    const tag = e.target.tagName;
+    if (tag === "SELECT" || tag === "OPTION" || tag === "INPUT") return;
+    View.focus_field_button(Model.current_field);
+  });
 });
