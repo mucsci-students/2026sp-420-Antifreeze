@@ -106,8 +106,14 @@ def delete_faculty_tool(name):
 def list_faculty_tool():
     return list_faculty(_scheduler)
 
+def get_faculty_details_tool(name):
+    return get_faculty_details(_scheduler, name)
+
 
 # COURSES
+def get_course_details_tool(course_id):
+    return get_course_details(_scheduler, course_id)
+
 def add_course_tool(course_id, credits, room, lab, conflicts, faculty):
     return add_course(_scheduler, course_id, credits, room, lab, conflicts, faculty)
 
@@ -157,12 +163,21 @@ def build_tools():
         StructuredTool.from_function(
             func=add_faculty_tool,
             name="add_faculty",
-            description="Add faculty"
+            description=(
+                "Add a faculty member. "
+                "mandatory_days, times, course_preferences, room_preferences, and lab_preferences are all optional. "
+                "Always pass mandatory_days as a plain list of day strings, e.g. ['MON', 'TUE']. Never ask the user for a format — just use a list."
+            )
         ),
         StructuredTool.from_function(
             func=modify_faculty_tool,
             name="modify_faculty",
-            description="Modify faculty"
+            description=(
+                "Modify an existing faculty member. "
+                "ALWAYS call get_faculty_details first to retrieve current values, then apply only the user's requested changes and preserve all other fields exactly. "
+                "Never ask the user to re-supply fields that weren't changed. "
+                "Always pass mandatory_days as a plain list of day strings, e.g. ['MON', 'TUE']. Never ask the user for a format — just use a list."
+            )
         ),
         StructuredTool.from_function(
             func=delete_faculty_tool,
@@ -172,18 +187,39 @@ def build_tools():
         StructuredTool.from_function(
             func=list_faculty_tool,
             name="list_faculty",
-            description="List faculty"
+            description="List all faculty names"
+        ),
+        StructuredTool.from_function(
+            func=get_faculty_details_tool,
+            name="get_faculty_details",
+            description="Get full details for a single faculty member by name. Always call this before modifying a faculty member so you have all current field values."
         ),
 
         StructuredTool.from_function(
+            func=get_course_details_tool,
+            name="get_course_details",
+            description="Get full details for a single course by course_id, including its index. Always call this before modifying a course so you have all current field values and the required index."
+        ),
+        StructuredTool.from_function(
             func=add_course_tool,
             name="add_course",
-            description="Add course"
+            description=(
+                "Add a course. "
+                "room, lab, conflicts, and faculty are all list fields — always pass them as plain lists of strings, "
+                "e.g. ['Roddy 136', 'Roddy 150']. If the user provides a single value, still wrap it in a list. "
+                "Never ask the user for a specific format — just use a list."
+            )
         ),
         StructuredTool.from_function(
             func=modify_course_tool,
             name="modify_course",
-            description="Modify course"
+            description=(
+                "Modify an existing course by index. "
+                "ALWAYS call get_course_details first to retrieve the current values and index, then apply only the user's requested changes and preserve all other fields exactly. "
+                "Never ask the user to re-supply fields that weren't changed. "
+                "room, lab, conflicts, and faculty are all list fields — always pass them as plain lists of strings, e.g. ['Roddy 136', 'Roddy 150']. "
+                "Never ask the user for a specific format — just use a list."
+            )
         ),
         StructuredTool.from_function(
             func=delete_course_tool,
@@ -250,7 +286,15 @@ def get_agent(scheduler):
 
         tools = build_tools()
 
-        _agent = create_agent(model=model, tools=tools)
+        system_prompt = (
+            "You are a scheduling assistant. Be concise. "
+            "When you run the scheduler or generate schedules, do NOT list the schedule contents in your reply. "
+            "Simply confirm how many schedules were generated (e.g. '1 schedule generated. You can now view it in the GUI.'). "
+            "The user can view schedules directly in the application. "
+            "For all other actions (add, modify, delete), give a brief one-sentence confirmation."
+        )
+
+        _agent = create_agent(model=model, tools=tools, system_prompt=system_prompt)
 
     return _agent
 
