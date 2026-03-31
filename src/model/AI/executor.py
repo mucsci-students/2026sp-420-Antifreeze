@@ -61,7 +61,7 @@ def add_faculty(
         if prof.name.upper() == name.upper():
             return {"error": f'"{name}" already exists.'}
 
-    # ✅ defaults handled properly
+    # defaults
     times = times or {}
     course_preferences = course_preferences or {}
     room_preferences = room_preferences or {}
@@ -124,7 +124,7 @@ def modify_faculty(
             if prof.name.upper() == new_name.upper():
                 return {"error": f'"{new_name}" already exists.'}
 
-    # ✅ defaults
+    # defaults
     times = times or {}
     course_preferences = course_preferences or {}
     room_preferences = room_preferences or {}
@@ -203,19 +203,19 @@ def add_course(scheduler, course_id: str, credits: int, room, lab, conflicts, fa
     if course_id.upper() in existing:
         return {"error": f'"{course_id}" already exists.'}
 
-    # 🔥 FIX: normalize structure
+    # normalize structure
     room = _ensure_list(room)
     lab = _ensure_list(lab)
     conflicts = _ensure_list(conflicts)
     faculty = _ensure_list(faculty)
 
-    # 🔥 FIX: clean
+    # clean
     room = _clean_list(room)
     lab = _clean_list(lab)
     conflicts = _clean_list(conflicts)
     faculty = _clean_list(faculty)
 
-    # 🔥 FIX: semantic normalization
+    # semantic normalization
     room = [_normalize_name(r) for r in room]
     lab = [_normalize_name(l) for l in lab]
 
@@ -260,7 +260,7 @@ def delete_course(scheduler, course_id: str):
 
 def modify_course(scheduler, index: int, course_id: str, credits: int, room, lab, conflicts, faculty):
     try:
-        # 🔥 SAME FIXES HERE (important)
+        # same normalization (important)
         room = _ensure_list(room)
         lab = _ensure_list(lab)
         conflicts = _ensure_list(conflicts)

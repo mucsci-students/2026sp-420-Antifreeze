@@ -1,3 +1,11 @@
+# AI agent module for the scheduling assistant.
+# Builds LangChain StructuredTools that wrap all scheduler operations,
+# constructs a stateful agent with a system prompt, and exposes run_agent()
+# as the single entry point for the chat route.
+#
+# Global state: _scheduler and _agent are initialised once on the first
+# call to get_agent() and reused for the lifetime of the process.
+
 import os
 
 from langchain.chat_models import init_chat_model
@@ -158,6 +166,10 @@ def get_schedule_tool(index):
 # TOOL BUILDER
 # -------------------------
 
+# Constructs the full list of StructuredTools for the agent.
+# Each tool wraps a module-level function that delegates to the shared
+# _scheduler instance. Descriptions guide the agent on argument format
+# and when to call each tool.
 def build_tools():
     return [
         StructuredTool.from_function(
@@ -276,11 +288,15 @@ def build_tools():
 # AGENT FACTORY
 # -------------------------
 
+# Returns the singleton agent, creating it on first call.
+# Injects the scheduler into module-level state so all tool wrappers
+# can reach it without needing it passed per-call.
+# Parameters: scheduler - shared Schedule instance
 def get_agent(scheduler):
     global _agent, _scheduler
 
     if _agent is None:
-        _scheduler = scheduler  # 🔥 inject scheduler ONCE
+        _scheduler = scheduler  # inject scheduler once at agent creation
 
         model = init_chat_model("gpt-5-mini", model_provider="openai")
 
@@ -303,6 +319,10 @@ def get_agent(scheduler):
 # ENTRY POINT
 # -------------------------
 
+# Sends a user message to the agent and returns the final reply string.
+# Initialises the agent on first call via get_agent().
+# Parameters: scheduler - shared Schedule instance, user_input - message from the user
+# Returns: str - the agent's natural-language response
 def run_agent(scheduler, user_input: str):
     agent = get_agent(scheduler)
 
