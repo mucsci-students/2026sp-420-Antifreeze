@@ -25,6 +25,9 @@ export let current_content = null;
 export let csv_schedules = [];
 export let csv_mode = false;
 
+// The full data object of the currently selected list item (faculty, course, lab, or room)
+export let selected_item_data = null;
+
 // ---------------------------------------------------------------------------
 // State setters
 // ---------------------------------------------------------------------------
@@ -36,6 +39,7 @@ export function set_current_content(val) { current_content = val; }
 export function set_loaded_file_content(val) { loaded_file_content = val; }
 export function set_csv_schedules(val) { csv_schedules = val; }
 export function set_csv_mode(val) { csv_mode = val; }
+export function set_selected_item_data(val) { selected_item_data = val; }
 
 // ---------------------------------------------------------------------------
 // History stack helpers
@@ -52,11 +56,7 @@ export function clear_forward_stack() { forward_stack = []; }
 // ---------------------------------------------------------------------------
 
 export async function api_load_empty_config() {
-  const res = await fetch("/static/empty.json");
-  const blob = await res.blob();
-  const formData = new FormData();
-  formData.append("file", blob, "empty.json");
-  return await fetch("/load_config", { method: "POST", body: formData });
+ return await fetch("/load_empty_config", { method: "POST" });
 }
 
 export async function api_load_config(file) {
@@ -117,8 +117,8 @@ export async function api_add_course(form_data) {
   });
 }
 
-export async function api_modify_course(course_id, form_data) {
-  return await fetch(`/courses/${encodeURIComponent(course_id)}`, {
+export async function api_modify_course(index, form_data) {
+  return await fetch(`/courses/${index}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(form_data)

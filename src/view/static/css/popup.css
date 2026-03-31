@@ -161,8 +161,10 @@
 }
 .form-line .dynamic-container {
   display: inline-block;
+  vertical-align: top;
 }
 .form-line button {
+  vertical-align: top;
   padding-left: 5px;
   padding-right: 5px;
   padding-top: 2px;
@@ -176,6 +178,27 @@
 }
 .input-wrapper {
   margin-right: 2px;
+  position: relative;
+}
+
+span.field-error {
+  display: block;
+  color: #cc0000;
+  font-size: 0.82em;
+  margin-top: 1px;
+  margin-bottom: 2px;
+  margin-left: 2px;
+}
+
+select.dynamic-select {
+  width: 200px;
+  display: inline-block;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+  font-size: medium;
+  color: #484848;
+  background-color: #f5f5f5;
+  border: 1px solid #aaa;
+  padding: 1px 2px;
 }
 #remove-button {
   margin-left: 8px;

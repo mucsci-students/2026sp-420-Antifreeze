@@ -103,15 +103,7 @@ function validate_faculty_form(is_add) {
     }
   });
 
-  // Mandatory days: optional, but if filled must be a valid abbreviation
-  const day_pattern = /^(MON|TUE|WED|THU|FRI)$/;
-  document.querySelectorAll('input[name="faculty-mandatory-day"]').forEach(input => {
-    const val = input.value.trim();
-    if (val !== "" && !day_pattern.test(val)) {
-      View.show_field_error(input, "Day must be one of: MON, TUE, WED, THU, FRI");
-      valid = false;
-    }
-  });
+  // Mandatory days are now dropdowns — no free-text validation needed
 
   return valid;
 }
@@ -172,7 +164,7 @@ function validate_courses_form(is_add) {
 
   // Rooms: at least one non-empty entry required when adding
   if (is_add) {
-    const room_inputs = [...document.querySelectorAll('input[name="courses-room"]')];
+    const room_inputs = [...document.querySelectorAll('[name="courses-room"]')];
     const filled_rooms = room_inputs.filter(i => i.value.trim() !== "");
     if (room_inputs.length > 0 && filled_rooms.length === 0) {
       View.show_field_error(room_inputs[0], "At least one room is required.");
@@ -333,6 +325,9 @@ async function go_to_field(field) {
 async function load_faculty() {
   const faculty = await Model.api_get_faculty();
   View.render_faculty_list(faculty);
+  Model.set_selected_item_data(null);
+  View.render_amd_images(Model.current_field, false);
+  attach_list_item_listeners();
   navigate_to("Faculty");
 }
 
@@ -340,6 +335,9 @@ async function load_courses() {
   try {
     const courses = await Model.api_get_courses();
     View.render_courses_list(courses);
+    Model.set_selected_item_data(null);
+    View.render_amd_images(Model.current_field, false);
+    attach_list_item_listeners();
     navigate_to("Courses");
   } catch (err) {
     View.render_load_error("courses", err.message);
@@ -351,6 +349,9 @@ async function load_rooms() {
   try {
     const rooms = await Model.api_get_rooms();
     View.render_rooms_list(rooms);
+    Model.set_selected_item_data(null);
+    View.render_amd_images(Model.current_field, false);
+    attach_list_item_listeners();
     navigate_to("Rooms");
   } catch (err) {
     View.render_load_error("rooms", err.message);
@@ -362,11 +363,29 @@ async function load_labs() {
   try {
     const labs = await Model.api_get_labs();
     View.render_labs_list(labs);
+    Model.set_selected_item_data(null);
+    View.render_amd_images(Model.current_field, false);
+    attach_list_item_listeners();
     navigate_to("Labs");
   } catch (err) {
     View.render_load_error("labs", err.message);
     navigate_to("Labs");
   }
+}
+
+// Attaches click listeners to each rendered list item.
+// On click: selects the item, stores its data, and enables Modify/Delete buttons.
+function attach_list_item_listeners() {
+  document.querySelectorAll(".navigator-item").forEach(li => {
+    li.addEventListener("click", () => {
+      const idx = parseInt(li.dataset.index);
+      const item = View.get_list_item(idx);
+      if (!item) return;
+      View.select_list_item(li);
+      Model.set_selected_item_data({ ...item, _list_index: idx });
+      View.render_amd_images(Model.current_field, true);
+    });
+  });
 }
 
 async function load_schedule() {
@@ -416,7 +435,7 @@ async function generate_schedules() {
 
 async function view_schedule(index = 0) {
   let current_index = index;
-  let current_mode = "course";
+  let current_mode = "faculty";
 
   // When viewing a loaded CSV, use the local parser instead of the backend API.
   const schedule_count = Model.csv_mode ? Model.csv_schedules.length : null;
@@ -429,14 +448,13 @@ async function view_schedule(index = 0) {
       alert(data.error);
       return;
     }
-    View.render_schedule_table(data, current_index, current_mode);
+    View.render_schedule_calendar(data, current_index, current_mode);
   };
 
-  View.render_view_schedule_popup(
+  View.render_schedule_view_inline(
     index,
     (new_index) => {
       current_index = new_index;
-      View.popup_title.textContent = `Schedule ${current_index + 1}`;
       refresh();
     },
     (new_mode) => {
@@ -447,7 +465,86 @@ async function view_schedule(index = 0) {
   );
 
   await refresh();
-  View.show_popup();
+}
+
+// ---------------------------------------------------------------------------
+// Shared form helpers
+// ---------------------------------------------------------------------------
+
+// Checks all elements with the given name attr for duplicate values.
+// Highlights the second occurrence and returns false if a duplicate is found.
+function check_select_duplicates(name_attr, label) {
+  const elements = [...document.querySelectorAll(`[name="${name_attr}"]`)];
+  const seen = new Map();
+  for (const el of elements) {
+    const v = el.value.trim();
+    if (!v) continue;
+    if (seen.has(v)) {
+      View.show_field_error(el, `Duplicate ${label}: "${v}" is already selected above.`);
+      return false;
+    }
+    seen.set(v, el);
+  }
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// Faculty form helpers
+// ---------------------------------------------------------------------------
+
+// Reads all faculty form fields from the popup and returns a data object.
+// Deduplicates multi-select fields; returns null and shows an error if duplicates found.
+function read_faculty_form_fields() {
+  const max_credits  = parseInt(document.getElementById("faculty-max-credits")?.value) || 0;
+  const min_credits  = parseInt(document.getElementById("faculty-min-credits")?.value) || 0;
+  const unique_limit = parseInt(document.getElementById("faculty-unique-course-limit")?.value) || 1;
+  const max_days     = parseInt(document.getElementById("faculty-max-days")?.value) || 4;
+
+  // Parse time slots: "DAY HH:MM-HH:MM" → { DAY: ["HH:MM-HH:MM", ...] }
+  const times = {};
+  document.querySelectorAll('input[name="faculty-time-slot"]').forEach(input => {
+    const val = input.value.trim();
+    if (!val) return;
+    const space = val.indexOf(" ");
+    if (space < 0) return;
+    const day = val.slice(0, space).toUpperCase();
+    const range = val.slice(space + 1);
+    if (!times[day]) times[day] = [];
+    times[day].push(range);
+  });
+
+  function read_select_values(name) {
+    return [...document.querySelectorAll(`[name="${name}"]`)]
+      .map(el => el.value.trim())
+      .filter(v => v !== "");
+  }
+
+  const course_prefs = read_select_values("faculty-course-preference");
+  const room_prefs   = read_select_values("faculty-room-preference");
+  const lab_prefs    = read_select_values("faculty-lab-preference");
+  const mand_days    = read_select_values("faculty-mandatory-day");
+
+  View.clear_all_errors();
+  if (!check_select_duplicates("faculty-course-preference", "course preference")) return null;
+  if (!check_select_duplicates("faculty-room-preference",   "room preference"))   return null;
+  if (!check_select_duplicates("faculty-lab-preference",    "lab preference"))    return null;
+  if (!check_select_duplicates("faculty-mandatory-day",     "mandatory day"))     return null;
+
+  const course_preferences = Object.fromEntries(course_prefs.map(c => [c, 1]));
+  const room_preferences   = Object.fromEntries(room_prefs.map(r => [r, 1]));
+  const lab_preferences    = Object.fromEntries(lab_prefs.map(l => [l, 1]));
+
+  return {
+    maximum_credits: max_credits,
+    minimum_credits: min_credits,
+    unique_course_limit: unique_limit,
+    maximum_days: max_days,
+    times,
+    course_preferences,
+    room_preferences,
+    lab_preferences,
+    mandatory_days: mand_days,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -467,33 +564,25 @@ async function handle_popup_save() {
 
     if (Model.current_operation === "add") {
 
-      const max_credits = parseInt(document.getElementById("faculty-max-credits").value);
+      const fields = read_faculty_form_fields();
+      if (!fields) return;
 
-      const add_res = await Model.api_add_faculty({
-        name, maximum_credits: max_credits, maximum_days: 4, minimum_credits: 0,
-        unique_course_limit: 1, times: {}, course_preferences: {},
-        room_preferences: {}, lab_preferences: {}, mandatory_days: []
-      });
-
+      const add_res = await Model.api_add_faculty({ name, ...fields });
       if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
 
     } else if (Model.current_operation === "delete") {
 
       const del_res = await Model.api_delete_faculty(name);
-
       if (await check_response_error(del_res, `"${name}" was not found. Please check the name and try again.`)) return;
 
     } else if (Model.current_operation === "modify") {
 
-      const max_credits = parseInt(document.getElementById("faculty-max-credits").value);
+      const fields = read_faculty_form_fields();
+      if (!fields) return;
 
-      const mod_res = await Model.api_modify_faculty(name, {
-        name, maximum_credits: max_credits, maximum_days: 4, minimum_credits: 0,
-        unique_course_limit: 1, times: {}, course_preferences: {},
-        room_preferences: {}, lab_preferences: {}, mandatory_days: []
-      });
-
-      if (await check_response_error(mod_res, `"${name}" was not found. Please check the name and try again.`)) return;
+      const original_name = Model.selected_item_data ? Model.selected_item_data.name : name;
+      const mod_res = await Model.api_modify_faculty(original_name, { name, ...fields });
+      if (await check_response_error(mod_res, `"${original_name}" was not found. Please check the name and try again.`)) return;
     }
 
     await load_faculty();
@@ -516,21 +605,27 @@ async function handle_popup_save() {
     const credits_input = document.getElementById("courses-credits");
     const credits = credits_input ? parseInt(credits_input.value) : null;
 
-    const rooms = [...document.querySelectorAll('input[name="courses-room"]')]
+    const rooms = [...document.querySelectorAll('[name="courses-room"]')]
       .map(i => i.value.trim())
       .filter(v => v !== "");
 
-    const labs = [...document.querySelectorAll('input[name="courses-lab"]')]
+    const labs = [...document.querySelectorAll('[name="courses-lab"]')]
       .map(i => i.value.trim())
       .filter(v => v !== "");
 
-    const conflicts = [...document.querySelectorAll('input[name="courses-conflict"]')]
+    const conflicts = [...document.querySelectorAll('[name="courses-conflict"]')]
       .map(i => i.value.trim())
       .filter(v => v !== "");
 
-    const faculty = [...document.querySelectorAll('input[name="courses-faculty"]')]
+    const faculty = [...document.querySelectorAll('[name="courses-faculty"]')]
       .map(i => i.value.trim())
       .filter(v => v !== "");
+
+    View.clear_all_errors();
+    if (!check_select_duplicates("courses-room",     "room"))     return;
+    if (!check_select_duplicates("courses-lab",      "lab"))      return;
+    if (!check_select_duplicates("courses-conflict", "conflict")) return;
+    if (!check_select_duplicates("courses-faculty",  "faculty"))  return;
 
     const course_data = { course_id, credits, room: rooms, lab: labs, conflicts, faculty };
 
@@ -548,9 +643,14 @@ async function handle_popup_save() {
 
     } else if (Model.current_operation === "modify") {
 
-      const mod_res = await Model.api_modify_course(course_id, course_data);
+      const index = Model.selected_item_data?._list_index ?? null;
+      if (index === null) {
+        View.show_field_error(id_input, "No course selected. Please click a course from the list first.");
+        return;
+      }
+      const mod_res = await Model.api_modify_course(index, course_data);
 
-      if (await check_response_error(mod_res, `"${course_id}" was not found. Please check the course ID and try again.`)) return;
+      if (await check_response_error(mod_res, `"${course_id}" could not be modified.`)) return;
     }
 
     await load_courses();
@@ -823,25 +923,66 @@ View.file_input.addEventListener("change", async function () {
   }
 });
 
+// Fetches rooms, labs, course IDs, and faculty names to populate course dropdowns.
+async function get_course_options() {
+  const [rooms, labs, courses, faculty] = await Promise.all([
+    Model.api_get_rooms().catch(() => []),
+    Model.api_get_labs().catch(() => []),
+    Model.api_get_courses().catch(() => []),
+    Model.api_get_faculty().catch(() => []),
+  ]);
+  return {
+    rooms:   rooms.map(r => r.name),
+    labs:    labs.map(l => l.name),
+    courses: courses.map(c => c.course_id),
+    faculty: faculty.map(f => f.name),
+  };
+}
+
 // Add button: sets current_operation and opens the Add popup for the active field.
-View.add_button.addEventListener("click", () => {
+View.add_button.addEventListener("click", async () => {
   Model.set_current_operation("add");
   View.focus_field_button(Model.current_field);
-  View.render_edit_popup("Add", Model.current_field);
+  const needs_opts = Model.current_field === "Courses" || Model.current_field === "Faculty";
+  const options = needs_opts ? await get_course_options() : null;
+  View.render_edit_popup("Add", Model.current_field, null, options);
 });
 
-// Modify button: sets current_operation and opens the Modify popup for the active field.
-View.modify_button.addEventListener("click", () => {
+// Modify button: opens Modify popup pre-populated with the selected item's data.
+View.modify_button.addEventListener("click", async () => {
+  if (!Model.selected_item_data) return;
   Model.set_current_operation("modify");
   View.focus_field_button(Model.current_field);
-  View.render_edit_popup("Modify", Model.current_field);
+  const needs_opts = Model.current_field === "Courses" || Model.current_field === "Faculty";
+  const options = needs_opts ? await get_course_options() : null;
+  View.render_edit_popup("Modify", Model.current_field, Model.selected_item_data, options);
 });
 
-// Delete button: sets current_operation and opens the Delete popup for the active field.
-View.delete_button.addEventListener("click", () => {
+// Delete button: directly deletes the selected item without opening a popup.
+View.delete_button.addEventListener("click", async () => {
+  if (!Model.selected_item_data) return;
   Model.set_current_operation("delete");
-  View.focus_field_button(Model.current_field);
-  View.render_edit_popup("Delete", Model.current_field);
+
+  const field = Model.current_field;
+  const item = Model.selected_item_data;
+
+  if (field === "Faculty") {
+    const res = await Model.api_delete_faculty(item.name);
+    if (await check_response_error(res, `"${item.name}" could not be deleted.`)) return;
+    await load_faculty();
+  } else if (field === "Courses") {
+    const res = await Model.api_delete_course(item.course_id);
+    if (await check_response_error(res, `"${item.course_id}" could not be deleted.`)) return;
+    await load_courses();
+  } else if (field === "Labs") {
+    const res = await Model.api_delete_lab(item.name);
+    if (await check_response_error(res, `"${item.name}" could not be deleted.`)) return;
+    await load_labs();
+  } else if (field === "Rooms") {
+    const res = await Model.api_delete_room(item.name);
+    if (await check_response_error(res, `"${item.name}" could not be deleted.`)) return;
+    await load_rooms();
+  }
 });
 
 // Print button

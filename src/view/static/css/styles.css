@@ -379,6 +379,7 @@ button:disabled {
 
 /* ----- Time Slots Tab ----- */
 #time-slots-button {
+  width: 115px;
   text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
   background-color: #ac86ff;
   border: outset;
@@ -547,7 +548,6 @@ footer#config-name.visible {
 
 /* =========================
    CHAT LAYOUT
-========================= */
 
 #main-container {
   display: flex;
@@ -668,4 +668,164 @@ footer#config-name.visible {
 
 #chat-send {
   padding: 6px 10px;
+}
+}
+
+/* ----- Navigator List Items ----- */
+.navigator-list {
+  list-style: none;
+  margin: 6px 0;
+  padding: 0;
+}
+
+.navigator-item {
+  padding: 5px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+  user-select: none;
+}
+
+.navigator-item:hover {
+  background-color: #d8eeff;
+}
+
+.navigator-item.selected {
+  background-color: #b0d8ff;
+  font-weight: bold;
+  border-left: 4px solid #1394d1;
+  padding-left: 8px;
+}
+
+/* ----- Schedule Calendar Expanded Main ----- */
+main.schedule-view-expanded {
+  max-height: none;
+}
+
+main.schedule-view-expanded .navigator {
+  overflow-y: visible;
+}
+
+/* ----- Schedule Calendar View ----- */
+.schedule-control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 8px;
+}
+
+.schedule-control-row label {
+  width: 140px;
+  display: inline-block;
+}
+
+.schedule-of-label {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.schedule-section-title {
+  margin: 8px 8px 4px 8px;
+  font-size: 0.95em;
+  color: #555;
+  font-weight: normal;
+}
+
+.schedule-calendar-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 10px;
+}
+
+.schedule-calendar-card {
+  border: 2px solid #bbb;
+  background: #f9f9f9;
+  box-shadow: 2px 2px #ccc;
+  flex: 0 0 auto;
+}
+
+.calendar-card-title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1em;
+  padding: 4px 12px;
+  background: linear-gradient(
+    to right,
+    rgba(254, 82, 58, 0.6),
+    rgba(82, 134, 254, 0.4)
+  );
+  color: #fff;
+  text-shadow: 1px 1px #444;
+}
+
+.calendar-table {
+  border-collapse: collapse;
+  font-size: 0.78em;
+}
+
+.cal-time-header {
+  min-width: 60px;
+  border-bottom: 2px solid #999;
+  padding: 3px 4px;
+}
+
+.cal-day-header {
+  min-width: 95px;
+  border-bottom: 2px solid #999;
+  border-left: 1px solid #ccc;
+  padding: 3px 6px;
+  text-align: center;
+  font-weight: bold;
+  background: #e8e8e8;
+}
+
+.cal-time-cell {
+  color: #888;
+  font-size: 0.85em;
+  padding: 4px 5px;
+  vertical-align: top;
+  border-top: 1px solid #e0e0e0;
+  white-space: nowrap;
+}
+
+.cal-day-cell {
+  border-left: 1px solid #ccc;
+  border-top: 1px solid #e0e0e0;
+  vertical-align: top;
+  padding: 2px;
+  min-width: 95px;
+  min-height: 20px;
+}
+
+.cal-course-block {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+  padding: 3px 5px;
+  margin: 2px 1px;
+  font-size: 0.9em;
+  line-height: 1.35;
+  cursor: default;
+}
+
+.cal-course-id {
+  font-weight: bold;
+}
+
+.cal-course-detail {
+  color: #444;
+}
+
+.cal-course-time {
+  color: #666;
+  font-size: 0.85em;
+}
+
+.cal-lab-badge {
+  display: inline-block;
+  background: #e0a000;
+  color: #fff;
+  font-size: 0.72em;
+  padding: 0 3px;
+  border-radius: 2px;
+  margin-top: 2px;
 }
