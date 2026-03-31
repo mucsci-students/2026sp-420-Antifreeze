@@ -52,11 +52,7 @@ export function clear_forward_stack() { forward_stack = []; }
 // ---------------------------------------------------------------------------
 
 export async function api_load_empty_config() {
-  const res = await fetch("/static/empty.json");
-  const blob = await res.blob();
-  const formData = new FormData();
-  formData.append("file", blob, "empty.json");
-  return await fetch("/load_config", { method: "POST", body: formData });
+ return await fetch("/load_empty_config", { method: "POST" });
 }
 
 export async function api_load_config(file) {

@@ -18,6 +18,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Par
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 import io
+import copy
 
 from model.schedule.conflict import conflict
 from model.schedule.course import course
@@ -39,7 +40,8 @@ class Schedule():
         self.faculty = faculty()
         self.lab = lab()
         self.room = room()
-        self.config = self.load_config(empty_path)
+        self.config = load_config_from_file(CombinedConfig, empty_path)
+        self.empty_config = copy.deepcopy(self.config)
         self.result = []
 
     #--------------#
@@ -51,6 +53,12 @@ class Schedule():
     # Parameters: Configuration file path
     def load_config(self, file_name):
         try:
+            
+            if os.path.basename(file_name) == "empty.json":
+                self.load_empty_prototype()
+                print("Loaded from prototype.")
+                return
+
             self.config = load_config_from_file(CombinedConfig, file_name)
             print("Config loaded successfully.")
 
@@ -59,7 +67,12 @@ class Schedule():
                 print("Could not load file, try again")
                 print(e)
                 return
-
+        
+    def load_empty_prototype(self):
+    
+        self.config = copy.deepcopy(self._empty_prototype)
+        self.result = []
+        return
     # Save Configuration
     # Saves the current configuration to a file
     def save_config(self):
