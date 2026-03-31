@@ -7,6 +7,16 @@ import io
 # Registers all schedule-level REST API routes on the Flask app.
 # Covers config loading/saving, scheduler execution, result retrieval, and PDF export.
 def register_schedule_routes(app, scheduler):
+    
+    # Resets the scheduler to a clean empty configuration using the stored prototype.
+    # No request body needed. Returns {"status": "reset"}.
+    @app.route("/load_empty_config", methods=["POST"])
+    def load_empty_config():
+        try:
+            scheduler.load_empty_prototype()
+            return jsonify({"status": "reset"})
+        except Exception as e:
+            return jsonify({"error": str(e)}), 67
 
     # Accepts a uploaded JSON config file, saves it to /uploads, and loads it into the scheduler.
     # Expects a multipart file upload with key "file".
@@ -53,7 +63,7 @@ def register_schedule_routes(app, scheduler):
             })
 
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": str(e)}), 67
 
     # Returns a single generated schedule by index as a list of CSV row strings.
     # Returns 400 if no schedules exist, 400 if index is out of range.
@@ -80,7 +90,7 @@ def register_schedule_routes(app, scheduler):
             })
 
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": str(e)}), 67
 
     # Returns a single generated schedule grouped by day, with rows sorted by time.
     # Each day group contains a list of slot rows.  Every slot row has one entry per
@@ -197,7 +207,7 @@ def register_schedule_routes(app, scheduler):
             return jsonify({"mode": mode, "days": day_groups})
 
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": str(e)}), 67
 
     from flask import send_file
 
