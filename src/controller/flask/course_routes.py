@@ -5,7 +5,7 @@ from flask import request, jsonify
 # All handlers close over `scheduler` for access to the config and course model.
 def register_course_routes(app, scheduler):
 
-    # Returns a JSON array of all courses with their course_id and credits.
+    # Returns a JSON array of all courses with their full configuration.
     @app.route("/courses", methods=["GET"])
     def get_courses():
         try:
@@ -14,7 +14,11 @@ def register_course_routes(app, scheduler):
             for c in scheduler.config.config.courses:
                 courses.append({
                     "course_id": c.course_id,
-                    "credits": c.credits
+                    "credits": c.credits,
+                    "room": list(c.room),
+                    "lab": list(c.lab),
+                    "conflicts": list(c.conflicts),
+                    "faculty": list(c.faculty),
                 })
 
             return jsonify(courses)

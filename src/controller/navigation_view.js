@@ -76,13 +76,14 @@ export function show_field_error(input_el, message) {
 
   const error_span = document.createElement("span");
   error_span.className = "field-error";
-  error_span.style.color = "#cc0000";
-  error_span.style.fontSize = "0.82em";
-  error_span.style.display = "block";
-  error_span.style.marginTop = "2px";
   error_span.textContent = message;
 
-  input_el.insertAdjacentElement("afterend", error_span);
+  // If the element is inside an .input-wrapper, attach the error to the
+  // wrapper's parent so it appears below the whole row without shifting
+  // the remove button sideways.
+  const wrapper = input_el.closest(".input-wrapper");
+  const anchor = wrapper ?? input_el;
+  anchor.insertAdjacentElement("afterend", error_span);
 }
 
 // Removes the inline error state (red border + error span) from a given input element.
@@ -90,7 +91,11 @@ export function show_field_error(input_el, message) {
 export function clear_field_error(input_el) {
   if (!input_el) return;
   input_el.style.borderColor = "";
-  const next = input_el.nextElementSibling;
+
+  // Check after both the element itself and its wrapper
+  const wrapper = input_el.closest(".input-wrapper");
+  const anchor = wrapper ?? input_el;
+  const next = anchor.nextElementSibling;
   if (next && next.classList.contains("field-error")) {
     next.remove();
   }
@@ -173,10 +178,11 @@ export function render_button_images(back_stack, forward_stack) {
   }
 }
 
-// Updates add/modify/delete button images and colors based on whether a field is selected.
-// Dims buttons when no field is active.
-// Parameters: current_field - the currently selected field string or null
-export function render_amd_images(current_field) {
+// Updates add/modify/delete button images based on field and item selection state.
+// Add is enabled whenever a field is active. Modify/Delete only light up when an
+// item is also selected in the list. item_selected defaults to false.
+// Parameters: current_field - active field string or null, item_selected - boolean
+export function render_amd_images(current_field, item_selected = false) {
   if (current_field == null || current_field == "Schedule") {
     add_img.src = "/static/images/add_shadow.png";
     modify_img.src = "/static/images/modify_shadow.png";
@@ -190,16 +196,27 @@ export function render_amd_images(current_field) {
     delete_button.disabled = true;
     print_button.disabled = true;
   } else {
+    // Add is always available when a field is active
     add_img.src = "/static/images/add.png";
-    modify_img.src = "/static/images/modify.png";
-    delete_img.src = "/static/images/delete.png";
     add_button.style.color = "#484848";
-    modify_button.style.color = "#484848";
-    delete_button.style.color = "#484848";
-
     add_button.disabled = false;
-    modify_button.disabled = false;
-    delete_button.disabled = false;
+
+    // Modify and Delete only activate after clicking a specific item
+    if (item_selected) {
+      modify_img.src = "/static/images/modify.png";
+      delete_img.src = "/static/images/delete.png";
+      modify_button.style.color = "#484848";
+      delete_button.style.color = "#484848";
+      modify_button.disabled = false;
+      delete_button.disabled = false;
+    } else {
+      modify_img.src = "/static/images/modify_shadow.png";
+      delete_img.src = "/static/images/delete_shadow.png";
+      modify_button.style.color = "#808080";
+      delete_button.style.color = "#808080";
+      modify_button.disabled = true;
+      delete_button.disabled = true;
+    }
   }
 }
 
@@ -207,36 +224,60 @@ export function render_amd_images(current_field) {
 // Field list renderers
 // ---------------------------------------------------------------------------
 
+// Cached array of the items currently rendered in the navigator list.
+let _list_items = [];
+
+// Returns the full item data object at the given index in the current list.
+export function get_list_item(i) { return _list_items[i] ?? null; }
+
+// Builds and renders a clickable <ul> list into navigator_div.
+// label_fn(item) produces the display string for each item.
+function _make_list(items, label_fn) {
+  _list_items = items;
+  navigator_div.innerHTML = "";
+  const ul = document.createElement("ul");
+  ul.className = "navigator-list";
+  items.forEach((item, i) => {
+    const li = document.createElement("li");
+    li.className = "navigator-item";
+    li.dataset.index = String(i);
+    li.textContent = label_fn(item);
+    ul.appendChild(li);
+  });
+  navigator_div.appendChild(ul);
+}
+
+// Highlights the given <li> as selected and removes selection from any other item.
+export function select_list_item(li) {
+  navigator_div.querySelectorAll(".navigator-item.selected")
+    .forEach(el => el.classList.remove("selected"));
+  li.classList.add("selected");
+}
+
+// Removes the selected highlight from all list items.
+export function clear_item_selection() {
+  navigator_div.querySelectorAll(".navigator-item.selected")
+    .forEach(el => el.classList.remove("selected"));
+}
+
 export function render_faculty_list(faculty) {
   main.classList.remove("schedule-view-expanded");
-  let html = "<ul>";
-  faculty.forEach(f => { html += `<li>${f.name}</li>`; });
-  html += "</ul>";
-  navigator_div.innerHTML = html;
+  _make_list(faculty, f => f.name);   // full object stored; label shows name only
 }
 
 export function render_courses_list(courses) {
   main.classList.remove("schedule-view-expanded");
-  let html = "<ul>";
-  courses.forEach(c => { html += `<li>${c.course_id} (${c.credits} credits)</li>`; });
-  html += "</ul>";
-  navigator_div.innerHTML = html;
+  _make_list(courses, c => `${c.course_id} (${c.credits} credits)`);  // full object stored
 }
 
 export function render_rooms_list(rooms) {
   main.classList.remove("schedule-view-expanded");
-  let html = "<ul>";
-  rooms.forEach(r => { html += `<li>${r.name}</li>`; });
-  html += "</ul>";
-  navigator_div.innerHTML = html;
+  _make_list(rooms, r => r.name);
 }
 
 export function render_labs_list(labs) {
   main.classList.remove("schedule-view-expanded");
-  let html = "<ul>";
-  labs.forEach(l => { html += `<li>${l.name}</li>`; });
-  html += "</ul>";
-  navigator_div.innerHTML = html;
+  _make_list(labs, l => l.name);
 }
 
 export function render_load_error(field, message) {
@@ -342,7 +383,7 @@ export function render_schedules_generated_buttons() {
 // Renders the schedule table inside popup_form for the given data and group mode.
 // mode is one of: "course", "faculty", "room", "lab".
 // Parameters: data - schedule data object from the API, index - schedule index, mode - grouping mode
-export function render_schedule_table(data, index, mode) {
+export function render_schedule_table(data, _index, mode) {
   // Remove everything below the two control rows
   const all_children = Array.from(popup_form.children);
   all_children.forEach(child => {
@@ -795,10 +836,99 @@ function _parse_time_minutes(t) {
 // Popup form renderers (Add / Modify / Delete)
 // ---------------------------------------------------------------------------
 
+// Creates one <select> dropdown row with a remove button.
+// Parameters: name - the select name attr, choices - string[], selected_value - pre-selected string
+function _create_select_row(name, choices, selected_value = "") {
+  const wrapper = document.createElement("div");
+  wrapper.className = "input-wrapper";
+
+  const select = document.createElement("select");
+  select.name = name;
+  select.className = "dynamic-select";
+
+  const blank_opt = document.createElement("option");
+  blank_opt.value = "";
+  blank_opt.textContent = "— select —";
+  select.appendChild(blank_opt);
+
+  choices.forEach(choice => {
+    const opt = document.createElement("option");
+    opt.value = choice;
+    opt.textContent = choice;
+    if (choice === selected_value) opt.selected = true;
+    select.appendChild(opt);
+  });
+
+  const remove_btn = document.createElement("button");
+  remove_btn.type = "button";
+  remove_btn.id = "remove-button";
+  remove_btn.textContent = "-";
+  remove_btn.addEventListener("click", () => wrapper.remove());
+
+  select.addEventListener("change", () => clear_field_error(select));
+
+  wrapper.appendChild(select);
+  wrapper.appendChild(remove_btn);
+  return wrapper;
+}
+
+// Wires the "+" button for a dropdown-based dynamic field to append new select rows.
+// Parameters: button_id, container_id, name - same as add_dynamic_input,
+//             choices - the option strings to show in the dropdown
+function _setup_dynamic_select(button_id, container_id, name, choices) {
+  const btn = document.getElementById(button_id);
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const container = document.getElementById(container_id);
+    if (container) container.appendChild(_create_select_row(name, choices));
+  });
+}
+
+// Fills a dynamic dropdown container with pre-selected rows.
+// Parameters: container_id, name, choices - full option list, selected_values - pre-selected string[]
+function _fill_dynamic_select_container(container_id, name, choices, selected_values) {
+  const container = document.getElementById(container_id);
+  if (!container) return;
+  container.innerHTML = "";
+  const values = selected_values && selected_values.length > 0 ? selected_values : [""];
+  values.forEach(val => {
+    container.appendChild(_create_select_row(name, choices, val));
+  });
+}
+
+// Fills a dynamic list container (e.g. rooms, labs) with an array of string values.
+// Replaces the single blank input row that the inline HTML already provides.
+// Parameters: container_id - id of the .dynamic-container div,
+//             name - input name attr, values - string[]
+function _fill_dynamic_container(container_id, name, values) {
+  if (!values || values.length === 0) return;
+  const container = document.getElementById(container_id);
+  if (!container) return;
+  container.innerHTML = "";
+  values.forEach(val => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "input-wrapper";
+    const input = document.createElement("input");
+    input.type = "text";
+    input.name = name;
+    input.value = val;
+    const remove_btn = document.createElement("button");
+    remove_btn.type = "button";
+    remove_btn.id = "remove-button";
+    remove_btn.textContent = "-";
+    remove_btn.addEventListener("click", () => wrapper.remove());
+    wrapper.appendChild(input);
+    wrapper.appendChild(remove_btn);
+    container.appendChild(wrapper);
+  });
+}
+
 // Opens the add/modify/delete popup for the currently selected field.
 // Shows an error if no field is selected.
 // Parameters: action - "Add", "Modify", or "Delete"; current_field - active field string or null
-export function render_edit_popup(action, current_field) {
+// prefill - optional data object to pre-populate the Modify form fields
+// options - optional { rooms, labs, courses, faculty } arrays used to build dropdowns
+export function render_edit_popup(action, current_field, prefill = null, options = null) {
   if (current_field == null) {
     popup_title.textContent = "Error";
     popup_form.innerHTML = `<div class="form-line"><p>Please select a field first.</p></div>`;
@@ -811,7 +941,12 @@ export function render_edit_popup(action, current_field) {
 
   if (action === "Add") {
     switch (current_field) {
-      case "Faculty":
+      case "Faculty": {
+        const courses_opts = options?.courses || [];
+        const rooms_opts   = options?.rooms   || [];
+        const labs_opts    = options?.labs    || [];
+        const DAY_OPTS = ["MON", "TUE", "WED", "THU", "FRI"];
+
         popup_form.innerHTML = `
           <div class="form-line">
             <label for="faculty-name">Faculty Name:</label>
@@ -845,77 +980,48 @@ export function render_edit_popup(action, current_field) {
           </div>
           <div class="form-line">
             <label>Course Preferences:</label>
-            <div id="faculty-course-preferences-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="faculty-course-preference" placeholder="e.g. CMSC 162" />
-              </div>
-            </div>
+            <div id="faculty-course-preferences-container" class="dynamic-container"></div>
             <button type="button" id="add-faculty-course-preferences">+</button>
           </div>
           <div class="form-line">
             <label>Room Preferences:</label>
-            <div id="faculty-room-preferences-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="faculty-room-preference" placeholder="e.g. Roddy 136" />
-              </div>
-            </div>
+            <div id="faculty-room-preferences-container" class="dynamic-container"></div>
             <button type="button" id="add-faculty-room-preferences">+</button>
           </div>
           <div class="form-line">
             <label>Lab Preferences:</label>
-            <div id="faculty-lab-preferences-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="faculty-lab-preference" placeholder="e.g. Mac" />
-              </div>
-            </div>
+            <div id="faculty-lab-preferences-container" class="dynamic-container"></div>
             <button type="button" id="add-faculty-lab-preferences">+</button>
           </div>
           <div class="form-line">
             <label>Mandatory Days:</label>
-            <div id="faculty-mandatory-days-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="faculty-mandatory-day" placeholder="e.g. MON/TUE/WED/THU/FRI" required/>
-              </div>
-            </div>
+            <div id="faculty-mandatory-days-container" class="dynamic-container"></div>
             <button type="button" id="add-faculty-mandatory-days">+</button>
           </div>
         `;
 
-        setup_dynamic_fields([
-          {
-            button_id: "add-faculty-time-slots",
-            container_id: "faculty-time-slots-container",
-            name: "faculty-time-slot",
-            placeholder: "e.g. TUE 09:00-12:00",
-          },
-          {
-            button_id: "add-faculty-course-preferences",
-            container_id: "faculty-course-preferences-container",
-            name: "faculty-course-preference",
-            placeholder: "e.g. CMSC 162",
-          },
-          {
-            button_id: "add-faculty-room-preferences",
-            container_id: "faculty-room-preferences-container",
-            name: "faculty-room-preference",
-            placeholder: "e.g. Roddy 136",
-          },
-          {
-            button_id: "add-faculty-lab-preferences",
-            container_id: "faculty-lab-preferences-container",
-            name: "faculty-lab-preference",
-            placeholder: "e.g. Mac",
-          },
-          {
-            button_id: "add-faculty-mandatory-days",
-            container_id: "faculty-mandatory-days-container",
-            name: "faculty-mandatory-day",
-            placeholder: "e.g. TUE",
-          },
-        ]);
-        break;
+        // Time slots stay as free-text inputs
+        add_dynamic_input("add-faculty-time-slots", "faculty-time-slots-container", "faculty-time-slot", "e.g. TUE 09:00-12:00");
 
-      case "Courses":
+        // Preferences and mandatory days use dropdowns
+        _fill_dynamic_select_container("faculty-course-preferences-container", "faculty-course-preference", courses_opts, []);
+        _fill_dynamic_select_container("faculty-room-preferences-container",   "faculty-room-preference",   rooms_opts,   []);
+        _fill_dynamic_select_container("faculty-lab-preferences-container",    "faculty-lab-preference",    labs_opts,    []);
+        _fill_dynamic_select_container("faculty-mandatory-days-container",     "faculty-mandatory-day",     DAY_OPTS,     []);
+
+        _setup_dynamic_select("add-faculty-course-preferences", "faculty-course-preferences-container", "faculty-course-preference", courses_opts);
+        _setup_dynamic_select("add-faculty-room-preferences",   "faculty-room-preferences-container",   "faculty-room-preference",   rooms_opts);
+        _setup_dynamic_select("add-faculty-lab-preferences",    "faculty-lab-preferences-container",    "faculty-lab-preference",    labs_opts);
+        _setup_dynamic_select("add-faculty-mandatory-days",     "faculty-mandatory-days-container",     "faculty-mandatory-day",     DAY_OPTS);
+        break;
+      }
+
+      case "Courses": {
+        const rooms_opts   = options?.rooms    || [];
+        const labs_opts    = options?.labs     || [];
+        const courses_opts = options?.courses  || [];
+        const faculty_opts = options?.faculty  || [];
+
         popup_form.innerHTML = `
           <div class="form-line">
             <label for="courses-id">Course ID:</label>
@@ -928,69 +1034,39 @@ export function render_edit_popup(action, current_field) {
           <hr />
           <div class="form-line">
             <label>Rooms:</label>
-            <div id="courses-rooms-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="courses-room" placeholder="e.g. Roddy 140" required/>
-              </div>
-            </div>
+            <div id="courses-rooms-container" class="dynamic-container"></div>
             <button type="button" id="add-courses-rooms">+</button>
           </div>
           <div class="form-line">
             <label>Labs:</label>
-            <div id="courses-labs-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="courses-lab" placeholder="e.g. Linux" />
-              </div>
-            </div>
+            <div id="courses-labs-container" class="dynamic-container"></div>
             <button type="button" id="add-courses-labs">+</button>
           </div>
           <div class="form-line">
             <label>Conflicts:</label>
-            <div id="courses-conflicts-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="courses-conflict" placeholder="e.g. CMSC 380" />
-              </div>
-            </div>
+            <div id="courses-conflicts-container" class="dynamic-container"></div>
             <button type="button" id="add-courses-conflicts">+</button>
           </div>
           <div class="form-line">
             <label>Faculty:</label>
-            <div id="courses-faculty-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="courses-faculty" placeholder="e.g. Hobbs" />
-              </div>
-            </div>
+            <div id="courses-faculty-container" class="dynamic-container"></div>
             <button type="button" id="add-courses-faculty">+</button>
           </div>
         `;
 
-        setup_dynamic_fields([
-          {
-            button_id: "add-courses-rooms",
-            container_id: "courses-rooms-container",
-            name: "courses-room",
-            placeholder: "e.g. Roddy 140",
-          },
-          {
-            button_id: "add-courses-labs",
-            container_id: "courses-labs-container",
-            name: "courses-lab",
-            placeholder: "e.g. Linux",
-          },
-          {
-            button_id: "add-courses-conflicts",
-            container_id: "courses-conflicts-container",
-            name: "courses-conflict",
-            placeholder: "e.g. CMSC 380",
-          },
-          {
-            button_id: "add-courses-faculty",
-            container_id: "courses-faculty-container",
-            name: "courses-faculty",
-            placeholder: "e.g. Hobbs",
-          },
-        ]);
+        // Seed each container with one blank dropdown row
+        _fill_dynamic_select_container("courses-rooms-container",     "courses-room",     rooms_opts,   []);
+        _fill_dynamic_select_container("courses-labs-container",      "courses-lab",      labs_opts,    []);
+        _fill_dynamic_select_container("courses-conflicts-container", "courses-conflict", courses_opts, []);
+        _fill_dynamic_select_container("courses-faculty-container",   "courses-faculty",  faculty_opts, []);
+
+        // Wire "+" buttons to append new dropdown rows
+        _setup_dynamic_select("add-courses-rooms",     "courses-rooms-container",     "courses-room",     rooms_opts);
+        _setup_dynamic_select("add-courses-labs",      "courses-labs-container",      "courses-lab",      labs_opts);
+        _setup_dynamic_select("add-courses-conflicts", "courses-conflicts-container", "courses-conflict", courses_opts);
+        _setup_dynamic_select("add-courses-faculty",   "courses-faculty-container",   "courses-faculty",  faculty_opts);
         break;
+      }
 
       case "Labs":
         popup_form.innerHTML = `
@@ -1013,7 +1089,12 @@ export function render_edit_popup(action, current_field) {
 
   } else if (action === "Modify") {
     switch (current_field) {
-      case "Faculty":
+      case "Faculty": {
+        const courses_opts = options?.courses || [];
+        const rooms_opts   = options?.rooms   || [];
+        const labs_opts    = options?.labs    || [];
+        const DAY_OPTS = ["MON", "TUE", "WED", "THU", "FRI"];
+
         popup_form.innerHTML = `
           <div class="form-line">
             <label for="faculty-name">Faculty Name:</label>
@@ -1047,77 +1128,66 @@ export function render_edit_popup(action, current_field) {
           </div>
           <div class="form-line">
             <label>Course Preferences:</label>
-            <div id="faculty-course-preferences-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="faculty-course-preference" placeholder="e.g. CMSC 162" />
-              </div>
-            </div>
+            <div id="faculty-course-preferences-container" class="dynamic-container"></div>
             <button type="button" id="add-faculty-course-preferences">+</button>
           </div>
           <div class="form-line">
             <label>Room Preferences:</label>
-            <div id="faculty-room-preferences-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="faculty-room-preference" placeholder="e.g. Roddy 136" />
-              </div>
-            </div>
+            <div id="faculty-room-preferences-container" class="dynamic-container"></div>
             <button type="button" id="add-faculty-room-preferences">+</button>
           </div>
           <div class="form-line">
             <label>Lab Preferences:</label>
-            <div id="faculty-lab-preferences-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="faculty-lab-preference" placeholder="e.g. Mac" />
-              </div>
-            </div>
+            <div id="faculty-lab-preferences-container" class="dynamic-container"></div>
             <button type="button" id="add-faculty-lab-preferences">+</button>
           </div>
           <div class="form-line">
             <label>Mandatory Days:</label>
-            <div id="faculty-mandatory-days-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="faculty-mandatory-day" placeholder="e.g. MON/TUE/WED/THU/FRI" />
-              </div>
-            </div>
+            <div id="faculty-mandatory-days-container" class="dynamic-container"></div>
             <button type="button" id="add-faculty-mandatory-days">+</button>
           </div>
         `;
 
-        setup_dynamic_fields([
-          {
-            button_id: "add-faculty-time-slots",
-            container_id: "faculty-time-slots-container",
-            name: "faculty-time-slot",
-            placeholder: "e.g. TUE 09:00-12:00",
-          },
-          {
-            button_id: "add-faculty-course-preferences",
-            container_id: "faculty-course-preferences-container",
-            name: "faculty-course-preference",
-            placeholder: "e.g. CMSC 162",
-          },
-          {
-            button_id: "add-faculty-room-preferences",
-            container_id: "faculty-room-preferences-container",
-            name: "faculty-room-preference",
-            placeholder: "e.g. Roddy 136",
-          },
-          {
-            button_id: "add-faculty-lab-preferences",
-            container_id: "faculty-lab-preferences-container",
-            name: "faculty-lab-preference",
-            placeholder: "e.g. Mac",
-          },
-          {
-            button_id: "add-faculty-mandatory-days",
-            container_id: "faculty-mandatory-days-container",
-            name: "faculty-mandatory-day",
-            placeholder: "e.g. TUE",
-          },
-        ]);
-        break;
+        add_dynamic_input("add-faculty-time-slots", "faculty-time-slots-container", "faculty-time-slot", "e.g. TUE 09:00-12:00");
 
-      case "Courses":
+        // Prefill values (or blank row if none)
+        const pref_courses  = prefill ? Object.keys(prefill.course_preferences || {}) : [];
+        const pref_rooms    = prefill ? Object.keys(prefill.room_preferences || {})   : [];
+        const pref_labs     = prefill ? Object.keys(prefill.lab_preferences || {})    : [];
+        const pref_days     = prefill ? (prefill.mandatory_days || [])                : [];
+
+        _fill_dynamic_select_container("faculty-course-preferences-container", "faculty-course-preference", courses_opts, pref_courses);
+        _fill_dynamic_select_container("faculty-room-preferences-container",   "faculty-room-preference",   rooms_opts,   pref_rooms);
+        _fill_dynamic_select_container("faculty-lab-preferences-container",    "faculty-lab-preference",    labs_opts,    pref_labs);
+        _fill_dynamic_select_container("faculty-mandatory-days-container",     "faculty-mandatory-day",     DAY_OPTS,     pref_days);
+
+        _setup_dynamic_select("add-faculty-course-preferences", "faculty-course-preferences-container", "faculty-course-preference", courses_opts);
+        _setup_dynamic_select("add-faculty-room-preferences",   "faculty-room-preferences-container",   "faculty-room-preference",   rooms_opts);
+        _setup_dynamic_select("add-faculty-lab-preferences",    "faculty-lab-preferences-container",    "faculty-lab-preference",    labs_opts);
+        _setup_dynamic_select("add-faculty-mandatory-days",     "faculty-mandatory-days-container",     "faculty-mandatory-day",     DAY_OPTS);
+
+        if (prefill) {
+          document.getElementById("faculty-name").value = prefill.name ?? "";
+          document.getElementById("faculty-max-credits").value = prefill.maximum_credits ?? "";
+          document.getElementById("faculty-min-credits").value = prefill.minimum_credits ?? "";
+          document.getElementById("faculty-unique-course-limit").value = prefill.unique_course_limit ?? "";
+          document.getElementById("faculty-max-days").value = prefill.maximum_days ?? "";
+
+          const time_strings = [];
+          for (const [day, ranges] of Object.entries(prefill.times || {})) {
+            for (const r of ranges) time_strings.push(`${day} ${r}`);
+          }
+          _fill_dynamic_container("faculty-time-slots-container", "faculty-time-slot", time_strings);
+        }
+        break;
+      }
+
+      case "Courses": {
+        const rooms_opts   = options?.rooms    || [];
+        const labs_opts    = options?.labs     || [];
+        const courses_opts = options?.courses  || [];
+        const faculty_opts = options?.faculty  || [];
+
         popup_form.innerHTML = `
           <div class="form-line">
             <label for="courses-id">Course ID:</label>
@@ -1130,69 +1200,43 @@ export function render_edit_popup(action, current_field) {
           <hr />
           <div class="form-line">
             <label>Rooms:</label>
-            <div id="courses-rooms-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="courses-room" placeholder="e.g. Roddy 140"/>
-              </div>
-            </div>
+            <div id="courses-rooms-container" class="dynamic-container"></div>
             <button type="button" id="add-courses-rooms">+</button>
           </div>
           <div class="form-line">
             <label>Labs:</label>
-            <div id="courses-labs-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="courses-lab" placeholder="e.g. Linux"/>
-              </div>
-            </div>
+            <div id="courses-labs-container" class="dynamic-container"></div>
             <button type="button" id="add-courses-labs">+</button>
           </div>
           <div class="form-line">
             <label>Conflicts:</label>
-            <div id="courses-conflicts-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="courses-conflict" placeholder="e.g. CMSC 380"/>
-              </div>
-            </div>
+            <div id="courses-conflicts-container" class="dynamic-container"></div>
             <button type="button" id="add-courses-conflicts">+</button>
           </div>
           <div class="form-line">
             <label>Faculty:</label>
-            <div id="courses-faculty-container" class="dynamic-container">
-              <div class="input-wrapper">
-                <input type="text" name="courses-faculty" placeholder="e.g. Hobbs"/>
-              </div>
-            </div>
+            <div id="courses-faculty-container" class="dynamic-container"></div>
             <button type="button" id="add-courses-faculty">+</button>
           </div>
         `;
 
-        setup_dynamic_fields([
-          {
-            button_id: "add-courses-rooms",
-            container_id: "courses-rooms-container",
-            name: "courses-room",
-            placeholder: "e.g. Roddy 140",
-          },
-          {
-            button_id: "add-courses-labs",
-            container_id: "courses-labs-container",
-            name: "courses-lab",
-            placeholder: "e.g. Linux",
-          },
-          {
-            button_id: "add-courses-conflicts",
-            container_id: "courses-conflicts-container",
-            name: "courses-conflict",
-            placeholder: "e.g. CMSC 380",
-          },
-          {
-            button_id: "add-courses-faculty",
-            container_id: "courses-faculty-container",
-            name: "courses-faculty",
-            placeholder: "e.g. Hobbs",
-          },
-        ]);
+        // Pre-populate with existing values (prefill) or one blank row
+        _fill_dynamic_select_container("courses-rooms-container",     "courses-room",     rooms_opts,   prefill?.room      || []);
+        _fill_dynamic_select_container("courses-labs-container",      "courses-lab",      labs_opts,    prefill?.lab       || []);
+        _fill_dynamic_select_container("courses-conflicts-container", "courses-conflict", courses_opts, prefill?.conflicts || []);
+        _fill_dynamic_select_container("courses-faculty-container",   "courses-faculty",  faculty_opts, prefill?.faculty   || []);
+
+        _setup_dynamic_select("add-courses-rooms",     "courses-rooms-container",     "courses-room",     rooms_opts);
+        _setup_dynamic_select("add-courses-labs",      "courses-labs-container",      "courses-lab",      labs_opts);
+        _setup_dynamic_select("add-courses-conflicts", "courses-conflicts-container", "courses-conflict", courses_opts);
+        _setup_dynamic_select("add-courses-faculty",   "courses-faculty-container",   "courses-faculty",  faculty_opts);
+
+        if (prefill) {
+          document.getElementById("courses-id").value = prefill.course_id ?? "";
+          document.getElementById("courses-credits").value = prefill.credits ?? "";
+        }
         break;
+      }
 
       case "Labs":
         popup_form.innerHTML = `
@@ -1205,6 +1249,9 @@ export function render_edit_popup(action, current_field) {
             <input type="text" id="labs-new-name" placeholder="e.g. Linux" />
           </div>
         `;
+        if (prefill) {
+          document.getElementById("labs-name").value = prefill.name ?? "";
+        }
         break;
 
       case "Rooms":
@@ -1218,6 +1265,9 @@ export function render_edit_popup(action, current_field) {
             <input type="text" id="rooms-new-name" placeholder="e.g. Roddy 148" />
           </div>
         `;
+        if (prefill) {
+          document.getElementById("rooms-name").value = prefill.name ?? "";
+        }
         break;
     }
 
