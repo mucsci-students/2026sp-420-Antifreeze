@@ -536,6 +536,31 @@ footer#config-name.visible {
   }
 }
 
+/* ----- Navigator List Items ----- */
+.navigator-list {
+  list-style: none;
+  margin: 6px 0;
+  padding: 0;
+}
+
+.navigator-item {
+  padding: 5px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+  user-select: none;
+}
+
+.navigator-item:hover {
+  background-color: #d8eeff;
+}
+
+.navigator-item.selected {
+  background-color: #b0d8ff;
+  font-weight: bold;
+  border-left: 4px solid #1394d1;
+  padding-left: 8px;
+}
+
 /* ----- Schedule Calendar Expanded Main ----- */
 main.schedule-view-expanded {
   max-height: none;

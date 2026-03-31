@@ -1,11 +1,25 @@
 from flask import request, jsonify
+import re
+
+
+def _friendly_faculty_error(e):
+    """Convert a pydantic ValidationError into a plain readable string, or
+    fall back to str(e) for any other exception."""
+    msg = str(e)
+    # Mandatory-days mismatch: extract just the day list from the pydantic message
+    m = re.search(r"Mandatory days \[([^\]]+)\] must be present in the availability times", msg)
+    if m:
+        missing = m.group(1)
+        return (f"Mandatory day(s) {missing} must have a time slot set. "
+                f"Please add an availability time for each mandatory day.")
+    return msg
 
 
 # Registers all faculty REST API routes on the Flask app.
 # All handlers close over `scheduler` for access to the config and faculty model.
 def register_faculty_routes(app, scheduler):
 
-    # Returns a JSON array of all faculty names from the scheduler config.
+    # Returns a JSON array of all faculty with their full configuration.
     @app.route("/faculty", methods=["GET"])
     def get_faculty():
         faculty_list = []
@@ -13,7 +27,16 @@ def register_faculty_routes(app, scheduler):
         try:
             for f in scheduler.config.config.faculty:
                 faculty_list.append({
-                    "name": f.name
+                    "name": f.name,
+                    "maximum_credits": f.maximum_credits,
+                    "minimum_credits": f.minimum_credits,
+                    "unique_course_limit": f.unique_course_limit,
+                    "maximum_days": f.maximum_days,
+                    "times": {str(day): [str(t) for t in times] for day, times in f.times.items()},
+                    "course_preferences": {str(k): v for k, v in f.course_preferences.items()},
+                    "room_preferences": {str(k): v for k, v in f.room_preferences.items()},
+                    "lab_preferences": {str(k): v for k, v in f.lab_preferences.items()},
+                    "mandatory_days": [str(d) for d in f.mandatory_days],
                 })
 
             return jsonify(faculty_list)
@@ -71,7 +94,7 @@ def register_faculty_routes(app, scheduler):
 
         except Exception as e:
             print("Faculty add error:", e)
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": _friendly_faculty_error(e)}), 400
 
     # Deletes the faculty member matching `name` from the scheduler config.
     # Returns 404 if the faculty member does not exist.
@@ -145,7 +168,7 @@ def register_faculty_routes(app, scheduler):
 
         except Exception as e:
             print("Faculty modify error:", e)
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": _friendly_faculty_error(e)}), 400
 
     # Returns details for a single faculty member. Search is case-insensitive.
     # Returns 404 if not found.
