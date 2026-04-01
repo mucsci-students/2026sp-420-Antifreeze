@@ -10,4 +10,9 @@ def register_chat_route(app, scheduler):
 
         result = run_agent(scheduler, message)
 
+        # 🔥 UI actions pass through directly
+        if isinstance(result, dict) and "ui_action" in result:
+            return jsonify(result)
+
+        # ✅ everything else unchanged
         return jsonify({"result": result})

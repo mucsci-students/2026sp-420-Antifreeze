@@ -6,6 +6,7 @@
 # Global state: _scheduler and _agent are initialised once on the first
 # call to get_agent() and reused for the lifetime of the process.
 
+import json
 import os
 
 from langchain.chat_models import init_chat_model
@@ -272,15 +273,11 @@ def build_tools():
         ),
 
         StructuredTool.from_function(
-            func=run_scheduler_tool,
-            name="run_scheduler",
-            description="Run scheduler"
-        ),
-        StructuredTool.from_function(
-            func=get_schedule_tool,
-            name="get_schedule",
-            description="Get schedule"
-        ),
+            func=open_schedule_tool,
+            name="open_schedule",
+            description="Open the schedule tab",
+            return_direct=True 
+        )
     ]
 
 
@@ -330,4 +327,16 @@ def run_agent(scheduler, user_input: str):
         "messages": [HumanMessage(content=user_input)]
     })
 
-    return result["messages"][-1].content
+    last = result["messages"][-1].content
+
+    if isinstance(last, dict):
+        return last
+
+    if isinstance(last, str):
+        try:
+            parsed = json.loads(last)
+            return parsed
+        except:
+            return last
+
+    return last
