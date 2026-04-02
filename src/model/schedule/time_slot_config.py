@@ -77,11 +77,14 @@ class time_slot_config():
         if day not in times:
             times[day] = []
 
-        # Check for exact duplicate
+        # Check for exact duplicate (entries may be dicts or pydantic models)
+        def _field(obj, key):
+            return obj.get(key) if isinstance(obj, dict) else getattr(obj, key, None)
+
         for existing in times[day]:
-            if (existing.get("start") == start and
-                    existing.get("spacing") == spacing and
-                    existing.get("end") == end):
+            if (_field(existing, "start") == start and
+                    _field(existing, "spacing") == spacing and
+                    _field(existing, "end") == end):
                 print(f"Identical time range already exists for '{day}' — no change made.")
                 return
 
@@ -115,7 +118,9 @@ class time_slot_config():
             return
 
         removed = times[day].pop(range_index)
-        print(f"Time range {removed.get('start')}–{removed.get('end')} removed from {day}.")
+        r_start = removed.get("start") if isinstance(removed, dict) else getattr(removed, "start", "?")
+        r_end   = removed.get("end")   if isinstance(removed, dict) else getattr(removed, "end",   "?")
+        print(f"Time range {r_start}–{r_end} removed from {day}.")
 
     # Prints all time ranges for every day.
     # Parameters: config

@@ -393,6 +393,100 @@ def modify_room(scheduler, old_name: str, new_name: str):
     return {"status": "modified", "room": new_name}
 
 # -------------------------
+# TIME SLOTS
+# -------------------------
+
+# Serializes a time-range entry to a plain dict.
+# Handles both dict entries (added at runtime) and pydantic TimeBlock objects
+# (loaded from a config file).
+def _ts_serialize_range(r):
+    if isinstance(r, dict):
+        return {"start": str(r.get("start", "")), "spacing": int(r.get("spacing", 0)), "end": str(r.get("end", ""))}
+    return {"start": str(getattr(r, "start", "")), "spacing": int(getattr(r, "spacing", 0)), "end": str(getattr(r, "end", ""))}
+
+
+# Serializes a meeting entry to a plain dict.
+# Handles both dict entries and pydantic model objects.
+def _ts_serialize_meeting(m):
+    if isinstance(m, dict):
+        return {"day": str(m.get("day", "")), "duration": int(m.get("duration", 0)), "lab": bool(m.get("lab", False))}
+    return {"day": str(getattr(m, "day", "")), "duration": int(getattr(m, "duration", 0)), "lab": bool(getattr(m, "lab", False))}
+
+
+# Serializes a class-pattern entry to a plain dict.
+# Handles both dict entries and pydantic model objects.
+# start_time is omitted from the result when absent.
+def _ts_serialize_class(cls):
+    if isinstance(cls, dict):
+        credits = cls.get("credits", 0)
+        meetings = cls.get("meetings", [])
+        start_time = cls.get("start_time", None)
+        disabled = cls.get("disabled", False)
+    else:
+        credits = getattr(cls, "credits", 0)
+        meetings = getattr(cls, "meetings", [])
+        start_time = getattr(cls, "start_time", None)
+        disabled = getattr(cls, "disabled", False)
+    result = {"credits": int(credits), "meetings": [_ts_serialize_meeting(m) for m in meetings], "disabled": bool(disabled)}
+    if start_time is not None:
+        result["start_time"] = str(start_time)
+    return result
+
+
+def get_time_slot_config(scheduler):
+    times_raw = scheduler.time_slot.get_times(scheduler.config)
+    classes_raw = scheduler.time_slot.get_classes(scheduler.config)
+    times = {str(day): [_ts_serialize_range(r) for r in ranges] for day, ranges in times_raw.items()}
+    classes = [_ts_serialize_class(cls) for cls in classes_raw]
+    return {"times": times, "classes": classes}
+
+
+def add_time_range(scheduler, day: str, start: str, spacing: int, end: str):
+    day = day.upper()
+    if day not in {"MON", "TUE", "WED", "THU", "FRI"}:
+        return {"error": f"'{day}' is not a valid day."}
+    scheduler.time_slot.add_time(scheduler.config, day, start, spacing, end)
+    return {"status": "added", "day": day, "start": start, "end": end}
+
+
+def modify_time_range(scheduler, day: str, index: int, start: str, spacing: int, end: str):
+    day = day.upper()
+    if not scheduler.time_slot.validate_time_entry(scheduler.config, day, "modify", index):
+        return {"error": f"Time range index {index} for {day} not found."}
+    scheduler.time_slot.modify_time(scheduler.config, day, index, start, spacing, end)
+    return {"status": "modified"}
+
+
+def delete_time_range(scheduler, day: str, index: int):
+    day = day.upper()
+    if not scheduler.time_slot.validate_time_entry(scheduler.config, day, "delete", index):
+        return {"error": f"Time range index {index} for {day} not found."}
+    scheduler.time_slot.delete_time(scheduler.config, day, index)
+    return {"status": "deleted"}
+
+
+def add_class_pattern(scheduler, credits: int, meetings: list, start_time: str = None, disabled: bool = False):
+    if not scheduler.time_slot.validate_class_entry(scheduler.config, "add", credits=credits, meetings=meetings):
+        return {"error": "Invalid class pattern — check day names and durations."}
+    scheduler.time_slot.add_class(scheduler.config, credits, meetings, start_time, disabled)
+    return {"status": "added"}
+
+
+def modify_class_pattern(scheduler, index: int, credits: int, meetings: list, start_time: str = None, disabled: bool = False):
+    if not scheduler.time_slot.validate_class_entry(scheduler.config, "modify", class_index=index):
+        return {"error": f"Class pattern index {index} not found."}
+    scheduler.time_slot.modify_class(scheduler.config, index, credits, meetings, start_time, disabled)
+    return {"status": "modified"}
+
+
+def delete_class_pattern(scheduler, index: int):
+    if not scheduler.time_slot.validate_class_entry(scheduler.config, "delete", class_index=index):
+        return {"error": f"Class pattern index {index} not found."}
+    scheduler.time_slot.delete_class(scheduler.config, index)
+    return {"status": "deleted"}
+
+
+# -------------------------
 # SCHEDULER
 # -------------------------
 def open_schedule_tool():

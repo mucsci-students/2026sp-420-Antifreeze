@@ -190,6 +190,56 @@ export async function api_delete_room(name) {
 }
 
 // ---------------------------------------------------------------------------
+// Time Slots API
+// ---------------------------------------------------------------------------
+
+export async function api_get_time_slots() {
+  const res = await fetch("/time_slots");
+  if (!res.ok) throw new Error("Failed to load time slots");
+  return await res.json();
+}
+
+export async function api_add_time_range(data) {
+  return await fetch("/time_slots/times", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+}
+
+export async function api_modify_time_range(day, index, data) {
+  return await fetch(`/time_slots/times/${encodeURIComponent(day)}/${index}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+}
+
+export async function api_delete_time_range(day, index) {
+  return await fetch(`/time_slots/times/${encodeURIComponent(day)}/${index}`, { method: "DELETE" });
+}
+
+export async function api_add_class_pattern(data) {
+  return await fetch("/time_slots/classes", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+}
+
+export async function api_modify_class_pattern(index, data) {
+  return await fetch(`/time_slots/classes/${index}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+}
+
+export async function api_delete_class_pattern(index) {
+  return await fetch(`/time_slots/classes/${index}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
 // Scheduler API
 // ---------------------------------------------------------------------------
 
