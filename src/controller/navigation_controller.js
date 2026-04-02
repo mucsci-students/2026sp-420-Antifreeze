@@ -1263,6 +1263,8 @@ focus_containers.forEach(el => {
   el.addEventListener("click", (e) => {
 
     if (e.target.closest("#chat-container")) return;
+    // Skip form controls so programmatic focus does not steal focus from open dropdowns or inputs.
+    if (["SELECT", "INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
 
     View.focus_field_button(Model.current_field);
   });
@@ -1307,9 +1309,10 @@ async function send_message() {
         let result = data.result;
         let did_ui_action = false;
 
-        // 🔥 Case 1: direct UI action from backend
+        // Case 1: direct UI action from backend — open the schedule viewer via the View button.
         if (data.ui_action === "open_schedule") {
-            document.getElementById("schedule-button").click();
+            Model.set_schedules_generated(true);
+            View.view_button.click();
             did_ui_action = true;
         }
 
@@ -1320,9 +1323,10 @@ async function send_message() {
             } catch {}
         }
 
-        // 🔥 Case 2: UI action inside result
+        // Case 2: UI action embedded inside result object — open the schedule viewer via the View button.
         if (result?.ui_action === "open_schedule") {
-            document.getElementById("schedule-button").click();
+            Model.set_schedules_generated(true);
+            View.view_button.click();
             did_ui_action = true;
         }
 
@@ -1351,6 +1355,8 @@ async function send_message() {
     }
 }
 
+// Refreshes the active tab after an AI chat response and opens the schedule
+// viewer via the View button if the backend reports generated schedules.
 async function refresh_current_field() {
     // Refresh whichever list tab is active
     if (Model.current_field === "Faculty") await load_faculty();
@@ -1364,11 +1370,8 @@ async function refresh_current_field() {
     const { count } = await Model.api_get_schedule_count();
     if (count > 0) {
         Model.set_schedules_generated(true);
-        if (Model.current_field !== "Schedule") {
-            Model.set_current_field("Schedule");
-            await load_schedule();
-        }
         View.render_schedules_generated_buttons();
+        View.view_button.click();
     }
 }
 

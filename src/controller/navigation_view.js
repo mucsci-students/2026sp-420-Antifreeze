@@ -686,7 +686,7 @@ export function render_schedule_view_inline(index, on_load_click, on_group_chang
         <option value="faculty">Faculty</option>
         <option value="room">Room</option>
         <option value="lab">Lab</option>
-        <option value="course">Course</option>
+        <option value="course">Day</option>
       </select>
     </div>
     <div id="schedule-calendar-container"></div>
@@ -718,7 +718,7 @@ export function render_schedule_calendar(data, index, mode) {
     return;
   }
 
-  const MODE_TITLE = { faculty: "Faculty", room: "Rooms", lab: "Lab", course: "Course" };
+  const MODE_TITLE = { faculty: "Faculty", room: "Rooms", lab: "Lab", course: "Day" };
   const section_title = document.createElement("h4");
   section_title.className = "schedule-section-title";
   section_title.textContent = `Schedule ${index + 1} — grouped by ${MODE_TITLE[mode] || mode}`;
