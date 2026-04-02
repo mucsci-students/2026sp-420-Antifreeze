@@ -1290,7 +1290,7 @@ async function send_message() {
     if (!message) return;
 
     // show user message
-    chat_box.innerHTML += `<div class="chat-msg chat-user"><b>You:</b> ${message}</div>`;
+    chat_box.innerHTML += `<div class="chat-msg chat-user"><b>User:</b> ${message}</div>`;
     chat_input.value = "";
 
     try {
@@ -1304,7 +1304,44 @@ async function send_message() {
 
         const data = await res.json();
 
-        chat_box.innerHTML += `<div class="chat-msg chat-ai"><b>AI:</b> ${format_response(data.result)}</div>`;
+        let result = data.result;
+        let did_ui_action = false;
+
+        // 🔥 Case 1: direct UI action from backend
+        if (data.ui_action === "open_schedule") {
+            document.getElementById("schedule-button").click();
+            did_ui_action = true;
+        }
+
+        // 🔥 Parse stringified JSON if needed
+        if (typeof result === "string") {
+            try {
+                result = JSON.parse(result);
+            } catch {}
+        }
+
+        // 🔥 Case 2: UI action inside result
+        if (result?.ui_action === "open_schedule") {
+            document.getElementById("schedule-button").click();
+            did_ui_action = true;
+        }
+
+        // 🔥 Decide what to display
+        let response_text;
+
+        if (did_ui_action) {
+            response_text = message.toLowerCase().includes("generate")
+                ? "opening Schedule view..."
+                : "Opening schedule view...";
+        } else if (result) {
+            response_text = format_response(result);
+        } else {
+            console.error("No result returned:", data);
+            response_text = "Something went wrong.";
+        }
+
+        // 🔥 Always render response
+        chat_box.innerHTML += `<div class="chat-msg chat-ai"><b>Clippy:</b> ${response_text}</div>`;
         chat_box.scrollTop = chat_box.scrollHeight;
 
         await refresh_current_field();

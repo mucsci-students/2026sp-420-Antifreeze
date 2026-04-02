@@ -392,7 +392,6 @@ def modify_room(scheduler, old_name: str, new_name: str):
 
     return {"status": "modified", "room": new_name}
 
-
 # -------------------------
 # TIME SLOTS
 # -------------------------
@@ -490,19 +489,5 @@ def delete_class_pattern(scheduler, index: int):
 # -------------------------
 # SCHEDULER
 # -------------------------
-
-def run_scheduler(scheduler, limit: int, optimize: bool):
-    results = scheduler.run_scheduler(limit, optimize)
-    return {"count": len(results)}
-
-
-def get_schedule(scheduler, index: int):
-    if not scheduler.result:
-        return {"error": "No schedules generated"}
-
-    if index >= len(scheduler.result):
-        return {"error": "Index out of range"}
-
-    model = scheduler.result[index]
-
-    return {"schedule": [sch.as_csv() for sch in model]}
+def open_schedule_tool():
+    return {"ui_action": "open_schedule"}
