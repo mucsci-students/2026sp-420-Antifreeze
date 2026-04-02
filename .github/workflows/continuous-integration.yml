@@ -1,4 +1,4 @@
-name: Run Unit Tests
+name: Continuous Integration
 run-name: Continuous Integration
 on: [push]
 jobs:
