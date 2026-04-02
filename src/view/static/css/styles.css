@@ -350,37 +350,6 @@ button:disabled {
 /* ----- Schedule Tab ----- */
 #schedule-button {
   text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
-  background-color: #41b9f2;
-  border: outset;
-  border-top-color: #ffffff;
-  border-left-color: #ffffff;
-  border-bottom-color: #1394d1;
-  border-right-color: #1394d1;
-  border-width: 3px;
-}
-
-#schedule-button:hover {
-  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
-  background-color: #6bd0ff;
-  border-top-color: #ffffff;
-  border-left-color: #ffffff;
-  border-bottom-color: #2bb1ef;
-  border-right-color: #2bb1ef;
-}
-
-#schedule-button:focus {
-  background-color: #2daae4;
-  border: inset;
-  border-top-color: #0f82b7;
-  border-left-color: #0f82b7;
-  border-bottom-color: #ffffff;
-  border-right-color: #ffffff;
-}
-
-/* ----- Time Slots Tab ----- */
-#time-slots-button {
-  width: 115px;
-  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
   background-color: #ac86ff;
   border: outset;
   border-top-color: #ffffff;
@@ -390,7 +359,7 @@ button:disabled {
   border-width: 3px;
 }
 
-#time-slots-button:hover {
+#schedule-button:hover {
   text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
   background-color: #c4a8ff;
   border-top-color: #ffffff;
@@ -399,11 +368,42 @@ button:disabled {
   border-right-color: #ac86ff;
 }
 
-#time-slots-button:focus {
+#schedule-button:focus {
   background-color: #956CEE;
   border: inset;
   border-top-color: #8d63e6;
   border-left-color: #8d63e6;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
+}
+
+/* ----- Time Slots Tab ----- */
+#time-slots-button {
+  width: 115px;
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #41b9f2;
+  border: outset;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #1394d1;
+  border-right-color: #1394d1;
+  border-width: 3px;
+}
+
+#time-slots-button:hover {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #6bd0ff;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #2bb1ef;
+  border-right-color: #2bb1ef;
+}
+
+#time-slots-button:focus {
+  background-color: #2daae4;
+  border: inset;
+  border-top-color: #0f82b7;
+  border-left-color: #0f82b7;
   border-bottom-color: #ffffff;
   border-right-color: #ffffff;
 }

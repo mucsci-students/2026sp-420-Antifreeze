@@ -29,6 +29,7 @@ export const courses_button = document.getElementById("courses-button");
 export const labs_button = document.getElementById("labs-button");
 export const rooms_button = document.getElementById("rooms-button");
 export const schedule_button = document.getElementById("schedule-button");
+export const time_slots_button = document.getElementById("time-slots-button");
 
 // Images inside buttons
 export const back_img = back_button.querySelector("img");
@@ -280,6 +281,92 @@ export function render_rooms_list(rooms) {
 export function render_labs_list(labs) {
   main.classList.remove("schedule-view-expanded");
   _make_list(labs, l => l.name);
+}
+
+// Renders the time slot configuration as two labeled sections (Time Ranges and
+// Class Patterns) in the navigator. Each clickable item stores its type,
+// parent day (for time ranges), and 0-based index so the controller can
+// dispatch the correct API call.
+// Parameters: data - { times: {DAY: [{start,spacing,end}]}, classes: [{...}] }
+export function render_time_slots_list(data) {
+  main.classList.remove("schedule-view-expanded");
+
+  const DAYS = ["MON", "TUE", "WED", "THU", "FRI"];
+
+  // Build a flat items array that the existing click-listener infrastructure
+  // can index into via dataset.index.
+  const items = [];
+
+  for (const day of DAYS) {
+    const ranges = (data.times || {})[day] || [];
+    ranges.forEach((r, i) => {
+      items.push({ _type: "time", _day: day, _index: i,
+                   start: r.start, spacing: r.spacing, end: r.end });
+    });
+  }
+
+  (data.classes || []).forEach((cls, i) => {
+    items.push({ _type: "class", _index: i,
+                 credits: cls.credits, meetings: cls.meetings,
+                 start_time: cls.start_time || null, disabled: cls.disabled || false });
+  });
+
+  _list_items = items;
+  navigator_div.innerHTML = "";
+
+  const ul = document.createElement("ul");
+  ul.className = "navigator-list";
+
+  // ---- Time Ranges section ----
+  const tr_header = document.createElement("li");
+  tr_header.className = "navigator-section-header";
+  tr_header.textContent = "Time Ranges";
+  ul.appendChild(tr_header);
+
+  const time_items = items.filter(it => it._type === "time");
+  if (time_items.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "navigator-section-empty";
+    empty.textContent = "(none)";
+    ul.appendChild(empty);
+  } else {
+    items.forEach((item, idx) => {
+      if (item._type !== "time") return;
+      const li = document.createElement("li");
+      li.className = "navigator-item";
+      li.dataset.index = String(idx);
+      li.textContent = `${item._day}: ${item.start} \u2013 ${item.end}  (spacing ${item.spacing} min)`;
+      ul.appendChild(li);
+    });
+  }
+
+  // ---- Class Patterns section ----
+  const cp_header = document.createElement("li");
+  cp_header.className = "navigator-section-header";
+  cp_header.textContent = "Class Patterns";
+  ul.appendChild(cp_header);
+
+  const class_items = items.filter(it => it._type === "class");
+  if (class_items.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "navigator-section-empty";
+    empty.textContent = "(none)";
+    ul.appendChild(empty);
+  } else {
+    items.forEach((item, idx) => {
+      if (item._type !== "class") return;
+      const li = document.createElement("li");
+      li.className = "navigator-item";
+      li.dataset.index = String(idx);
+      const meetings_str = (item.meetings || [])
+        .map(m => `${m.day} ${m.duration}min${m.lab ? " (lab)" : ""}`)
+        .join(", ");
+      li.textContent = `${item.credits} credits \u2014 ${meetings_str}${item.disabled ? " [DISABLED]" : ""}`;
+      ul.appendChild(li);
+    });
+  }
+
+  navigator_div.appendChild(ul);
 }
 
 export function render_load_error(field, message) {
@@ -1315,6 +1402,200 @@ export function render_edit_popup(action, current_field, prefill = null, options
 }
 
 // ---------------------------------------------------------------------------
+// Time Slots popup helpers
+// ---------------------------------------------------------------------------
+
+const _TS_DAY_OPTS = ["MON", "TUE", "WED", "THU", "FRI"];
+
+// Creates one meeting row for the class-pattern form.
+// Row layout: [Day dropdown] [Duration input] [Lab checkbox label] [-]
+// Parameters: selected_day - pre-selected day string (or "" for blank),
+//             duration - pre-filled duration value (or "" for blank),
+//             lab - whether the lab checkbox should be checked
+// Returns: div.input-wrapper element ready to append to the meetings container
+function _create_meeting_row(selected_day = "", duration = "", lab = false) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "input-wrapper ts-meeting-row";
+
+  const day_sel = document.createElement("select");
+  day_sel.name = "ts-meeting-day";
+  day_sel.className = "dynamic-select";
+  const blank = document.createElement("option");
+  blank.value = ""; blank.textContent = "Day";
+  day_sel.appendChild(blank);
+  _TS_DAY_OPTS.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d; opt.textContent = d;
+    if (d === selected_day) opt.selected = true;
+    day_sel.appendChild(opt);
+  });
+
+  const dur_input = document.createElement("input");
+  dur_input.type = "number";
+  dur_input.name = "ts-meeting-duration";
+  dur_input.min = "1";
+  dur_input.placeholder = "min";
+  dur_input.style.width = "60px";
+  if (duration !== "") dur_input.value = duration;
+
+  const lab_label = document.createElement("label");
+  lab_label.style.display = "flex";
+  lab_label.style.alignItems = "center";
+  lab_label.style.gap = "4px";
+  lab_label.style.fontSize = "0.85em";
+  const lab_cb = document.createElement("input");
+  lab_cb.type = "checkbox";
+  lab_cb.name = "ts-meeting-lab";
+  if (lab) lab_cb.checked = true;
+  lab_label.appendChild(lab_cb);
+  lab_label.appendChild(document.createTextNode("Lab"));
+
+  const remove_btn = document.createElement("button");
+  remove_btn.type = "button";
+  remove_btn.id = "remove-button";
+  remove_btn.textContent = "-";
+  remove_btn.addEventListener("click", () => wrapper.remove());
+
+  wrapper.appendChild(day_sel);
+  wrapper.appendChild(dur_input);
+  wrapper.appendChild(lab_label);
+  wrapper.appendChild(remove_btn);
+  return wrapper;
+}
+
+// Returns the inner HTML string for the time-range sub-form fields
+// (day, start, spacing, end). Pre-populates values when prefill is given.
+// Parameters: prefill - optional item data object ({ _day, start, spacing, end })
+// Returns: HTML string
+function _ts_time_range_html(prefill = null) {
+  const day_options = _TS_DAY_OPTS.map(d =>
+    `<option value="${d}"${prefill && prefill._day === d ? " selected" : ""}>${d}</option>`
+  ).join("");
+  return `
+    <div class="form-line">
+      <label for="ts-day">Day:</label>
+      <select id="ts-day">${day_options}</select>
+    </div>
+    <div class="form-line">
+      <label for="ts-start">Start (HH:MM):</label>
+      <input type="text" id="ts-start" placeholder="08:00" value="${prefill ? prefill.start : ""}"/>
+    </div>
+    <div class="form-line">
+      <label for="ts-spacing">Spacing (min):</label>
+      <input type="number" id="ts-spacing" min="1" placeholder="30" value="${prefill ? prefill.spacing : ""}"/>
+    </div>
+    <div class="form-line">
+      <label for="ts-end">End (HH:MM):</label>
+      <input type="text" id="ts-end" placeholder="17:00" value="${prefill ? prefill.end : ""}"/>
+    </div>
+  `;
+}
+
+// Returns the inner HTML string for the class-pattern sub-form skeleton
+// (credits, meetings container, optional start_time, disabled checkbox).
+// The meetings container is populated separately by _setup_ts_meetings.
+// Parameters: prefill - optional item data object ({ credits, start_time, disabled })
+// Returns: HTML string
+function _ts_class_pattern_html(prefill = null) {
+  const start_val = prefill && prefill.start_time ? prefill.start_time : "";
+  const disabled_attr = prefill && prefill.disabled ? " checked" : "";
+  return `
+    <div class="form-line">
+      <label for="ts-credits">Credits:</label>
+      <input type="number" id="ts-credits" min="1" placeholder="3" value="${prefill ? prefill.credits : ""}"/>
+    </div>
+    <div class="form-line">
+      <label>Meetings:</label>
+      <div id="ts-meetings-container" class="dynamic-container"></div>
+      <button type="button" id="ts-add-meeting">+</button>
+    </div>
+    <div class="form-line">
+      <label for="ts-class-start-time">Start Time (optional):</label>
+      <input type="text" id="ts-class-start-time" placeholder="08:00" value="${start_val}"/>
+    </div>
+    <div class="form-line">
+      <label for="ts-disabled">Disabled:</label>
+      <input type="checkbox" id="ts-disabled"${disabled_attr}/>
+    </div>
+  `;
+}
+
+// Fills the meetings container with rows from prefill (or one blank row
+// when no prefill is given), then wires the + button to append more rows.
+// Must be called after _ts_class_pattern_html has been inserted into the DOM.
+// Parameters: prefill - optional item data object with a meetings array
+//             ({ meetings: [{day, duration, lab}, ...] })
+function _setup_ts_meetings(prefill = null) {
+  const container = document.getElementById("ts-meetings-container");
+  if (!container) return;
+
+  if (prefill && prefill.meetings && prefill.meetings.length > 0) {
+    prefill.meetings.forEach(m => {
+      container.appendChild(_create_meeting_row(m.day, m.duration, m.lab));
+    });
+  } else {
+    container.appendChild(_create_meeting_row());
+  }
+
+  const add_btn = document.getElementById("ts-add-meeting");
+  if (add_btn) {
+    add_btn.addEventListener("click", () => {
+      container.appendChild(_create_meeting_row());
+    });
+  }
+}
+
+// Renders the Add Time Slots popup: a type selector toggles between the
+// time-range sub-form and the class-pattern sub-form.
+export function render_add_time_slots_popup() {
+  popup_title.textContent = "Add Time Slots";
+  popup_form.innerHTML = `
+    <div class="form-line">
+      <label for="ts-add-type">Type:</label>
+      <select id="ts-add-type">
+        <option value="time">Time Range</option>
+        <option value="class">Class Pattern</option>
+      </select>
+    </div>
+    <hr/>
+    <div id="ts-time-range-section">${_ts_time_range_html()}</div>
+    <div id="ts-class-section" style="display:none">${_ts_class_pattern_html()}</div>
+  `;
+
+  _setup_ts_meetings();
+
+  document.getElementById("ts-add-type").addEventListener("change", (e) => {
+    const is_time = e.target.value === "time";
+    document.getElementById("ts-time-range-section").style.display = is_time ? "" : "none";
+    document.getElementById("ts-class-section").style.display    = is_time ? "none" : "";
+  });
+
+  amd_popup.classList.remove("popup-hidden");
+  wrapper.style.pointerEvents = "none";
+}
+
+// Renders the Modify Time Slots popup pre-filled with the selected item's data.
+// prefill must include _type ("time" or "class") and the relevant fields.
+export function render_modify_time_slots_popup(prefill) {
+  popup_title.textContent = "Modify Time Slots";
+
+  if (!prefill || prefill._type === "time") {
+    popup_form.innerHTML = _ts_time_range_html(prefill);
+    if (prefill) {
+      // Day is fixed for modify (route uses the original day); show it read-only
+      const day_sel = document.getElementById("ts-day");
+      if (day_sel) day_sel.disabled = true;
+    }
+  } else {
+    popup_form.innerHTML = _ts_class_pattern_html(prefill);
+    _setup_ts_meetings(prefill);
+  }
+
+  amd_popup.classList.remove("popup-hidden");
+  wrapper.style.pointerEvents = "none";
+}
+
+// ---------------------------------------------------------------------------
 // Popup helpers
 // ---------------------------------------------------------------------------
 
@@ -1337,4 +1618,5 @@ export function focus_field_button(current_field) {
   else if (current_field === "Labs") labs_button.focus();
   else if (current_field === "Rooms") rooms_button.focus();
   else if (current_field === "Schedule") schedule_button.focus();
+  else if (current_field === "Time Slots") time_slots_button.focus();
 }

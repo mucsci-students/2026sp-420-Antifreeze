@@ -154,6 +154,32 @@ def delete_room_tool(name):
     return delete_room(_scheduler, name)
 
 
+# -------------------------
+# TIME SLOT CONFIG
+# -------------------------
+
+def get_time_slot_config_tool():
+    return get_time_slot_config(_scheduler)
+
+def add_time_range_tool(day, start, spacing, end):
+    return add_time_range(_scheduler, day, start, spacing, end)
+
+def modify_time_range_tool(day, index, start, spacing, end):
+    return modify_time_range(_scheduler, day, index, start, spacing, end)
+
+def delete_time_range_tool(day, index):
+    return delete_time_range(_scheduler, day, index)
+
+def add_class_pattern_tool(credits, meetings, start_time=None, disabled=False):
+    return add_class_pattern(_scheduler, credits, meetings, start_time, disabled)
+
+def modify_class_pattern_tool(index, credits, meetings, start_time=None, disabled=False):
+    return modify_class_pattern(_scheduler, index, credits, meetings, start_time, disabled)
+
+def delete_class_pattern_tool(index):
+    return delete_class_pattern(_scheduler, index)
+
+
 # SCHEDULER
 def run_scheduler_tool(limit, optimize):
     return run_scheduler(_scheduler, limit, optimize)
@@ -280,6 +306,68 @@ def build_tools():
             func=get_schedule_tool,
             name="get_schedule",
             description="Get schedule"
+        ),
+
+        StructuredTool.from_function(
+            func=get_time_slot_config_tool,
+            name="get_time_slot_config",
+            description=(
+                "Get the full time slot configuration, including all per-day time ranges "
+                "(times grid) and all class meeting patterns. Call this before modifying "
+                "any time slot entry to find the correct index."
+            )
+        ),
+        StructuredTool.from_function(
+            func=add_time_range_tool,
+            name="add_time_range",
+            description=(
+                "Add a time range to a day's availability grid. "
+                "day must be MON, TUE, WED, THU, or FRI. "
+                "start and end must be HH:MM strings (e.g. '08:00'). "
+                "spacing is the slot interval in minutes (e.g. 30)."
+            )
+        ),
+        StructuredTool.from_function(
+            func=modify_time_range_tool,
+            name="modify_time_range",
+            description=(
+                "Modify an existing time range by day and 0-based index. "
+                "Call get_time_slot_config first to find the correct index."
+            )
+        ),
+        StructuredTool.from_function(
+            func=delete_time_range_tool,
+            name="delete_time_range",
+            description=(
+                "Delete a time range by day and 0-based index. "
+                "Call get_time_slot_config first to find the correct index."
+            )
+        ),
+        StructuredTool.from_function(
+            func=add_class_pattern_tool,
+            name="add_class_pattern",
+            description=(
+                "Add a class meeting pattern. "
+                "credits is a positive integer. "
+                "meetings is a list of dicts with keys: day (MON/TUE/etc.), duration (minutes), lab (bool, optional). "
+                "start_time is optional (HH:MM string). disabled is optional bool."
+            )
+        ),
+        StructuredTool.from_function(
+            func=modify_class_pattern_tool,
+            name="modify_class_pattern",
+            description=(
+                "Modify an existing class pattern by 0-based index. "
+                "Call get_time_slot_config first to find the correct index."
+            )
+        ),
+        StructuredTool.from_function(
+            func=delete_class_pattern_tool,
+            name="delete_class_pattern",
+            description=(
+                "Delete a class meeting pattern by 0-based index. "
+                "Call get_time_slot_config first to find the correct index."
+            )
         ),
     ]
 
