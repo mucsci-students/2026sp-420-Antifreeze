@@ -1,5 +1,6 @@
 # Ignore pycache
 __pycache__/
+test/__pycache__/
 
 # Ignore pyc files
 *.pyc
