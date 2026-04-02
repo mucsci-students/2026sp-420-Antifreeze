@@ -489,5 +489,17 @@ def delete_class_pattern(scheduler, index: int):
 # -------------------------
 # SCHEDULER
 # -------------------------
+
+# Runs the scheduling engine and returns the number of generated schedules
+# along with a ui_action signal so the frontend opens the schedule viewer.
+# Parameters: scheduler - shared Schedule instance
+#             limit     - maximum number of schedules to generate
+#             optimize  - whether to apply optimizer flags
+# Returns: dict with ui_action "open_schedule" and count of generated schedules
+def run_scheduler(scheduler, limit: int, optimize: bool):
+    results = scheduler.run_scheduler(limit, optimize)
+    count = len(results) if results else 0
+    return {"ui_action": "open_schedule", "count": count}
+
 def open_schedule_tool():
     return {"ui_action": "open_schedule"}

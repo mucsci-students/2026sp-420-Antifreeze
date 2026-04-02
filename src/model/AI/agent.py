@@ -299,11 +299,25 @@ def build_tools():
         ),
 
         StructuredTool.from_function(
+            func=run_scheduler_tool,
+            name="run_scheduler",
+            description=(
+                "Generate schedules. limit is the max number of schedules to generate (integer). "
+                "optimize is a boolean (default False). "
+                "Automatically opens the View button panel so the user can see the generated schedules."
+            ),
+            return_direct=True
+        ),
+        StructuredTool.from_function(
             func=open_schedule_tool,
             name="open_schedule",
-            description="Open the schedule tab",
-            return_direct=True 
-        )
+            description=(
+                "Clicks the View button in the toolbar to open the generated schedule calendar. "
+                "This is NOT the Schedule nav button — it is the View button. "
+                "Call this after run_scheduler if the view did not open automatically."
+            ),
+            return_direct=True
+        ),
         StructuredTool.from_function(
             func=get_time_slot_config_tool,
             name="get_time_slot_config",
@@ -388,9 +402,9 @@ def get_agent(scheduler):
 
         system_prompt = (
             "You are a scheduling assistant. Be concise. "
-            "When you run the scheduler or generate schedules, do NOT list the schedule contents in your reply. "
-            "Simply confirm how many schedules were generated (e.g. '1 schedule generated. You can now view it in the GUI.'). "
-            "The user can view schedules directly in the application. "
+            "When the user asks to generate schedules, call run_scheduler. "
+            "run_scheduler will automatically open the View button panel — do NOT navigate to the Schedule tab or click any nav button. "
+            "Do NOT list schedule contents in your reply. "
             "For all other actions (add, modify, delete), give a brief one-sentence confirmation."
         )
 
