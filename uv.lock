@@ -135,7 +135,7 @@ wheels = [
 
 [[package]]
 name = "course-constraint-scheduler"
-version = "2.6.1"
+version = "2.6.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bidict" },
@@ -146,9 +146,9 @@ dependencies = [
     { name = "uvicorn", extra = ["standard"] },
     { name = "z3-solver" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9a/ad/c9d23fa908f8dd5350b57430ca56af1001e040d572097f96fcfcf2893011/course_constraint_scheduler-2.6.1.tar.gz", hash = "sha256:5707c8e84319cb6ad9d2c0c710ada8bd42e0283a94ad33a6b32af3c30c863070", size = 98211, upload-time = "2025-11-10T02:32:37.592Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c0/1c/7f544e2c446d0ce861df7c534d9a0aab22a5d9e5ce248c9781ab6ada6102/course_constraint_scheduler-2.6.2.tar.gz", hash = "sha256:4c7b5a622001a85ecd8cc72c08ca117f8ff4a827f8355f748c59949854171411", size = 168368, upload-time = "2026-03-21T03:23:53.535Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a7/8d/2effe93ff837da25f728db510a8c374684770beae1bdcc3dd967c7bd51d2/course_constraint_scheduler-2.6.1-py3-none-any.whl", hash = "sha256:f0cb04c40f602f1635024f48e41382a0c45c529b42326c670ff9a9c122997551", size = 34288, upload-time = "2025-11-10T02:32:36.001Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/df/2913d70851c130cd10c3795dce461d659c466e47d52b8ec9a1bb42cae322/course_constraint_scheduler-2.6.2-py3-none-any.whl", hash = "sha256:6d94e57f3b55c3b6828693c4ce952cca4466c9a39bbf41756b635c93e647aa56", size = 38029, upload-time = "2026-03-21T03:23:52.174Z" },
 ]
 
 [[package]]
@@ -734,7 +734,7 @@ wheels = [
 
 [[package]]
 name = "requests"
-version = "2.32.5"
+version = "2.33.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
@@ -742,9 +742,9 @@ dependencies = [
     { name = "idna" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c9/74/b3ff8e6c8446842c3f5c837e9c3dfcfe2018ea6ecef224c710c85ef728f4/requests-2.32.5.tar.gz", hash = "sha256:dbba0bac56e100853db0ea71b82b4dfd5fe2bf6d3754a8893c3af500cec7d7cf", size = 134517, upload-time = "2025-08-18T20:46:02.573Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/34/64/8860370b167a9721e8956ae116825caff829224fbca0ca6e7bf8ddef8430/requests-2.33.0.tar.gz", hash = "sha256:c7ebc5e8b0f21837386ad0e1c8fe8b829fa5f544d8df3b2253bff14ef29d7652", size = 134232, upload-time = "2026-03-25T15:10:41.586Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1e/db/4254e3eabe8020b458f1a747140d32277ec7a271daf1d235b70dc0b4e6e3/requests-2.32.5-py3-none-any.whl", hash = "sha256:2462f94637a34fd532264295e186976db0f5d453d1cdd31473c85a6a161affb6", size = 64738, upload-time = "2025-08-18T20:46:00.542Z" },
+    { url = "https://files.pythonhosted.org/packages/56/5d/c814546c2333ceea4ba42262d8c4d55763003e767fa169adc693bd524478/requests-2.33.0-py3-none-any.whl", hash = "sha256:3324635456fa185245e24865e810cecec7b4caf933d7eb133dcde67d48cee69b", size = 65017, upload-time = "2026-03-25T15:10:40.382Z" },
 ]
 
 [[package]]
