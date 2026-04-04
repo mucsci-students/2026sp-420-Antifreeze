@@ -4,16 +4,19 @@ body {
   background-repeat: no-repeat;
   font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
     "Lucida Sans", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
 }
 
 #wrapper {
-  margin-top: 30px;
-  margin-bottom: 30px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 20px auto;
   width: 80%;
+  height: calc(100vh - 40px);
   background-color: #e6e6e6;
-  display: block;
+  display: flex;
+  flex-direction: column;
   border: outset;
   border-top-color: #ffffff;
   border-left-color: #ffffff;
@@ -23,6 +26,8 @@ body {
   box-shadow: 3px 3px #464646;
   min-width: 960px;
   max-width: 2048px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* ----- Header ----- */
@@ -411,7 +416,10 @@ button:disabled {
 /* ----- Main Body ----- */
 main {
   background-color: #ffffff;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   margin-left: 3px;
   margin-right: 3px;
   border: inset;
@@ -421,12 +429,13 @@ main {
   border-right-color: #ffffff;
   min-width: 92%;
   max-width: 2048px;
-  max-height: 1080px;
+  overflow: auto;
 }
 
 .navigator {
   display: block;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* ----- Fields Display ----- */
@@ -440,6 +449,7 @@ main {
   border-bottom-color: #1394d1;
   border-right-color: #1394d1;
   width: 98%;
+  height: 20px;
   color: white;
   padding-left: 10px;
   padding-top: 2px;
@@ -512,53 +522,43 @@ footer#config-name {
   font-size: small;
   margin-left: 2px;
   margin-right: 4px;
-  height: 0;
-  padding: 0;
-  overflow: hidden;
-  border: none;
-  opacity: 0;
-  box-sizing: border-box;
-}
-
-footer#config-name.visible {
-  height: auto;
-  padding: 6px 10px;
   margin-top: 4px;
   margin-bottom: 5px;
+  padding: 6px 10px;
   border: inset;
   border-top-color: #bbbbbb;
   border-left-color: #bbbbbb;
   border-bottom-color: #ffffff;
   border-right-color: #ffffff;
   border-width: 2px;
-  border-left: 4px solid #808080;
-  animation: footer-fade 10.3s ease forwards;
-}
-
-@keyframes footer-fade {
-  0% {
-    opacity: 1;
-  }
-
-  85% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-
+  border-left: 3px solid #808080;
+  box-sizing: border-box;
 }
 
 /* ----- Chat Side Panel ----- */
+#chat-toggle {
+  display: block;
+  text-align: center;
+  align-content: center;
+  background-position: center;
+  margin-right: 30px;
+  width: 45px;
+}
+
 #main-container {
   display: flex;
   align-items: stretch;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 #main-content {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 #chat-container {
@@ -616,6 +616,9 @@ footer#config-name.visible {
   border: none;
   padding: 6px 10px;
   background-color: #e6e6e6;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 9px;
 }
 
 .chat-msg {
@@ -623,18 +626,23 @@ footer#config-name.visible {
 }
 
 .chat-user {
-  color: #2EA0D6;
+  color: #484848;
 }
 
 .chat-ai {
-  color: #2BB971;
+  color: #2bb971;
 }
 
 /* ----- Navigator List Items ----- */
 .navigator-list {
   list-style: none;
   margin: 6px 0;
-  padding: 0;
+  padding-left: 10px;
+}
+
+.navigator-section-header {
+  font-weight: bold;
+  padding-top: 8px;
 }
 
 .navigator-item {
@@ -665,6 +673,26 @@ main.schedule-view-expanded .navigator {
 }
 
 /* ----- Schedule Calendar View ----- */
+#schedule-load-btn {
+  border: outset;
+  border-top-color: #eeeeee;
+  border-left-color: #eeeeee;
+  border-bottom-color: #bbbbbb;
+  border-right-color: #bbbbbb;
+  border-width: 3px;
+  margin-top: 0;
+}
+
+#schedule-load-btn:hover {
+  color: #808080;
+  text-shadow: -1px -1px #ffffff;
+  border: inset;
+  border-top-color: #bbbbbb;
+  border-left-color: #bbbbbb;
+  border-bottom-color: #eeeeee;
+  border-right-color: #eeeeee;
+}
+
 .schedule-control-row {
   display: flex;
   align-items: center;
@@ -708,11 +736,9 @@ main.schedule-view-expanded .navigator {
   font-weight: bold;
   font-size: 1em;
   padding: 4px 12px;
-  background: linear-gradient(
-    to right,
-    rgba(254, 82, 58, 0.6),
-    rgba(82, 134, 254, 0.4)
-  );
+  background: linear-gradient(to right,
+      rgba(254, 82, 58, 0.6),
+      rgba(82, 134, 254, 0.4));
   color: #fff;
   text-shadow: 1px 1px #444;
 }
