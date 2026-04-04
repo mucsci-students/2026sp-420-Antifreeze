@@ -44,6 +44,11 @@ def register_schedule_routes(app, scheduler):
             download_name="schedule_config.json"
         )
 
+    # Returns the number of schedules currently held in memory.
+    @app.route("/schedule/count", methods=["GET"])
+    def get_schedule_count():
+        return jsonify({"count": len(scheduler.result) if scheduler.result else 0})
+
     # Runs the scheduler with the given parameters.
     # Expects limit (int) and optimize (bool) in the JSON body.
     # Returns the count of generated schedules.

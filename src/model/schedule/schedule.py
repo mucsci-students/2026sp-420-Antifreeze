@@ -16,6 +16,7 @@ from model.schedule.course import course
 from model.schedule.faculty import faculty
 from model.schedule.lab import lab
 from model.schedule.room import room
+from model.schedule.time_slot_config import time_slot_config
 
 
 
@@ -31,6 +32,7 @@ class Schedule():
         self.faculty = faculty()
         self.lab = lab()
         self.room = room()
+        self.time_slot = time_slot_config()
         self.config = load_config_from_file(CombinedConfig, empty_path)
         self.empty_config = copy.deepcopy(self.config)
         self.result = []

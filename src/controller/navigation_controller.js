@@ -216,6 +216,72 @@ function validate_labs_form() {
   return valid;
 }
 
+// Validates the time-range sub-form fields.
+// Returns true if all fields are valid, false if errors were shown.
+function validate_time_range_form() {
+  View.clear_all_errors();
+  let valid = true;
+  const time_pattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+  const start_input   = document.getElementById("ts-start");
+  const spacing_input = document.getElementById("ts-spacing");
+  const end_input     = document.getElementById("ts-end");
+
+  if (start_input) {
+    const v = start_input.value.trim();
+    if (!v) { View.show_field_error(start_input, "Start time is required."); valid = false; }
+    else if (!time_pattern.test(v)) { View.show_field_error(start_input, "Start time must be HH:MM (e.g. 08:00)."); valid = false; }
+  }
+  if (spacing_input) {
+    const v = spacing_input.value.trim();
+    if (!v || parseInt(v) <= 0 || !Number.isInteger(parseFloat(v))) {
+      View.show_field_error(spacing_input, "Spacing must be a positive whole number of minutes."); valid = false;
+    }
+  }
+  if (end_input) {
+    const v = end_input.value.trim();
+    if (!v) { View.show_field_error(end_input, "End time is required."); valid = false; }
+    else if (!time_pattern.test(v)) { View.show_field_error(end_input, "End time must be HH:MM (e.g. 17:00)."); valid = false; }
+  }
+  return valid;
+}
+
+// Validates the class-pattern sub-form fields.
+// Returns true if all fields are valid, false if errors were shown.
+function validate_class_pattern_form() {
+  View.clear_all_errors();
+  let valid = true;
+
+  const credits_input = document.getElementById("ts-credits");
+  if (credits_input) {
+    const v = credits_input.value.trim();
+    if (!v || parseInt(v) < 1 || !Number.isInteger(parseFloat(v))) {
+      View.show_field_error(credits_input, "Credits must be a positive whole number."); valid = false;
+    }
+  }
+
+  const day_sels = [...document.querySelectorAll('[name="ts-meeting-day"]')];
+  const dur_inputs = [...document.querySelectorAll('[name="ts-meeting-duration"]')];
+
+  if (day_sels.length === 0) {
+    if (credits_input) View.show_field_error(credits_input, "At least one meeting is required.");
+    valid = false;
+  }
+
+  day_sels.forEach((sel, i) => {
+    if (!sel.value) { View.show_field_error(sel, "Day is required."); valid = false; }
+    const dur = dur_inputs[i];
+    if (dur) {
+      const v = dur.value.trim();
+      if (!v || parseInt(v) <= 0 || !Number.isInteger(parseFloat(v))) {
+        View.show_field_error(dur, "Duration must be a positive whole number of minutes."); valid = false;
+      }
+    }
+  });
+
+  return valid;
+}
+
 // Validates the Rooms Add/Modify/Delete form (name only).
 // Returns true if valid, false otherwise.
 function validate_rooms_form() {
@@ -247,6 +313,9 @@ function get_current_id_input() {
   if (Model.current_field === "Courses") return document.getElementById("courses-id");
   if (Model.current_field === "Labs") return document.getElementById("labs-name");
   if (Model.current_field === "Rooms") return document.getElementById("rooms-name");
+  if (Model.current_field === "Time Slots") {
+    return document.getElementById("ts-start") || document.getElementById("ts-credits");
+  }
   return null;
 }
 
@@ -316,6 +385,7 @@ async function go_to_field(field) {
   else if (field === "Labs") await load_labs();
   else if (field === "Rooms") await load_rooms();
   else if (field === "Schedule") await load_schedule();
+  else if (field === "Time Slots") await load_time_slots();
 }
 
 // ---------------------------------------------------------------------------
@@ -386,6 +456,20 @@ function attach_list_item_listeners() {
       View.render_amd_images(Model.current_field, true);
     });
   });
+}
+
+async function load_time_slots() {
+  try {
+    const data = await Model.api_get_time_slots();
+    View.render_time_slots_list(data);
+    Model.set_selected_item_data(null);
+    View.render_amd_images(Model.current_field, false);
+    attach_list_item_listeners();
+    navigate_to("Time Slots");
+  } catch (err) {
+    View.render_load_error("time slots", err.message);
+    navigate_to("Time Slots");
+  }
 }
 
 async function load_schedule() {
@@ -750,6 +834,90 @@ async function handle_popup_save() {
     }
 
     await load_rooms();
+
+  } else if (Model.current_field === "Time Slots") {
+
+    if (Model.current_operation === "add") {
+      const type_sel = document.getElementById("ts-add-type");
+      const add_type = type_sel ? type_sel.value : "time";
+
+      if (add_type === "time") {
+        if (!validate_time_range_form()) return;
+
+        const day     = document.getElementById("ts-day")?.value || "";
+        const start   = document.getElementById("ts-start")?.value.trim() || "";
+        const spacing = parseInt(document.getElementById("ts-spacing")?.value) || 0;
+        const end     = document.getElementById("ts-end")?.value.trim() || "";
+
+        const res = await Model.api_add_time_range({ day, start, spacing, end });
+        if (await check_response_error(res, "Time range could not be added.")) return;
+
+      } else {
+        if (!validate_class_pattern_form()) return;
+
+        const credits    = parseInt(document.getElementById("ts-credits")?.value) || 0;
+        const start_time = document.getElementById("ts-class-start-time")?.value.trim() || null;
+        const disabled   = document.getElementById("ts-disabled")?.checked || false;
+
+        const day_sels   = [...document.querySelectorAll('[name="ts-meeting-day"]')];
+        const dur_inputs = [...document.querySelectorAll('[name="ts-meeting-duration"]')];
+        const lab_cbs    = [...document.querySelectorAll('[name="ts-meeting-lab"]')];
+
+        const meetings = day_sels.map((sel, i) => ({
+          day:      sel.value,
+          duration: parseInt(dur_inputs[i]?.value) || 0,
+          lab:      lab_cbs[i]?.checked || false
+        })).filter(m => m.day && m.duration > 0);
+
+        const res = await Model.api_add_class_pattern({
+          credits, meetings,
+          start_time: start_time || null,
+          disabled
+        });
+        if (await check_response_error(res, "Class pattern could not be added.")) return;
+      }
+
+    } else if (Model.current_operation === "modify") {
+      const item = Model.selected_item_data;
+      if (!item) return;
+
+      if (item._type === "time") {
+        if (!validate_time_range_form()) return;
+
+        const start   = document.getElementById("ts-start")?.value.trim() || "";
+        const spacing = parseInt(document.getElementById("ts-spacing")?.value) || 0;
+        const end     = document.getElementById("ts-end")?.value.trim() || "";
+
+        const res = await Model.api_modify_time_range(item._day, item._index, { start, spacing, end });
+        if (await check_response_error(res, "Time range could not be modified.")) return;
+
+      } else {
+        if (!validate_class_pattern_form()) return;
+
+        const credits    = parseInt(document.getElementById("ts-credits")?.value) || 0;
+        const start_time = document.getElementById("ts-class-start-time")?.value.trim() || null;
+        const disabled   = document.getElementById("ts-disabled")?.checked || false;
+
+        const day_sels   = [...document.querySelectorAll('[name="ts-meeting-day"]')];
+        const dur_inputs = [...document.querySelectorAll('[name="ts-meeting-duration"]')];
+        const lab_cbs    = [...document.querySelectorAll('[name="ts-meeting-lab"]')];
+
+        const meetings = day_sels.map((sel, i) => ({
+          day:      sel.value,
+          duration: parseInt(dur_inputs[i]?.value) || 0,
+          lab:      lab_cbs[i]?.checked || false
+        })).filter(m => m.day && m.duration > 0);
+
+        const res = await Model.api_modify_class_pattern(item._index, {
+          credits, meetings,
+          start_time: start_time || null,
+          disabled
+        });
+        if (await check_response_error(res, "Class pattern could not be modified.")) return;
+      }
+    }
+
+    await load_time_slots();
   }
 }
 
@@ -818,6 +986,15 @@ View.schedule_button.addEventListener("click", () => {
   View.popup_form.style.height = "605px";
   View.popup_box.style.width = "600px";
   View.popup_header.style.width = "595px";
+});
+
+View.time_slots_button.addEventListener("click", () => {
+  Model.set_current_field("Time Slots");
+  load_time_slots();
+  View.render_amd_images(Model.current_field);
+  View.popup_form.style.height = "540px";
+  View.popup_box.style.width = "500px";
+  View.popup_header.style.width = "495px";
 });
 
 // Back button
@@ -912,6 +1089,7 @@ View.file_input.addEventListener("change", async function () {
       View.labs_button.disabled = false;
       View.rooms_button.disabled = false;
       View.schedule_button.disabled = false;
+      View.time_slots_button.disabled = false;
       View.view_button.disabled = false;
 
       const timestamp = new Date().toLocaleTimeString();
@@ -943,6 +1121,10 @@ async function get_course_options() {
 View.add_button.addEventListener("click", async () => {
   Model.set_current_operation("add");
   View.focus_field_button(Model.current_field);
+  if (Model.current_field === "Time Slots") {
+    View.render_add_time_slots_popup();
+    return;
+  }
   const needs_opts = Model.current_field === "Courses" || Model.current_field === "Faculty";
   const options = needs_opts ? await get_course_options() : null;
   View.render_edit_popup("Add", Model.current_field, null, options);
@@ -953,6 +1135,10 @@ View.modify_button.addEventListener("click", async () => {
   if (!Model.selected_item_data) return;
   Model.set_current_operation("modify");
   View.focus_field_button(Model.current_field);
+  if (Model.current_field === "Time Slots") {
+    View.render_modify_time_slots_popup(Model.selected_item_data);
+    return;
+  }
   const needs_opts = Model.current_field === "Courses" || Model.current_field === "Faculty";
   const options = needs_opts ? await get_course_options() : null;
   View.render_edit_popup("Modify", Model.current_field, Model.selected_item_data, options);
@@ -982,6 +1168,15 @@ View.delete_button.addEventListener("click", async () => {
     const res = await Model.api_delete_room(item.name);
     if (await check_response_error(res, `"${item.name}" could not be deleted.`)) return;
     await load_rooms();
+  } else if (field === "Time Slots") {
+    if (item._type === "time") {
+      const res = await Model.api_delete_time_range(item._day, item._index);
+      if (await check_response_error(res, "Time range could not be deleted.")) return;
+    } else {
+      const res = await Model.api_delete_class_pattern(item._index);
+      if (await check_response_error(res, "Class pattern could not be deleted.")) return;
+    }
+    await load_time_slots();
   }
 });
 
@@ -1068,6 +1263,8 @@ focus_containers.forEach(el => {
   el.addEventListener("click", (e) => {
 
     if (e.target.closest("#chat-container")) return;
+    // Skip form controls so programmatic focus does not steal focus from open dropdowns or inputs.
+    if (["SELECT", "INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
 
     View.focus_field_button(Model.current_field);
   });
@@ -1095,7 +1292,7 @@ async function send_message() {
     if (!message) return;
 
     // show user message
-    chat_box.innerHTML += `<div class="chat-msg chat-user"><b>You:</b> ${message}</div>`;
+    chat_box.innerHTML += `<div class="chat-msg chat-user"><b>User:</b> ${message}</div>`;
     chat_input.value = "";
 
     try {
@@ -1109,16 +1306,79 @@ async function send_message() {
 
         const data = await res.json();
 
-        chat_box.innerHTML += `<div class="chat-msg chat-ai"><b>AI:</b> ${format_response(data.result)}</div>`;
+        let result = data.result;
+        let did_ui_action = false;
+
+        // Case 1: direct UI action from backend — open the schedule viewer via the View button.
+        if (data.ui_action === "open_schedule") {
+            Model.set_schedules_generated(true);
+            View.view_button.click();
+            did_ui_action = true;
+        }
+
+        // 🔥 Parse stringified JSON if needed
+        if (typeof result === "string") {
+            try {
+                result = JSON.parse(result);
+            } catch {}
+        }
+
+        // Case 2: UI action embedded inside result object — open the schedule viewer via the View button.
+        if (result?.ui_action === "open_schedule") {
+            Model.set_schedules_generated(true);
+            View.view_button.click();
+            did_ui_action = true;
+        }
+
+        // 🔥 Decide what to display
+        let response_text;
+
+        if (did_ui_action) {
+            response_text = message.toLowerCase().includes("generate")
+                ? "opening Schedule view..."
+                : "Opening schedule view...";
+        } else if (result) {
+            response_text = format_response(result);
+        } else {
+            console.error("No result returned:", data);
+            response_text = "Something went wrong.";
+        }
+
+        // 🔥 Always render response
+        chat_box.innerHTML += `<div class="chat-msg chat-ai"><b>Clippy:</b> ${response_text}</div>`;
         chat_box.scrollTop = chat_box.scrollHeight;
+
+        await refresh_current_field();
 
     } catch (err) {
         chat_box.innerHTML += `<div class="chat-msg chat-ai">Error: ${err}</div>`;
     }
 }
 
+// Refreshes the active tab after an AI chat response and opens the schedule
+// viewer via the View button if the backend reports generated schedules.
+async function refresh_current_field() {
+    // Refresh whichever list tab is active
+    if (Model.current_field === "Faculty") await load_faculty();
+    else if (Model.current_field === "Courses") await load_courses();
+    else if (Model.current_field === "Labs") await load_labs();
+    else if (Model.current_field === "Rooms") await load_rooms();
+    else if (Model.current_field === "Schedule") await load_schedule();
+    else if (Model.current_field === "Time Slots") await load_time_slots();
+
+    // Check if the AI just generated (or re-generated) schedules
+    const { count } = await Model.api_get_schedule_count();
+    if (count > 0) {
+        Model.set_schedules_generated(true);
+        View.render_schedules_generated_buttons();
+        View.view_button.click();
+    }
+}
+
 function format_response(res) {
-    if (res?.error) return res.error;
-    if (res?.status) return res.status;
-    return JSON.stringify(res);
+    const clean = s => s.replace(/\\"/g, '"');
+    if (typeof res === "string") return clean(res);
+    if (res?.error) return clean(res.error);
+    if (res?.status) return clean(res.status);
+    return clean(JSON.stringify(res));
 }
