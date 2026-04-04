@@ -198,9 +198,9 @@ def add_faculty(sched):
             break
 
         #Get existing courses, rooms, and labs for validation
-        existing_courses = [c.course_id.upper() for c in sched.config.config.courses]
-        existing_rooms = [r.upper() for r in sched.config.config.rooms]
-        existing_labs = [l.upper() for l in sched.config.config.labs]
+        existing_courses = [course.course_id.upper() for course in sched.config.config.courses]
+        existing_rooms = [rooms.upper() for rooms in sched.config.config.rooms]
+        existing_labs = [lab.upper() for lab in sched.config.config.labs]
 
         times = {}
         for day in ["MON", "TUE", "WED", "THU", "FRI"]:
@@ -395,9 +395,9 @@ def mod_faculty(sched):
             break
 
         #Get existing courses, rooms, and labs for validation
-        existing_courses = [c.course_id.upper() for c in sched.config.config.courses]
-        existing_rooms = [r.upper() for r in sched.config.config.rooms]
-        existing_labs = [l.upper() for l in sched.config.config.labs]
+        existing_courses = [course.course_id.upper() for course in sched.config.config.courses]
+        existing_rooms = [rooms.upper() for rooms in sched.config.config.rooms]
+        existing_labs = [lab.upper() for lab in sched.config.config.labs]
 
         times = {}
         for day in ["MON", "TUE", "WED", "THU", "FRI"]:

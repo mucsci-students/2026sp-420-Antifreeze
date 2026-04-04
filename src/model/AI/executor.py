@@ -164,7 +164,7 @@ def add_course(scheduler, course_id: str, credits: int, room, lab, conflicts, fa
 
     # 🔥 FIX: semantic normalization
     room = [_normalize_name(r) for r in room]
-    lab = [_normalize_name(l) for l in lab]
+    lab = [_normalize_name(lab) for lab in lab]
 
     scheduler.course.add_course(
         scheduler.config,
@@ -204,7 +204,7 @@ def modify_course(scheduler, index: int, course_id: str, credits: int, room, lab
         faculty = _clean_list(faculty)
 
         room = [_normalize_name(r) for r in room]
-        lab = [_normalize_name(l) for l in lab]
+        lab = [_normalize_name(lab) for lab in lab]
 
         course = scheduler.config.config.courses[index]
 
@@ -230,7 +230,7 @@ def add_lab(scheduler, name: str):
 
     name = _normalize_name(name)
 
-    if name.upper() in [l.upper() for l in labs]:
+    if name.upper() in [lab.upper() for lab in labs]:
         return {"error": f'"{name}" already exists.'}
 
     labs.append(name)
@@ -249,7 +249,7 @@ def delete_lab(scheduler, name: str):
     labs.remove(name)
 
     for course in scheduler.config.config.courses:
-        course.lab = [l for l in course.lab if l != name]
+        course.lab = [lab for lab in course.lab if lab != name]
 
     return {"status": "deleted", "lab": name}
 
@@ -269,7 +269,7 @@ def modify_lab(scheduler, old_name: str, new_name: str):
     labs[labs.index(old_name)] = new_name
 
     for course in scheduler.config.config.courses:
-        course.lab = [new_name if l == old_name else l for l in course.lab]
+        course.lab = [new_name if lab == old_name else lab for lab in course.lab]
 
     return {"status": "modified", "lab": new_name}
 

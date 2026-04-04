@@ -3,6 +3,8 @@ import os
 import types
 import pytest
 
+from src.model.schedule.room import room
+
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
 scheduler_stub = types.ModuleType("scheduler")
@@ -14,8 +16,6 @@ scheduler_config_stub = types.ModuleType("scheduler.config")
 scheduler_config_stub.CombinedConfig = object
 sys.modules.setdefault("scheduler.config", scheduler_config_stub)
 
-
-from src.model.schedule.room import room
 
 
 

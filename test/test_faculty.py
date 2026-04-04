@@ -3,6 +3,8 @@ import os
 import types
 import pytest
 
+from src.model.schedule.faculty import faculty
+
 
 # Point Python at the project root so src.model.schedule.faculty resolves
 
@@ -31,8 +33,7 @@ sys.modules.setdefault("scheduler", scheduler_stub)
 
 
 # Import the class under test
-
-from src.model.schedule.faculty import faculty
+# ^^^ Can't perform step above due to ruff prohibiting it
 
 
 

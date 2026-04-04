@@ -1,5 +1,5 @@
 from controller.modifyConfig.utilsCLI import end_prog
-from controller.modifyConfig import modLab, modRoom, modCourse, modConflict, modFaculty
+from controller.modifyConfig import modLab, modRoom, modCourse, modConflict, modFaculty, modTimeSlot
 
 def print_config_menu():
     print("\nPress the key associated with the command you would like to issue, then press enter.")

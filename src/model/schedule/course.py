@@ -40,10 +40,10 @@ class course():
             #variable being passed
             test = True
             # lists being tested against
-            courses = [c.course_id.upper() for c in config.config.courses]
-            labs = [l.upper() for l in config.config.labs]
-            rooms = [r.upper() for r in config.config.rooms]
-            fac_name =[f.name.upper() for f in config.config.faculty]
+            courses = [course.course_id.upper() for course in config.config.courses]
+            labs = [lab.upper() for lab in config.config.labs]
+            rooms = [room.upper() for room in config.config.rooms]
+            fac_name =[faculty.name.upper() for faculty in config.config.faculty]
             
         
             #tests and error detection 

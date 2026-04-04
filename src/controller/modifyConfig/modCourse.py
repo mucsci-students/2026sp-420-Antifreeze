@@ -83,10 +83,10 @@ def add_course(sched):
             return
 
         # Get existing rooms, labs, courses, and faculty for validation
-        existing_rooms = [r.upper() for r in sched.config.config.rooms]
-        existing_labs = [l.upper() for l in sched.config.config.labs]
-        existing_courses = [c.course_id.upper() for c in sched.config.config.courses]
-        existing_faculty = [f.name.upper() for f in sched.config.config.faculty]
+        existing_rooms = [rooms.upper() for rooms in sched.config.config.rooms]
+        existing_labs = [lab.upper() for lab in sched.config.config.labs]
+        existing_courses = [courses.course_id.upper() for courses in sched.config.config.courses]
+        existing_faculty = [faculty.name.upper() for faculty in sched.config.config.faculty]
 
         rooms = []
         while True:
@@ -182,10 +182,10 @@ def mod_course(sched):
             return
 
         # Get existing rooms, labs, courses, and faculty for validation
-        existing_rooms = [r.upper() for r in sched.config.config.rooms]
-        existing_labs = [l.upper() for l in sched.config.config.labs]
-        existing_courses = [c.course_id.upper() for c in sched.config.config.courses]
-        existing_faculty = [f.name.upper() for f in sched.config.config.faculty]
+        existing_rooms = [rooms.upper() for rooms in sched.config.config.rooms]
+        existing_labs = [lab.upper() for lab in sched.config.config.labs]
+        existing_courses = [course.course_id.upper() for course in sched.config.config.courses]
+        existing_faculty = [faculty.name.upper() for faculty in sched.config.config.faculty]
 
         rooms = []
         while True:

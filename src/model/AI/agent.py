@@ -5,7 +5,21 @@ from langchain_core.messages import HumanMessage
 from langchain.agents import create_agent
 from pydantic import BaseModel, Field
 
-from model.AI.executor import *
+from model.AI.executor import add_faculty
+from model.AI.executor import modify_faculty
+from model.AI.executor import delete_faculty
+from model.AI.executor import list_faculty
+from model.AI.executor import add_course
+from model.AI.executor import modify_course
+from model.AI.executor import delete_course
+from model.AI.executor import add_lab
+from model.AI.executor import modify_lab
+from model.AI.executor import delete_lab
+from model.AI.executor import add_room
+from model.AI.executor import modify_room
+from model.AI.executor import delete_room
+from model.AI.executor import run_scheduler
+from model.AI.executor import get_schedule
 
 
 # -------------------------

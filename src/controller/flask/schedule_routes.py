@@ -160,13 +160,17 @@ def register_schedule_routes(app, scheduler):
 
             # Determine secondary grouping key
             if mode == "faculty":
-                group_key_fn = lambda e: e["faculty"]
+                def group_key_fn(e): return e["faculty"]
+                # group_key_fn = lambda e: e["faculty"]
             elif mode == "room":
-                group_key_fn = lambda e: e["room"]
+                def group_key_fn(e): return e["room"]
+                # group_key_fn = lambda e: e["room"]
             elif mode == "lab":
-                group_key_fn = lambda e: e["lab"]
+                def group_key_fn(e): return e["lab"]
+                # group_key_fn = lambda e: e["lab"]
             else:
-                group_key_fn = None   # no sub-grouping for "course" mode
+                def group_key_fn(): return None
+                # group_key_fn = None   # no sub-grouping for "course" mode
 
             # Build day → (optional sub-group →) list-of-slots structure
             DAY_NAMES = {"MON": "Monday", "TUE": "Tuesday", "WED": "Wednesday",

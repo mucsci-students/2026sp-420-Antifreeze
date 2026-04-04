@@ -68,7 +68,7 @@ class lab():
         # ---- Cascade: Courses ----
         for course in config.config.courses:
             if lab_name in course.lab:
-                course.lab = [l for l in course.lab if l != lab_name]
+                course.lab = [lab for lab in course.lab if lab != lab_name]
 
         # ---- Cascade: Faculty Preferences ----
         for faculty in config.config.faculty:
