@@ -7,7 +7,6 @@
 # call to get_agent() and reused for the lifetime of the process.
 
 import json
-import os
 
 from langchain.chat_models import init_chat_model
 from langchain_core.tools import StructuredTool
@@ -15,21 +14,44 @@ from langchain_core.messages import HumanMessage
 from langchain.agents import create_agent
 from pydantic import BaseModel, Field
 
+# Faculty imports
 from model.AI.executor import add_faculty
 from model.AI.executor import modify_faculty
 from model.AI.executor import delete_faculty
 from model.AI.executor import list_faculty
+from model.AI.executor import get_faculty_details
+
+# Course imports
 from model.AI.executor import add_course
 from model.AI.executor import modify_course
 from model.AI.executor import delete_course
+from model.AI.executor import get_course_details
+
+# Lab imports
 from model.AI.executor import add_lab
 from model.AI.executor import modify_lab
 from model.AI.executor import delete_lab
+
+# Room imports
 from model.AI.executor import add_room
 from model.AI.executor import modify_room
 from model.AI.executor import delete_room
+
+# Schedule imports
 from model.AI.executor import run_scheduler
 from model.AI.executor import get_schedule
+from model.AI.executor import open_schedule_tool
+
+# Time slot and range imports
+from model.AI.executor import add_time_range
+from model.AI.executor import modify_time_range
+from model.AI.executor import delete_time_range
+from model.AI.executor import get_time_slot_config
+
+# Class imports
+from model.AI.executor import add_class_pattern
+from model.AI.executor import modify_class_pattern
+from model.AI.executor import delete_class_pattern
 
 
 # -------------------------
@@ -451,7 +473,7 @@ def run_agent(scheduler, user_input: str):
         try:
             parsed = json.loads(last)
             return parsed
-        except:
+        except Exception:
             return last
 
     return last

@@ -9,9 +9,13 @@ dependencies = [
     "flask>=3.0",
     "langchain>=1.2.15",
     "pytest>=9.0.2",
-    "pytest-codecov>=0.7.0",
-    "pytest-cov>=7.1.0",
     "reportlab>=4.0",
-    "ruff>=0.15.8",
-    "ty>=0.0.27",
+]
+
+[dependency-groups]
+dev = [
+    "langchain>=1.2.15",
+    "langchain-openai>=1.1.12",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.1.0",
 ]

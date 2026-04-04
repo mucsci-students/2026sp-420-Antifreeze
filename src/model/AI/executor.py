@@ -316,7 +316,7 @@ def delete_lab(scheduler, name: str):
     labs.remove(actual)
 
     for course in scheduler.config.config.courses:
-        course.lab = [l for l in course.lab if l != actual]
+        course.lab = [lab for lab in course.lab if lab != actual]
 
     return {"status": "deleted", "lab": actual}
 
@@ -336,7 +336,7 @@ def modify_lab(scheduler, old_name: str, new_name: str):
     labs[labs.index(actual_old)] = new_name
 
     for course in scheduler.config.config.courses:
-        course.lab = [new_name if l == actual_old else l for l in course.lab]
+        course.lab = [new_name if lab == actual_old else lab for lab in course.lab]
 
     return {"status": "modified", "lab": new_name}
 
