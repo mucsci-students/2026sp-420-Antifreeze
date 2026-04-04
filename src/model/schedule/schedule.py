@@ -1,10 +1,5 @@
 import os
-from scheduler import (
-    Scheduler,
-    load_config_from_file,
-    CombinedConfig
-    
-)
+from scheduler import Scheduler, load_config_from_file, CombinedConfig
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
@@ -19,8 +14,7 @@ from model.schedule.room import room
 from model.schedule.time_slot_config import time_slot_config
 
 
-
-class Schedule():
+class Schedule:
     # Initialize Schedule
     # Initializes all scheduling submodules and creates an empty configuration
     # Sets up conflict, course, faculty, lab, and room handlers
@@ -37,8 +31,8 @@ class Schedule():
         self.empty_config = copy.deepcopy(self.config)
         self.result = []
 
-    #--------------#
-    #FILE MANAGEMENT
+    # --------------#
+    # FILE MANAGEMENT
 
     # Load Configuration
     # Loads a configuration file into the scheduler
@@ -46,7 +40,6 @@ class Schedule():
     # Parameters: Configuration file path
     def load_config(self, file_name):
         try:
-            
             if os.path.basename(file_name) == "empty.json":
                 self.load_empty_prototype()
                 print("Loaded from prototype.")
@@ -56,20 +49,24 @@ class Schedule():
             print("Config loaded successfully.")
 
         except Exception as e:
-            if(e):
+            if e:
                 print("Could not load file, try again")
                 print(e)
                 return
-        
+
     def load_empty_prototype(self):
-    
+
         self.config = copy.deepcopy(self._empty_prototype)
         self.result = []
         return
+
     # Save Configuration
     # Saves the current configuration to a file
     def save_config(self):
-        print("Enter the path of the file you would like to save to, including extension\n==> ",end="")
+        print(
+            "Enter the path of the file you would like to save to, including extension\n==> ",
+            end="",
+        )
         file_name = input()
         try:
             with open(file_name, "w") as f:
@@ -90,10 +87,10 @@ class Schedule():
         self.room.print_rooms(self.config)
         return
 
-    #Run Scheduler
-    #Executes the scheduling engine using the current configuration
-    #Prompts the user for generation limits, output format, and optimization options
-    #Generates schedules and writes results to a file
+    # Run Scheduler
+    # Executes the scheduling engine using the current configuration
+    # Prompts the user for generation limits, output format, and optimization options
+    # Generates schedules and writes results to a file
     def run_scheduler(self, limit: int = 10, optimize: bool = True):
 
         if optimize:
@@ -103,7 +100,7 @@ class Schedule():
                 "faculty_lab",
                 "same_room",
                 "same_lab",
-                "pack_rooms"
+                "pack_rooms",
             ]
         else:
             self.config.optimizer_flags = []
@@ -124,11 +121,10 @@ class Schedule():
 
         return self.result
 
-
-    #Print Schedule
-    #Displays the current schedule in a human-readable, formatted layout
-    #Prints courses, faculty assignments, classes, time slots, and misc settings
-    #Requires a loaded configuration   
+    # Print Schedule
+    # Displays the current schedule in a human-readable, formatted layout
+    # Prints courses, faculty assignments, classes, time slots, and misc settings
+    # Requires a loaded configuration
     def print_schedule(self, count: int = 1):
 
         if not self.result:
@@ -139,7 +135,6 @@ class Schedule():
         output = []
 
         for i in range(count):
-            
             schedule_lines = []
 
             for sch in self.result[i]:
@@ -174,14 +169,12 @@ class Schedule():
         elements = []
 
         for i, model in enumerate(self.result):
-
-            elements.append(Paragraph(f"Schedule {i+1}", styles["Heading2"]))
+            elements.append(Paragraph(f"Schedule {i + 1}", styles["Heading2"]))
             elements.append(Spacer(1, 10))
 
             table_data = [["Course", "Faculty", "Room", "Lab", "Time"]]
 
             for sch in model:
-
                 parts = sch.as_csv().split(",")
 
                 if len(parts) < 5:
@@ -191,10 +184,14 @@ class Schedule():
 
             table = Table(table_data)
 
-            table.setStyle(TableStyle([
-                ("BACKGROUND", (0,0), (-1,0), colors.lightgrey),
-                ("GRID", (0,0), (-1,-1), 1, colors.black)
-            ]))
+            table.setStyle(
+                TableStyle(
+                    [
+                        ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                        ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                    ]
+                )
+            )
 
             elements.append(table)
             elements.append(Spacer(1, 30))

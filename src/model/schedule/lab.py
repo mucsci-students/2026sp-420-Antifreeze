@@ -1,8 +1,5 @@
-
-
 # Manages lab entries in the scheduler configuration.
-class lab():
-
+class lab:
     # Initializes lab subclass.
     def __init__(self):
         return
@@ -14,22 +11,22 @@ class lab():
     # Returns: True if validation passes, False otherwise
     def validate_entry(self, config: str, lab_name: str, operation: str) -> bool:
         labs = config.config.labs
-        
+
         # Check for empty input
         if lab_name == "":
             print("Error: Lab must have a name — returning to menu.")
             return False
-        
+
         if operation == "add":
             if lab_name in labs:
                 print(f"Error: Lab '{lab_name}' already exists — returning to menu.")
                 return False
-        
+
         elif operation in ["modify", "delete"]:
             if lab_name not in labs:
                 print(f"Error: Lab '{lab_name}' does not exist — returning to menu.")
                 return False
-        
+
         return True
 
     # Adds a lab to the config.
@@ -76,7 +73,7 @@ class lab():
                 del faculty.lab_preferences[lab_name]
 
         print(f"Lab '{lab_name}' deleted successfully.")
-    
+
     # Renames a lab in the config.
     # Cascades the rename to course lab lists and faculty lab preferences.
     # Parameters: config, old_name, new_name
@@ -99,10 +96,7 @@ class lab():
 
         # ---- Cascade: Courses ----
         for course in config.config.courses:
-            course.lab = [
-                new_name if lab == old_name else lab
-                for lab in course.lab
-            ]
+            course.lab = [new_name if lab == old_name else lab for lab in course.lab]
 
         # ---- Cascade: Faculty Preferences ----
         for faculty in config.config.faculty:
@@ -117,7 +111,7 @@ class lab():
     def print_labs(self, config: str):
         labs = config.config.labs
         print("\nLabs:")
-        for lab in labs:            
+        for lab in labs:
             print(f"Name: {lab}")
 
     # Returns a list of all lab names from the config.
@@ -136,7 +130,7 @@ class lab():
 
         lab_schedule = {}
 
-        with open(csv_path, newline='') as f:
+        with open(csv_path, newline="") as f:
             for line in f:
                 line = line.strip()
 
@@ -144,30 +138,30 @@ class lab():
                 if not line or line.startswith("Schedule"):
                     continue
 
-                parts = [p.strip() for p in line.split(',')]
+                parts = [p.strip() for p in line.split(",")]
 
                 # Expect at least: course_section, faculty, room, lab, and one meeting
                 if len(parts) < 5:
                     continue
 
                 course_section = parts[0]
-                faculty        = parts[1]
-                room           = parts[2]
-                lab_name       = parts[3]
-                meetings       = parts[4:]
+                faculty = parts[1]
+                room = parts[2]
+                lab_name = parts[3]
+                meetings = parts[4:]
 
                 # Only include rows that have an assigned lab
                 if lab_name == "None" or lab_name == "":
                     continue
 
-                course_id, _, section = course_section.partition('.')
+                course_id, _, section = course_section.partition(".")
 
                 entry = {
                     "course_id": course_id,
                     "section": section,
                     "faculty": faculty,
                     "room": room,
-                    "meetings": meetings
+                    "meetings": meetings,
                 }
 
                 if lab_name not in lab_schedule:

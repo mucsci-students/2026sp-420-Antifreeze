@@ -9,15 +9,12 @@ def register_room_routes(app, scheduler):
             rooms = []
 
             for room in scheduler.config.config.rooms:
-                rooms.append({
-                    "name": room
-                })
+                rooms.append({"name": room})
 
             return jsonify(rooms)
 
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-
 
     @app.route("/rooms", methods=["POST"])
     def add_room():
@@ -42,23 +39,23 @@ def register_room_routes(app, scheduler):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-
     @app.route("/rooms/<room_name>", methods=["DELETE"])
     def delete_room(room_name):
         try:
             rooms = scheduler.config.config.rooms
 
             if room_name not in rooms:
-                return jsonify({"error": f'"{room_name}" was not found. Please check the name and try again.'}), 404
+                return jsonify(
+                    {
+                        "error": f'"{room_name}" was not found. Please check the name and try again.'
+                    }
+                ), 404
 
             rooms.remove(room_name)
 
             # cascade removal from courses
             for course in scheduler.config.config.courses:
-                course.room = [
-                    r for r in course.room
-                    if r != room_name
-                ]
+                course.room = [r for r in course.room if r != room_name]
 
             print(f"Room '{room_name}' deleted successfully.")
 
@@ -66,7 +63,6 @@ def register_room_routes(app, scheduler):
 
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-
 
     @app.route("/rooms/<room_name>", methods=["PUT"])
     def modify_room(room_name):
@@ -80,19 +76,22 @@ def register_room_routes(app, scheduler):
             upper_case_rooms = [room.upper() for room in rooms]
 
             if room_name.upper() not in upper_case_rooms:
-                return jsonify({"error": f'"{room_name}" was not found. Please check the name and try again.'}), 404
+                return jsonify(
+                    {
+                        "error": f'"{room_name}" was not found. Please check the name and try again.'
+                    }
+                ), 404
 
             if new_name.upper() in upper_case_rooms:
-                return jsonify({"error": f'"{new_name}" already exists. Choose a different name.'}), 409
+                return jsonify(
+                    {"error": f'"{new_name}" already exists. Choose a different name.'}
+                ), 409
 
             rooms[rooms.index(room_name)] = new_name
 
             # cascade rename inside courses
             for course in scheduler.config.config.courses:
-                course.room = [
-                    new_name if r == room_name else r
-                    for r in course.room
-                ]
+                course.room = [new_name if r == room_name else r for r in course.room]
 
             return jsonify({"status": "modified"})
 

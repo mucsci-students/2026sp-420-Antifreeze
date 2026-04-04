@@ -2,11 +2,7 @@ from flask import Flask
 from controller.flask.routes import register_routes
 from model.schedule import schedule
 
-app = Flask(
-    __name__,
-    template_folder="view/templates",
-    static_folder="view/static"
-)
+app = Flask(__name__, template_folder="view/templates", static_folder="view/static")
 
 scheduler = schedule.Schedule()
 

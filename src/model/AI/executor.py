@@ -2,6 +2,7 @@
 # HELPERS (ADD AT TOP)
 # -------------------------
 
+
 def _ensure_list(val):
     if val is None:
         return []
@@ -42,6 +43,7 @@ def _find_in_list(name: str, lst: list):
 # FACULTY
 # -------------------------
 
+
 def add_faculty(
     scheduler,
     name: str,
@@ -53,7 +55,7 @@ def add_faculty(
     course_preferences=None,
     room_preferences=None,
     lab_preferences=None,
-    mandatory_days=None
+    mandatory_days=None,
 ):
     fac_list = scheduler.config.config.faculty
 
@@ -80,15 +82,21 @@ def add_faculty(
             course_preferences,
             room_preferences,
             lab_preferences,
-            mandatory_days
+            mandatory_days,
         )
     except Exception as e:
         msg = str(e)
         import re
-        m = re.search(r"Mandatory days \[([^\]]+)\] must be present in the availability times", msg)
+
+        m = re.search(
+            r"Mandatory days \[([^\]]+)\] must be present in the availability times",
+            msg,
+        )
         if m:
             missing = m.group(1)
-            return {"error": f"Mandatory day(s) {missing} must have an availability time set. Please ask the user to provide time slots for those days (e.g. '09:00-09:50') before setting them as mandatory."}
+            return {
+                "error": f"Mandatory day(s) {missing} must have an availability time set. Please ask the user to provide time slots for those days (e.g. '09:00-09:50') before setting them as mandatory."
+            }
         return {"error": msg}
 
     return {"status": "added", "faculty": name}
@@ -106,7 +114,7 @@ def modify_faculty(
     course_preferences=None,
     room_preferences=None,
     lab_preferences=None,
-    mandatory_days=None
+    mandatory_days=None,
 ):
     fac_list = scheduler.config.config.faculty
 
@@ -144,15 +152,21 @@ def modify_faculty(
             course_preferences,
             room_preferences,
             lab_preferences,
-            mandatory_days
+            mandatory_days,
         )
     except Exception as e:
         msg = str(e)
         import re
-        m = re.search(r"Mandatory days \[([^\]]+)\] must be present in the availability times", msg)
+
+        m = re.search(
+            r"Mandatory days \[([^\]]+)\] must be present in the availability times",
+            msg,
+        )
         if m:
             missing = m.group(1)
-            return {"error": f"Mandatory day(s) {missing} must have an availability time set. Please ask the user to provide time slots for those days (e.g. '09:00-09:50') before setting them as mandatory."}
+            return {
+                "error": f"Mandatory day(s) {missing} must have an availability time set. Please ask the user to provide time slots for those days (e.g. '09:00-09:50') before setting them as mandatory."
+            }
         return {"error": msg}
 
     return {"status": "modified", "faculty": new_name}
@@ -170,9 +184,7 @@ def delete_faculty(scheduler, name: str):
 
 
 def list_faculty(scheduler):
-    return {
-        "faculty": [{"name": f.name} for f in scheduler.config.config.faculty]
-    }
+    return {"faculty": [{"name": f.name} for f in scheduler.config.config.faculty]}
 
 
 def get_faculty_details(scheduler, name: str):
@@ -184,8 +196,12 @@ def get_faculty_details(scheduler, name: str):
                 "minimum_credits": f.minimum_credits,
                 "maximum_days": f.maximum_days,
                 "unique_course_limit": f.unique_course_limit,
-                "times": {str(day): [str(t) for t in times] for day, times in f.times.items()},
-                "course_preferences": {str(k): v for k, v in f.course_preferences.items()},
+                "times": {
+                    str(day): [str(t) for t in times] for day, times in f.times.items()
+                },
+                "course_preferences": {
+                    str(k): v for k, v in f.course_preferences.items()
+                },
                 "room_preferences": {str(k): v for k, v in f.room_preferences.items()},
                 "lab_preferences": {str(k): v for k, v in f.lab_preferences.items()},
                 "mandatory_days": [str(d) for d in f.mandatory_days],
@@ -196,6 +212,7 @@ def get_faculty_details(scheduler, name: str):
 # -------------------------
 # COURSE (FIXED)
 # -------------------------
+
 
 def add_course(scheduler, course_id: str, credits: int, room, lab, conflicts, faculty):
     existing = [c.course_id.upper() for c in scheduler.config.config.courses]
@@ -220,13 +237,7 @@ def add_course(scheduler, course_id: str, credits: int, room, lab, conflicts, fa
     lab = [_normalize_name(lab) for lab in lab]
 
     scheduler.course.add_course(
-        scheduler.config,
-        course_id,
-        credits,
-        room,
-        lab,
-        conflicts,
-        faculty
+        scheduler.config, course_id, credits, room, lab, conflicts, faculty
     )
 
     return {"status": "added", "course": course_id}
@@ -258,7 +269,9 @@ def delete_course(scheduler, course_id: str):
     return {"status": "deleted", "course": course_id}
 
 
-def modify_course(scheduler, index: int, course_id: str, credits: int, room, lab, conflicts, faculty):
+def modify_course(
+    scheduler, index: int, course_id: str, credits: int, room, lab, conflicts, faculty
+):
     try:
         # same normalization (important)
         room = _ensure_list(room)
@@ -292,6 +305,7 @@ def modify_course(scheduler, index: int, course_id: str, credits: int, room, lab
 # -------------------------
 # LAB
 # -------------------------
+
 
 def add_lab(scheduler, name: str):
     labs = scheduler.config.config.labs
@@ -345,6 +359,7 @@ def modify_lab(scheduler, old_name: str, new_name: str):
 # ROOM
 # -------------------------
 
+
 def add_room(scheduler, name: str):
     rooms = scheduler.config.config.rooms
 
@@ -392,25 +407,43 @@ def modify_room(scheduler, old_name: str, new_name: str):
 
     return {"status": "modified", "room": new_name}
 
+
 # -------------------------
 # TIME SLOTS
 # -------------------------
+
 
 # Serializes a time-range entry to a plain dict.
 # Handles both dict entries (added at runtime) and pydantic TimeBlock objects
 # (loaded from a config file).
 def _ts_serialize_range(r):
     if isinstance(r, dict):
-        return {"start": str(r.get("start", "")), "spacing": int(r.get("spacing", 0)), "end": str(r.get("end", ""))}
-    return {"start": str(getattr(r, "start", "")), "spacing": int(getattr(r, "spacing", 0)), "end": str(getattr(r, "end", ""))}
+        return {
+            "start": str(r.get("start", "")),
+            "spacing": int(r.get("spacing", 0)),
+            "end": str(r.get("end", "")),
+        }
+    return {
+        "start": str(getattr(r, "start", "")),
+        "spacing": int(getattr(r, "spacing", 0)),
+        "end": str(getattr(r, "end", "")),
+    }
 
 
 # Serializes a meeting entry to a plain dict.
 # Handles both dict entries and pydantic model objects.
 def _ts_serialize_meeting(m):
     if isinstance(m, dict):
-        return {"day": str(m.get("day", "")), "duration": int(m.get("duration", 0)), "lab": bool(m.get("lab", False))}
-    return {"day": str(getattr(m, "day", "")), "duration": int(getattr(m, "duration", 0)), "lab": bool(getattr(m, "lab", False))}
+        return {
+            "day": str(m.get("day", "")),
+            "duration": int(m.get("duration", 0)),
+            "lab": bool(m.get("lab", False)),
+        }
+    return {
+        "day": str(getattr(m, "day", "")),
+        "duration": int(getattr(m, "duration", 0)),
+        "lab": bool(getattr(m, "lab", False)),
+    }
 
 
 # Serializes a class-pattern entry to a plain dict.
@@ -427,7 +460,11 @@ def _ts_serialize_class(cls):
         meetings = getattr(cls, "meetings", [])
         start_time = getattr(cls, "start_time", None)
         disabled = getattr(cls, "disabled", False)
-    result = {"credits": int(credits), "meetings": [_ts_serialize_meeting(m) for m in meetings], "disabled": bool(disabled)}
+    result = {
+        "credits": int(credits),
+        "meetings": [_ts_serialize_meeting(m) for m in meetings],
+        "disabled": bool(disabled),
+    }
     if start_time is not None:
         result["start_time"] = str(start_time)
     return result
@@ -436,7 +473,10 @@ def _ts_serialize_class(cls):
 def get_time_slot_config(scheduler):
     times_raw = scheduler.time_slot.get_times(scheduler.config)
     classes_raw = scheduler.time_slot.get_classes(scheduler.config)
-    times = {str(day): [_ts_serialize_range(r) for r in ranges] for day, ranges in times_raw.items()}
+    times = {
+        str(day): [_ts_serialize_range(r) for r in ranges]
+        for day, ranges in times_raw.items()
+    }
     classes = [_ts_serialize_class(cls) for cls in classes_raw]
     return {"times": times, "classes": classes}
 
@@ -449,9 +489,13 @@ def add_time_range(scheduler, day: str, start: str, spacing: int, end: str):
     return {"status": "added", "day": day, "start": start, "end": end}
 
 
-def modify_time_range(scheduler, day: str, index: int, start: str, spacing: int, end: str):
+def modify_time_range(
+    scheduler, day: str, index: int, start: str, spacing: int, end: str
+):
     day = day.upper()
-    if not scheduler.time_slot.validate_time_entry(scheduler.config, day, "modify", index):
+    if not scheduler.time_slot.validate_time_entry(
+        scheduler.config, day, "modify", index
+    ):
         return {"error": f"Time range index {index} for {day} not found."}
     scheduler.time_slot.modify_time(scheduler.config, day, index, start, spacing, end)
     return {"status": "modified"}
@@ -459,28 +503,53 @@ def modify_time_range(scheduler, day: str, index: int, start: str, spacing: int,
 
 def delete_time_range(scheduler, day: str, index: int):
     day = day.upper()
-    if not scheduler.time_slot.validate_time_entry(scheduler.config, day, "delete", index):
+    if not scheduler.time_slot.validate_time_entry(
+        scheduler.config, day, "delete", index
+    ):
         return {"error": f"Time range index {index} for {day} not found."}
     scheduler.time_slot.delete_time(scheduler.config, day, index)
     return {"status": "deleted"}
 
 
-def add_class_pattern(scheduler, credits: int, meetings: list, start_time: str = None, disabled: bool = False):
-    if not scheduler.time_slot.validate_class_entry(scheduler.config, "add", credits=credits, meetings=meetings):
+def add_class_pattern(
+    scheduler,
+    credits: int,
+    meetings: list,
+    start_time: str = None,
+    disabled: bool = False,
+):
+    if not scheduler.time_slot.validate_class_entry(
+        scheduler.config, "add", credits=credits, meetings=meetings
+    ):
         return {"error": "Invalid class pattern — check day names and durations."}
-    scheduler.time_slot.add_class(scheduler.config, credits, meetings, start_time, disabled)
+    scheduler.time_slot.add_class(
+        scheduler.config, credits, meetings, start_time, disabled
+    )
     return {"status": "added"}
 
 
-def modify_class_pattern(scheduler, index: int, credits: int, meetings: list, start_time: str = None, disabled: bool = False):
-    if not scheduler.time_slot.validate_class_entry(scheduler.config, "modify", class_index=index):
+def modify_class_pattern(
+    scheduler,
+    index: int,
+    credits: int,
+    meetings: list,
+    start_time: str = None,
+    disabled: bool = False,
+):
+    if not scheduler.time_slot.validate_class_entry(
+        scheduler.config, "modify", class_index=index
+    ):
         return {"error": f"Class pattern index {index} not found."}
-    scheduler.time_slot.modify_class(scheduler.config, index, credits, meetings, start_time, disabled)
+    scheduler.time_slot.modify_class(
+        scheduler.config, index, credits, meetings, start_time, disabled
+    )
     return {"status": "modified"}
 
 
 def delete_class_pattern(scheduler, index: int):
-    if not scheduler.time_slot.validate_class_entry(scheduler.config, "delete", class_index=index):
+    if not scheduler.time_slot.validate_class_entry(
+        scheduler.config, "delete", class_index=index
+    ):
         return {"error": f"Class pattern index {index} not found."}
     scheduler.time_slot.delete_class(scheduler.config, index)
     return {"status": "deleted"}
@@ -489,6 +558,7 @@ def delete_class_pattern(scheduler, index: int):
 # -------------------------
 # SCHEDULER
 # -------------------------
+
 
 # Runs the scheduling engine and returns the number of generated schedules
 # along with a ui_action signal so the frontend opens the schedule viewer.
@@ -500,6 +570,7 @@ def run_scheduler(scheduler, limit: int, optimize: bool):
     results = scheduler.run_scheduler(limit, optimize)
     count = len(results) if results else 0
     return {"ui_action": "open_schedule", "count": count}
+
 
 def open_schedule_tool():
     return {"ui_action": "open_schedule"}

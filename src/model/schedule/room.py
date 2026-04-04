@@ -1,8 +1,5 @@
-
-
 # Manages room entries in the scheduler configuration.
-class room():
-
+class room:
     # Initializes room subclass.
     def __init__(self):
         return
@@ -14,22 +11,22 @@ class room():
     # Returns: True if validation passes, False otherwise
     def validate_entry(self, config: str, room_name: str, operation: str) -> bool:
         rooms = config.config.rooms
-        
+
         # Check for empty input
         if room_name == "":
             print("Error: Room must have a name — returning to menu.")
             return False
-        
+
         if operation == "add":
             if room_name in rooms:
                 print(f"Error: Room '{room_name}' already exists — returning to menu.")
                 return False
-        
+
         elif operation in ["modify", "delete"]:
             if room_name not in rooms:
                 print(f"Error: Room '{room_name}' does not exist — returning to menu.")
                 return False
-        
+
         return True
 
     # Adds a room to the config.
@@ -81,7 +78,7 @@ class room():
                 del faculty.room_preferences[room_name]
 
         print(f"Room '{room_name}' deleted successfully.")
-    
+
     # Renames a room in the config.
     # Cascades the rename to course room lists and faculty room preferences.
     # Parameters: config, old_name, new_name
@@ -108,10 +105,7 @@ class room():
 
         # ---- Cascade: Courses ----
         for course in config.config.courses:
-            course.room = [
-                new_name if r == old_name else r
-                for r in course.room
-            ]
+            course.room = [new_name if r == old_name else r for r in course.room]
 
         # ---- Cascade: Faculty Preferences ----
         for faculty in config.config.faculty:
@@ -124,9 +118,9 @@ class room():
     # Prints all rooms in the config.
     # Parameters: config
     def print_rooms(self, config: str):
-        rooms = config.config.rooms 
+        rooms = config.config.rooms
         print("\nRooms:")
-        for room in rooms:            
+        for room in rooms:
             print(f"Name: {room}")
 
     # Returns a list of all room names from the config.
@@ -145,7 +139,7 @@ class room():
 
         room_schedule = {}
 
-        with open(csv_path, newline='') as f:
+        with open(csv_path, newline="") as f:
             for line in f:
                 line = line.strip()
 
@@ -153,26 +147,26 @@ class room():
                 if not line or line.startswith("Schedule"):
                     continue
 
-                parts = [p.strip() for p in line.split(',')]
+                parts = [p.strip() for p in line.split(",")]
 
                 # Expect at least: course_section, faculty, room, lab, and one meeting
                 if len(parts) < 5:
                     continue
 
                 course_section = parts[0]
-                faculty        = parts[1]
-                room_name      = parts[2]
-                lab_name       = parts[3]
-                meetings       = parts[4:]
+                faculty = parts[1]
+                room_name = parts[2]
+                lab_name = parts[3]
+                meetings = parts[4:]
 
-                course_id, _, section = course_section.partition('.')
+                course_id, _, section = course_section.partition(".")
 
                 entry = {
                     "course_id": course_id,
                     "section": section,
                     "faculty": faculty,
                     "lab": lab_name,
-                    "meetings": meetings
+                    "meetings": meetings,
                 }
 
                 if room_name not in room_schedule:

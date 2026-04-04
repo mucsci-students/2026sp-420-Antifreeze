@@ -5,7 +5,7 @@ import pytest
 
 from src.model.schedule.room import room
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 scheduler_stub = types.ModuleType("scheduler")
 scheduler_stub.Scheduler = object
@@ -17,17 +17,18 @@ scheduler_config_stub.CombinedConfig = object
 sys.modules.setdefault("scheduler.config", scheduler_config_stub)
 
 
-
-
 # Mock objects
+
 
 class MockConfig:
     """Lightweight stand-in for the real config object."""
+
     def __init__(self, rooms):
         self.config = self
         self.rooms = list(rooms)
         self.courses = []
         self.faculty = []
+
 
 class MockCourse:
     def __init__(self, rooms):
@@ -37,7 +38,8 @@ class MockCourse:
 class MockFaculty:
     def __init__(self, prefs):
         self.room_preferences = prefs
-        
+
+
 SAMPLE_CSV_CONTENT = """\
 Schedule 1:
 CMSC 140.01,Hardy,Roddy 136,None,MON 09:00-09:50,WED 09:00-10:50,FRI 09:00-09:50
@@ -77,8 +79,8 @@ CMSC 476.01,Zoppetti,Roddy 136,Linux,MON 13:00-13:50,WED 13:00-14:50^,FRI 13:00-
 """
 
 
-
 # Fixtures
+
 
 @pytest.fixture
 def R():
@@ -99,8 +101,8 @@ def sample_schedule(R, sample_csv):
     return R.get_room_schedule(sample_csv)
 
 
-
 # validate_entry — add
+
 
 class TestValidateEntryAdd:
     def test_valid_new_room_returns_true(self, R):
@@ -116,8 +118,8 @@ class TestValidateEntryAdd:
         assert R.validate_entry(cfg, "", "add") is False
 
 
-
 # validate_entry — modify
+
 
 class TestValidateEntryModify:
     def test_existing_room_returns_true(self, R):
@@ -133,8 +135,8 @@ class TestValidateEntryModify:
         assert R.validate_entry(cfg, "", "modify") is False
 
 
-
 # validate_entry — delete
+
 
 class TestValidateEntryDelete:
     def test_existing_room_returns_true(self, R):
@@ -150,8 +152,8 @@ class TestValidateEntryDelete:
         assert R.validate_entry(cfg, "", "delete") is False
 
 
-
 # add_room
+
 
 class TestAddRoom:
     def test_new_room_is_appended(self, R):
@@ -175,8 +177,8 @@ class TestAddRoom:
         assert "" not in cfg.config.rooms
 
 
-
 # delete_room
+
 
 class TestDeleteRoom:
     def test_room_is_removed(self, R):
@@ -199,33 +201,32 @@ class TestDeleteRoom:
         cfg = MockConfig(["Roddy 136", "Roddy 140", "Roddy 147"])
         R.delete_room(cfg, "")  # must not raise
         assert len(cfg.config.rooms) == 3
-    
 
     def test_delete_removes_room_from_courses(self, R):
         cfg = MockConfig(["Roddy 136", "Roddy 140"])
 
         cfg.config.courses = [
             MockCourse(["Roddy 136", "Roddy 140"]),
-            MockCourse(["Roddy 136"])
+            MockCourse(["Roddy 136"]),
         ]
 
         R.delete_room(cfg, "Roddy 136")
 
         assert "Roddy 136" not in cfg.config.courses[0].room
         assert "Roddy 136" not in cfg.config.courses[1].room
-    
+
     def test_delete_removes_room_preferences(self, R):
         cfg = MockConfig(["Roddy 136", "Roddy 140"])
 
-        cfg.config.faculty = [
-            MockFaculty({"Roddy 136": 1, "Roddy 140": 2})
-        ]
+        cfg.config.faculty = [MockFaculty({"Roddy 136": 1, "Roddy 140": 2})]
 
         R.delete_room(cfg, "Roddy 136")
 
         assert "Roddy 136" not in cfg.config.faculty[0].room_preferences
 
+
 # modify_room
+
 
 class TestModifyRoom:
     def test_old_name_is_removed(self, R):
@@ -267,25 +268,21 @@ class TestModifyRoom:
         cfg = MockConfig(["Roddy 136", "Roddy 140", "Roddy 147"])
         R.modify_room(cfg, "", "Roddy 200")
         assert len(cfg.config.rooms) == 3
-    
+
     def test_modify_updates_course_rooms(self, R):
         cfg = MockConfig(["Roddy 136", "Roddy 140"])
 
-        cfg.config.courses = [
-            MockCourse(["Roddy 136"])
-        ]
+        cfg.config.courses = [MockCourse(["Roddy 136"])]
 
         R.modify_room(cfg, "Roddy 136", "Roddy 200")
 
         assert "Roddy 200" in cfg.config.courses[0].room
         assert "Roddy 136" not in cfg.config.courses[0].room
-   
+
     def test_modify_updates_faculty_preferences(self, R):
         cfg = MockConfig(["Roddy 136", "Roddy 140"])
 
-        cfg.config.faculty = [
-            MockFaculty({"Roddy 136": 1})
-        ]
+        cfg.config.faculty = [MockFaculty({"Roddy 136": 1})]
 
         R.modify_room(cfg, "Roddy 136", "Roddy 200")
 
@@ -295,8 +292,8 @@ class TestModifyRoom:
         assert "Roddy 136" not in prefs
 
 
-
 # get_room_ids
+
 
 class TestGetRoomIds:
     def test_returns_a_list(self, R):
@@ -319,7 +316,10 @@ class TestGetRoomIds:
         cfg = MockConfig(["Roddy 136", "Roddy 140", "Roddy 147"])
         ids = R.get_room_ids(cfg)
         ids.append("epic awesome room Dr. Killian give us a 100% please")
-        assert "epic awesome room Dr. Killian give us a 100% please" not in cfg.config.rooms
+        assert (
+            "epic awesome room Dr. Killian give us a 100% please"
+            not in cfg.config.rooms
+        )
 
 
 class TestGetRoomScheduleStructure:
@@ -336,8 +336,8 @@ class TestGetRoomScheduleStructure:
         assert "Roddy 147" in sample_schedule
 
 
-
 # get_room_schedule — Roddy 136 entries
+
 
 class TestGetRoomScheduleRoddy136:
     def test_has_six_entries(self, sample_schedule):
@@ -361,8 +361,8 @@ class TestGetRoomScheduleRoddy136:
         assert "CMSC 152" not in course_ids
 
 
-
 # get_room_schedule — Roddy 140 entries
+
 
 class TestGetRoomScheduleRoddy140:
     def test_has_seven_entries(self, sample_schedule):
@@ -380,8 +380,8 @@ class TestGetRoomScheduleRoddy140:
         assert "CMSC 476" not in course_ids
 
 
-
 # get_room_schedule — Roddy 147 entries
+
 
 class TestGetRoomScheduleRoddy147:
     def test_has_four_entries(self, sample_schedule):
@@ -401,26 +401,32 @@ class TestGetRoomScheduleRoddy147:
         )
 
 
-
 # get_room_schedule — entry field correctness
+
 
 class TestGetRoomScheduleEntryFields:
     @pytest.fixture
     def entry_161_01(self, sample_schedule):
         """Spot-check CMSC 161.01: Zoppetti, Roddy 136, Linux."""
         return next(
-            (e for e in sample_schedule["Roddy 136"]
-             if e["course_id"] == "CMSC 161" and e["section"] == "01"),
-            None
+            (
+                e
+                for e in sample_schedule["Roddy 136"]
+                if e["course_id"] == "CMSC 161" and e["section"] == "01"
+            ),
+            None,
         )
 
     @pytest.fixture
     def entry_140_01(self, sample_schedule):
         """Spot-check CMSC 140.01: Hardy, Roddy 136, None lab."""
         return next(
-            (e for e in sample_schedule["Roddy 136"]
-             if e["course_id"] == "CMSC 140" and e["section"] == "01"),
-            None
+            (
+                e
+                for e in sample_schedule["Roddy 136"]
+                if e["course_id"] == "CMSC 140" and e["section"] == "01"
+            ),
+            None,
         )
 
     def test_entry_161_01_exists(self, entry_161_01):
@@ -457,8 +463,8 @@ class TestGetRoomScheduleEntryFields:
         assert len(entry_140_01["meetings"]) == 3
 
 
-
 # get_room_schedule — edge cases
+
 
 class TestGetRoomScheduleEdgeCases:
     def test_empty_csv_returns_empty_dict(self, R, tmp_path):
@@ -468,18 +474,12 @@ class TestGetRoomScheduleEdgeCases:
 
     def test_single_row_produces_one_room_key(self, R, tmp_path):
         f = tmp_path / "single.csv"
-        f.write_text(
-            "Schedule 1:\n"
-            "CMSC 999.01,Prof,Roddy 200,None,MON 10:00-10:50\n\n"
-        )
+        f.write_text("Schedule 1:\nCMSC 999.01,Prof,Roddy 200,None,MON 10:00-10:50\n\n")
         result = R.get_room_schedule(str(f))
         assert list(result.keys()) == ["Roddy 200"]
 
     def test_single_row_produces_one_entry(self, R, tmp_path):
         f = tmp_path / "single.csv"
-        f.write_text(
-            "Schedule 1:\n"
-            "CMSC 999.01,Prof,Roddy 200,None,MON 10:00-10:50\n\n"
-        )
+        f.write_text("Schedule 1:\nCMSC 999.01,Prof,Roddy 200,None,MON 10:00-10:50\n\n")
         result = R.get_room_schedule(str(f))
         assert len(result["Roddy 200"]) == 1

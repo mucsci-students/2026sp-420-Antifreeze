@@ -5,7 +5,7 @@ import pytest
 
 from src.model.schedule.time_slot_config import time_slot_config
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 scheduler_stub = types.ModuleType("scheduler")
 scheduler_stub.Scheduler = object
@@ -17,11 +17,12 @@ scheduler_config_stub.CombinedConfig = object
 sys.modules.setdefault("scheduler.config", scheduler_config_stub)
 
 
-
 # Mock objects
+
 
 class MockTimeSlotConfig:
     """Stand-in for the time_slot_config section of the real config."""
+
     def __init__(self, times=None, classes=None):
         self.times = times if times is not None else {}
         self.classes = classes if classes is not None else []
@@ -29,11 +30,13 @@ class MockTimeSlotConfig:
 
 class MockConfig:
     """Lightweight stand-in for the top-level config object."""
+
     def __init__(self, times=None, classes=None):
         self.time_slot_config = MockTimeSlotConfig(times, classes)
 
 
 # Helper builders
+
 
 def make_times_config():
     """Returns a MockConfig with realistic time grid data."""
@@ -43,14 +46,14 @@ def make_times_config():
             "TUE": [
                 {"start": "08:00", "spacing": 60, "end": "12:00"},
                 {"start": "13:10", "spacing": 60, "end": "17:10"},
-                {"start": "17:10", "spacing": 30, "end": "19:40"}
+                {"start": "17:10", "spacing": 30, "end": "19:40"},
             ],
             "WED": [{"start": "08:00", "spacing": 60, "end": "19:00"}],
             "THU": [
                 {"start": "08:00", "spacing": 60, "end": "12:00"},
-                {"start": "13:10", "spacing": 60, "end": "17:10"}
+                {"start": "13:10", "spacing": 60, "end": "17:10"},
             ],
-            "FRI": [{"start": "08:00", "spacing": 60, "end": "17:00"}]
+            "FRI": [{"start": "08:00", "spacing": 60, "end": "17:00"}],
         }
     )
 
@@ -64,39 +67,39 @@ def make_classes_config():
                 "meetings": [
                     {"day": "MON", "duration": 50},
                     {"day": "WED", "duration": 50},
-                    {"day": "FRI", "duration": 50}
-                ]
+                    {"day": "FRI", "duration": 50},
+                ],
             },
             {
                 "credits": 3,
                 "meetings": [
                     {"day": "TUE", "duration": 75},
-                    {"day": "THU", "duration": 75}
-                ]
+                    {"day": "THU", "duration": 75},
+                ],
             },
             {
                 "credits": 4,
                 "meetings": [
                     {"day": "MON", "duration": 110, "lab": True},
-                    {"day": "WED", "duration": 110}
+                    {"day": "WED", "duration": 110},
                 ],
-                "start_time": "16:00"
+                "start_time": "16:00",
             },
             {
                 "credits": 4,
                 "meetings": [
                     {"day": "TUE", "duration": 110, "lab": True},
-                    {"day": "THU", "duration": 110}
-                ]
+                    {"day": "THU", "duration": 110},
+                ],
             },
             {
                 "credits": 4,
                 "meetings": [
                     {"day": "MON", "duration": 110, "lab": True},
-                    {"day": "FRI", "duration": 110}
+                    {"day": "FRI", "duration": 110},
                 ],
-                "disabled": True
-            }
+                "disabled": True,
+            },
         ]
     )
 
@@ -109,6 +112,7 @@ def make_full_config():
 
 
 # Fixtures
+
 
 @pytest.fixture
 def T():
@@ -130,8 +134,7 @@ def full_cfg():
     return make_full_config()
 
 
-
-# validate_time_entry — add 
+# validate_time_entry — add
 
 
 class TestValidateTimeEntryAdd:
@@ -149,7 +152,6 @@ class TestValidateTimeEntryAdd:
         assert T.validate_time_entry(times_cfg, "mon", "add") is True
 
 
-
 # validate_time_entry — modify
 
 
@@ -161,10 +163,14 @@ class TestValidateTimeEntryModify:
         assert T.validate_time_entry(times_cfg, "MON", "modify", range_index=5) is False
 
     def test_negative_index_returns_false(self, T, times_cfg):
-        assert T.validate_time_entry(times_cfg, "MON", "modify", range_index=-1) is False
+        assert (
+            T.validate_time_entry(times_cfg, "MON", "modify", range_index=-1) is False
+        )
 
     def test_missing_index_returns_false(self, T, times_cfg):
-        assert T.validate_time_entry(times_cfg, "MON", "modify", range_index=None) is False
+        assert (
+            T.validate_time_entry(times_cfg, "MON", "modify", range_index=None) is False
+        )
 
     def test_empty_day_list_returns_false(self, T):
         cfg = MockConfig(times={"MON": []})
@@ -174,8 +180,7 @@ class TestValidateTimeEntryModify:
         assert T.validate_time_entry(times_cfg, "SUN", "modify", range_index=0) is False
 
 
-
-#validate_time_entry — delete
+# validate_time_entry — delete
 
 
 class TestValidateTimeEntryDelete:
@@ -183,13 +188,19 @@ class TestValidateTimeEntryDelete:
         assert T.validate_time_entry(times_cfg, "TUE", "delete", range_index=1) is True
 
     def test_out_of_bounds_index_returns_false(self, T, times_cfg):
-        assert T.validate_time_entry(times_cfg, "TUE", "delete", range_index=10) is False
+        assert (
+            T.validate_time_entry(times_cfg, "TUE", "delete", range_index=10) is False
+        )
 
     def test_missing_index_returns_false(self, T, times_cfg):
-        assert T.validate_time_entry(times_cfg, "TUE", "delete", range_index=None) is False
+        assert (
+            T.validate_time_entry(times_cfg, "TUE", "delete", range_index=None) is False
+        )
 
     def test_day_not_in_times_returns_false(self, T):
-        cfg = MockConfig(times={"MON": [{"start": "08:00", "spacing": 60, "end": "12:00"}]})
+        cfg = MockConfig(
+            times={"MON": [{"start": "08:00", "spacing": 60, "end": "12:00"}]}
+        )
         assert T.validate_time_entry(cfg, "FRI", "delete", range_index=0) is False
 
 
@@ -227,8 +238,7 @@ class TestAddTime:
         assert "FRI" in cfg.time_slot_config.times
 
 
-
-#modify_time
+# modify_time
 
 
 class TestModifyTime:
@@ -248,7 +258,9 @@ class TestModifyTime:
         assert times_cfg.time_slot_config.times["TUE"][0] == original_first
 
     def test_nonexistent_day_makes_no_change(self, T):
-        cfg = MockConfig(times={"MON": [{"start": "08:00", "spacing": 60, "end": "12:00"}]})
+        cfg = MockConfig(
+            times={"MON": [{"start": "08:00", "spacing": 60, "end": "12:00"}]}
+        )
         T.modify_time(cfg, "FRI", 0, "09:00", 30, "11:00")
         # FRI not present — MON should be untouched
         assert cfg.time_slot_config.times["MON"][0]["start"] == "08:00"
@@ -278,7 +290,9 @@ class TestDeleteTime:
         assert times_cfg.time_slot_config.times["MON"] == []
 
     def test_nonexistent_day_makes_no_change(self, T):
-        cfg = MockConfig(times={"MON": [{"start": "08:00", "spacing": 60, "end": "12:00"}]})
+        cfg = MockConfig(
+            times={"MON": [{"start": "08:00", "spacing": 60, "end": "12:00"}]}
+        )
         T.delete_time(cfg, "FRI", 0)
         assert len(cfg.time_slot_config.times["MON"]) == 1
 
@@ -310,44 +324,69 @@ class TestGetTimes:
         assert len(T.get_times(times_cfg)["MON"]) == 1
 
 
-
 # validate_class_entry — add
- 
+
 
 class TestValidateClassEntryAdd:
     def test_valid_add_returns_true(self, T, classes_cfg):
         meetings = [{"day": "MON", "duration": 50}, {"day": "WED", "duration": 50}]
-        assert T.validate_class_entry(classes_cfg, "add", credits=3, meetings=meetings) is True
+        assert (
+            T.validate_class_entry(classes_cfg, "add", credits=3, meetings=meetings)
+            is True
+        )
 
     def test_zero_credits_returns_false(self, T, classes_cfg):
         meetings = [{"day": "MON", "duration": 50}]
-        assert T.validate_class_entry(classes_cfg, "add", credits=0, meetings=meetings) is False
+        assert (
+            T.validate_class_entry(classes_cfg, "add", credits=0, meetings=meetings)
+            is False
+        )
 
     def test_negative_credits_returns_false(self, T, classes_cfg):
         meetings = [{"day": "MON", "duration": 50}]
-        assert T.validate_class_entry(classes_cfg, "add", credits=-1, meetings=meetings) is False
+        assert (
+            T.validate_class_entry(classes_cfg, "add", credits=-1, meetings=meetings)
+            is False
+        )
 
     def test_none_credits_returns_false(self, T, classes_cfg):
         meetings = [{"day": "MON", "duration": 50}]
-        assert T.validate_class_entry(classes_cfg, "add", credits=None, meetings=meetings) is False
+        assert (
+            T.validate_class_entry(classes_cfg, "add", credits=None, meetings=meetings)
+            is False
+        )
 
     def test_empty_meetings_returns_false(self, T, classes_cfg):
-        assert T.validate_class_entry(classes_cfg, "add", credits=3, meetings=[]) is False
+        assert (
+            T.validate_class_entry(classes_cfg, "add", credits=3, meetings=[]) is False
+        )
 
     def test_none_meetings_returns_false(self, T, classes_cfg):
-        assert T.validate_class_entry(classes_cfg, "add", credits=3, meetings=None) is False
+        assert (
+            T.validate_class_entry(classes_cfg, "add", credits=3, meetings=None)
+            is False
+        )
 
     def test_invalid_day_in_meeting_returns_false(self, T, classes_cfg):
         meetings = [{"day": "SUN", "duration": 50}]
-        assert T.validate_class_entry(classes_cfg, "add", credits=3, meetings=meetings) is False
+        assert (
+            T.validate_class_entry(classes_cfg, "add", credits=3, meetings=meetings)
+            is False
+        )
 
     def test_zero_duration_returns_false(self, T, classes_cfg):
         meetings = [{"day": "MON", "duration": 0}]
-        assert T.validate_class_entry(classes_cfg, "add", credits=3, meetings=meetings) is False
+        assert (
+            T.validate_class_entry(classes_cfg, "add", credits=3, meetings=meetings)
+            is False
+        )
 
     def test_negative_duration_returns_false(self, T, classes_cfg):
         meetings = [{"day": "MON", "duration": -10}]
-        assert T.validate_class_entry(classes_cfg, "add", credits=3, meetings=meetings) is False
+        assert (
+            T.validate_class_entry(classes_cfg, "add", credits=3, meetings=meetings)
+            is False
+        )
 
 
 # validate_class_entry — modify / delete
@@ -372,7 +411,6 @@ class TestValidateClassEntryModifyDelete:
     def test_empty_classes_list_returns_false(self, T):
         cfg = MockConfig(classes=[])
         assert T.validate_class_entry(cfg, "delete", class_index=0) is False
-
 
 
 # add_class
@@ -428,7 +466,7 @@ class TestAddClass:
         assert len(cfg.time_slot_config.classes) == 1
 
 
-#modify_class
+# modify_class
 
 
 class TestModifyClass:
@@ -476,7 +514,6 @@ class TestModifyClass:
         assert classes_cfg.time_slot_config.classes == original
 
 
-
 # delete_class
 
 
@@ -493,7 +530,9 @@ class TestDeleteClass:
         assert first["meetings"][0]["day"] == "TUE"
 
     def test_deleting_last_entry_leaves_empty_list(self, T):
-        cfg = MockConfig(classes=[{"credits": 3, "meetings": [{"day": "MON", "duration": 50}]}])
+        cfg = MockConfig(
+            classes=[{"credits": 3, "meetings": [{"day": "MON", "duration": 50}]}]
+        )
         T.delete_class(cfg, 0)
         assert cfg.time_slot_config.classes == []
 
@@ -506,7 +545,6 @@ class TestDeleteClass:
         initial = len(classes_cfg.time_slot_config.classes)
         T.delete_class(classes_cfg, -1)
         assert len(classes_cfg.time_slot_config.classes) == initial
-
 
 
 # get_classes
@@ -536,7 +574,6 @@ class TestGetClasses:
     def test_start_time_entry_has_start_time_key(self, T, classes_cfg):
         # Index 2 has start_time
         assert T.get_classes(classes_cfg)[2].get("start_time") == "16:00"
-
 
 
 # Integration: add then delete, modify then get

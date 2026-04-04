@@ -1,6 +1,7 @@
 from controller.modifyConfig.utilsCLI import prompt
 import re
 
+
 def modTimeSlot(sched):
     try:
         print("Re-enter full Time Slot Configuration")
@@ -61,11 +62,7 @@ def modTimeSlot(sched):
                     print("Time block overlaps an existing block for this day.")
                     continue
 
-                block = {
-                    "start": start,
-                    "spacing": spacing,
-                    "end": end
-                }
+                block = {"start": start, "spacing": spacing, "end": end}
 
                 blocks.append(block)
                 print(f"Current {day} blocks: {blocks}")
@@ -113,20 +110,14 @@ def modTimeSlot(sched):
                     print("Enter 'y' or 'n'.")
                     continue
 
-                meeting = {
-                    "day": day,
-                    "duration": duration
-                }
+                meeting = {"day": day, "duration": duration}
                 if lab == "y":
                     meeting["lab"] = True
 
                 meetings.append(meeting)
                 print(f"Current meetings: {meetings}")
 
-            entry = {
-                "credits": credits,
-                "meetings": meetings
-            }
+            entry = {"credits": credits, "meetings": meetings}
 
             start_time = prompt("Fixed start time (HH:MM) or 'd'\n==> ")
             if start_time != "d":
@@ -143,10 +134,7 @@ def modTimeSlot(sched):
             print(f"Current class patterns: {classes}")
 
         # ---------- ASSIGN ----------
-        sched.config.time_slot_config = {
-            "times": times,
-            "classes": classes
-        }
+        sched.config.time_slot_config = {"times": times, "classes": classes}
 
         print("\nTime slot configuration updated.")
 

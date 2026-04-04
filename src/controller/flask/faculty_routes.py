@@ -7,11 +7,15 @@ def _friendly_faculty_error(e):
     fall back to str(e) for any other exception."""
     msg = str(e)
     # Mandatory-days mismatch: extract just the day list from the pydantic message
-    m = re.search(r"Mandatory days \[([^\]]+)\] must be present in the availability times", msg)
+    m = re.search(
+        r"Mandatory days \[([^\]]+)\] must be present in the availability times", msg
+    )
     if m:
         missing = m.group(1)
-        return (f"Mandatory day(s) {missing} must have a time slot set. "
-                f"Please add an availability time for each mandatory day.")
+        return (
+            f"Mandatory day(s) {missing} must have a time slot set. "
+            f"Please add an availability time for each mandatory day."
+        )
     return msg
 
 
@@ -26,18 +30,29 @@ def register_faculty_routes(app, scheduler):
 
         try:
             for f in scheduler.config.config.faculty:
-                faculty_list.append({
-                    "name": f.name,
-                    "maximum_credits": f.maximum_credits,
-                    "minimum_credits": f.minimum_credits,
-                    "unique_course_limit": f.unique_course_limit,
-                    "maximum_days": f.maximum_days,
-                    "times": {str(day): [str(t) for t in times] for day, times in f.times.items()},
-                    "course_preferences": {str(k): v for k, v in f.course_preferences.items()},
-                    "room_preferences": {str(k): v for k, v in f.room_preferences.items()},
-                    "lab_preferences": {str(k): v for k, v in f.lab_preferences.items()},
-                    "mandatory_days": [str(d) for d in f.mandatory_days],
-                })
+                faculty_list.append(
+                    {
+                        "name": f.name,
+                        "maximum_credits": f.maximum_credits,
+                        "minimum_credits": f.minimum_credits,
+                        "unique_course_limit": f.unique_course_limit,
+                        "maximum_days": f.maximum_days,
+                        "times": {
+                            str(day): [str(t) for t in times]
+                            for day, times in f.times.items()
+                        },
+                        "course_preferences": {
+                            str(k): v for k, v in f.course_preferences.items()
+                        },
+                        "room_preferences": {
+                            str(k): v for k, v in f.room_preferences.items()
+                        },
+                        "lab_preferences": {
+                            str(k): v for k, v in f.lab_preferences.items()
+                        },
+                        "mandatory_days": [str(d) for d in f.mandatory_days],
+                    }
+                )
 
             return jsonify(faculty_list)
 
@@ -83,7 +98,7 @@ def register_faculty_routes(app, scheduler):
                 data["course_preferences"],
                 data["room_preferences"],
                 data["lab_preferences"],
-                set(data["mandatory_days"])
+                set(data["mandatory_days"]),
             )
 
             return jsonify({"status": "added"})
@@ -110,7 +125,11 @@ def register_faculty_routes(app, scheduler):
                     break
 
             if target is None:
-                return jsonify({"error": f'"{name}" was not found. Please check the name and try again.'}), 404
+                return jsonify(
+                    {
+                        "error": f'"{name}" was not found. Please check the name and try again.'
+                    }
+                ), 404
 
             scheduler.faculty.delete_faculty(scheduler.config, name)
 
@@ -136,7 +155,11 @@ def register_faculty_routes(app, scheduler):
                     break
 
             if target is None:
-                return jsonify({"error": f'"{name}" was not found. Please check the name and try again.'}), 404
+                return jsonify(
+                    {
+                        "error": f'"{name}" was not found. Please check the name and try again.'
+                    }
+                ), 404
 
             new_name = data.get("name", name)
 
@@ -144,7 +167,11 @@ def register_faculty_routes(app, scheduler):
             if new_name.upper() != name.upper():
                 for prof in fac_list:
                     if prof.name.upper() == new_name.upper():
-                        return jsonify({"error": f'"{new_name}" already exists. Choose a different name.'}), 409
+                        return jsonify(
+                            {
+                                "error": f'"{new_name}" already exists. Choose a different name.'
+                            }
+                        ), 409
 
             scheduler.faculty.modify_faculty(
                 scheduler.config,
@@ -158,7 +185,7 @@ def register_faculty_routes(app, scheduler):
                 data["course_preferences"],
                 data["room_preferences"],
                 data["lab_preferences"],
-                set(data["mandatory_days"])
+                set(data["mandatory_days"]),
             )
 
             return jsonify({"status": "modified"})
@@ -177,13 +204,15 @@ def register_faculty_routes(app, scheduler):
         try:
             for f in scheduler.config.config.faculty:
                 if f.name.upper() == name.upper():
-                    return jsonify({
-                        "name": f.name,
-                        "maximum_credits": f.maximum_credits,
-                        "maximum_days": f.maximum_days,
-                        "minimum_credits": f.minimum_credits,
-                        "unique_course_limit": f.unique_course_limit
-                    })
+                    return jsonify(
+                        {
+                            "name": f.name,
+                            "maximum_credits": f.maximum_credits,
+                            "maximum_days": f.maximum_days,
+                            "minimum_credits": f.minimum_credits,
+                            "unique_course_limit": f.unique_course_limit,
+                        }
+                    )
 
             return jsonify({"error": "Faculty not found"}), 404
 

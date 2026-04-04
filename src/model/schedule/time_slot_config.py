@@ -1,20 +1,14 @@
-
-
 # Manages time slot configuration entries in the scheduler configuration.
 # Covers two sub-sections:
 #   - times:   per-day time grids  (start, spacing, end)
 #   - classes: meeting patterns    (credits, meetings, start_time, disabled)
-class time_slot_config():
-
+class time_slot_config:
     VALID_DAYS = {"MON", "TUE", "WED", "THU", "FRI"}
 
     # Initializes time_slot_config subclass.
     def __init__(self):
         return
 
- 
-    
- 
     # TIME-GRID HELPERS
     # Validates a time-grid entry based on operation type.
     # For 'add': fails if the exact (start, spacing, end) range already
@@ -24,12 +18,15 @@ class time_slot_config():
     # Parameters: config, day (e.g. "MON"), operation ('add'/'modify'/'delete'),
     #             range_index (int, required for modify/delete)
     # Returns: True if validation passes, False otherwise
-    def validate_time_entry(self, config, day: str, operation: str,
-                            range_index: int = None) -> bool:
+    def validate_time_entry(
+        self, config, day: str, operation: str, range_index: int = None
+    ) -> bool:
         day = day.upper()
 
         if day not in self.VALID_DAYS:
-            print(f"Error: '{day}' is not a valid day — expected one of {sorted(self.VALID_DAYS)}.")
+            print(
+                f"Error: '{day}' is not a valid day — expected one of {sorted(self.VALID_DAYS)}."
+            )
             return False
 
         times = config.time_slot_config.times
@@ -48,8 +45,10 @@ class time_slot_config():
                 return False
 
             if range_index < 0 or range_index >= len(times[day]):
-                print(f"Error: Range index {range_index} is out of bounds for '{day}' "
-                      f"(0–{len(times[day]) - 1}).")
+                print(
+                    f"Error: Range index {range_index} is out of bounds for '{day}' "
+                    f"(0–{len(times[day]) - 1})."
+                )
                 return False
 
         return True
@@ -77,10 +76,14 @@ class time_slot_config():
             return obj.get(key) if isinstance(obj, dict) else getattr(obj, key, None)
 
         for existing in times[day]:
-            if (_field(existing, "start") == start and
-                    _field(existing, "spacing") == spacing and
-                    _field(existing, "end") == end):
-                print(f"Identical time range already exists for '{day}' — no change made.")
+            if (
+                _field(existing, "start") == start
+                and _field(existing, "spacing") == spacing
+                and _field(existing, "end") == end
+            ):
+                print(
+                    f"Identical time range already exists for '{day}' — no change made."
+                )
                 return
 
         times[day].append(new_range)
@@ -89,8 +92,9 @@ class time_slot_config():
     # Modifies an existing time range for a day by index.
     # Parameters: config, day (e.g. "MON"), range_index (int),
     #             start (str "HH:MM"), spacing (int minutes), end (str "HH:MM")
-    def modify_time(self, config, day: str, range_index: int,
-                    start: str, spacing: int, end: str):
+    def modify_time(
+        self, config, day: str, range_index: int, start: str, spacing: int, end: str
+    ):
         day = day.upper()
         times = config.time_slot_config.times
 
@@ -99,8 +103,10 @@ class time_slot_config():
             return
 
         times[day][range_index] = {"start": start, "spacing": spacing, "end": end}
-        print(f"Time range at index {range_index} for {day} updated to {start}–{end} "
-              f"(spacing {spacing} min).")
+        print(
+            f"Time range at index {range_index} for {day} updated to {start}–{end} "
+            f"(spacing {spacing} min)."
+        )
 
     # Deletes a time range from a day by index.
     # Parameters: config, day (e.g. "MON"), range_index (int)
@@ -113,8 +119,16 @@ class time_slot_config():
             return
 
         removed = times[day].pop(range_index)
-        r_start = removed.get("start") if isinstance(removed, dict) else getattr(removed, "start", "?")
-        r_end   = removed.get("end")   if isinstance(removed, dict) else getattr(removed, "end",   "?")
+        r_start = (
+            removed.get("start")
+            if isinstance(removed, dict)
+            else getattr(removed, "start", "?")
+        )
+        r_end = (
+            removed.get("end")
+            if isinstance(removed, dict)
+            else getattr(removed, "end", "?")
+        )
         print(f"Time range {r_start}–{r_end} removed from {day}.")
 
     # Prints all time ranges for every day.
@@ -139,10 +153,7 @@ class time_slot_config():
     def get_times(self, config) -> dict:
         return config.time_slot_config.times
 
-  
-    
-
-    #CLASS-PATTERN HELPERS
+    # CLASS-PATTERN HELPERS
     # Validates a class-pattern entry based on operation type.
     # For 'add': basic sanity checks only (credits > 0, meetings non-empty).
     # For 'modify' or 'delete': fails if class_index is out of range.
@@ -151,10 +162,14 @@ class time_slot_config():
     #             credits (int, used for add validation),
     #             meetings (list, used for add validation)
     # Returns: True if validation passes, False otherwise
-    def validate_class_entry(self, config, operation: str,
-                             class_index: int = None,
-                             credits: int = None,
-                             meetings: list = None) -> bool:
+    def validate_class_entry(
+        self,
+        config,
+        operation: str,
+        class_index: int = None,
+        credits: int = None,
+        meetings: list = None,
+    ) -> bool:
         classes = config.time_slot_config.classes
 
         if operation == "add":
@@ -179,8 +194,10 @@ class time_slot_config():
                 print("Error: A class index is required for modify/delete.")
                 return False
             if class_index < 0 or class_index >= len(classes):
-                print(f"Error: Class index {class_index} is out of bounds "
-                      f"(0–{len(classes) - 1}).")
+                print(
+                    f"Error: Class index {class_index} is out of bounds "
+                    f"(0–{len(classes) - 1})."
+                )
                 return False
             return True
 
@@ -191,8 +208,14 @@ class time_slot_config():
     #             meetings (list of dicts with day, duration, and optional lab bool),
     #             start_time (str "HH:MM", optional),
     #             disabled (bool, optional — defaults to False)
-    def add_class(self, config, credits: int, meetings: list,
-                  start_time: str = None, disabled: bool = False):
+    def add_class(
+        self,
+        config,
+        credits: int,
+        meetings: list,
+        start_time: str = None,
+        disabled: bool = False,
+    ):
         classes = config.time_slot_config.classes
 
         new_class = {"credits": credits, "meetings": meetings}
@@ -211,9 +234,15 @@ class time_slot_config():
     # Parameters: config, class_index (int), credits (int),
     #             meetings (list of dicts), start_time (str or None),
     #             disabled (bool)
-    def modify_class(self, config, class_index: int, credits: int,
-                     meetings: list, start_time: str = None,
-                     disabled: bool = False):
+    def modify_class(
+        self,
+        config,
+        class_index: int,
+        credits: int,
+        meetings: list,
+        start_time: str = None,
+        disabled: bool = False,
+    ):
         classes = config.time_slot_config.classes
 
         if class_index < 0 or class_index >= len(classes):
@@ -242,7 +271,9 @@ class time_slot_config():
 
         removed = classes.pop(class_index)
         days = ", ".join(m.get("day", "?") for m in removed.get("meetings", []))
-        print(f"Class pattern removed ({removed.get('credits', '?')} credits, met {days}).")
+        print(
+            f"Class pattern removed ({removed.get('credits', '?')} credits, met {days})."
+        )
 
     # Prints all class meeting patterns in the config.
     # Parameters: config
@@ -250,8 +281,12 @@ class time_slot_config():
         classes = config.time_slot_config.classes
         print("\nClass Meeting Patterns:")
         for i, cls in enumerate(classes):
-            credits = cls.get("credits", cls.credits if hasattr(cls, "credits") else "?")
-            meetings = cls.get("meetings", cls.meetings if hasattr(cls, "meetings") else [])
+            credits = cls.get(
+                "credits", cls.credits if hasattr(cls, "credits") else "?"
+            )
+            meetings = cls.get(
+                "meetings", cls.meetings if hasattr(cls, "meetings") else []
+            )
             start_time = cls.get("start_time", getattr(cls, "start_time", None))
             disabled = cls.get("disabled", getattr(cls, "disabled", False))
 
@@ -278,9 +313,6 @@ class time_slot_config():
     def get_classes(self, config) -> list:
         return config.time_slot_config.classes
 
-
- 
-  
     # CONVENIENCE / PRINT ALL
     # Prints the full time slot configuration (times + classes).
     # Parameters: config
