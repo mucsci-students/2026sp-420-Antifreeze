@@ -435,6 +435,7 @@ main {
 .navigator {
   display: block;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* ----- Fields Display ----- */
@@ -448,6 +449,7 @@ main {
   border-bottom-color: #1394d1;
   border-right-color: #1394d1;
   width: 98%;
+  height: 20px;
   color: white;
   padding-left: 10px;
   padding-top: 2px;
@@ -529,12 +531,20 @@ footer#config-name {
   border-bottom-color: #ffffff;
   border-right-color: #ffffff;
   border-width: 2px;
-  border-left: 4px solid #808080;
+  border-left: 3px solid #808080;
   box-sizing: border-box;
-  opacity: 1;
 }
 
 /* ----- Chat Side Panel ----- */
+#chat-toggle {
+  display: block;
+  text-align: center;
+  align-content: center;
+  background-position: center;
+  margin-right: 30px;
+  width: 45px;
+}
+
 #main-container {
   display: flex;
   align-items: stretch;
@@ -606,6 +616,9 @@ footer#config-name {
   border: none;
   padding: 6px 10px;
   background-color: #e6e6e6;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 9px;
 }
 
 .chat-msg {
@@ -613,18 +626,23 @@ footer#config-name {
 }
 
 .chat-user {
-  color: #2EA0D6;
+  color: #484848;
 }
 
 .chat-ai {
-  color: #2BB971;
+  color: #2bb971;
 }
 
 /* ----- Navigator List Items ----- */
 .navigator-list {
   list-style: none;
   margin: 6px 0;
-  padding: 0;
+  padding-left: 10px;
+}
+
+.navigator-section-header {
+  font-weight: bold;
+  padding-top: 8px;
 }
 
 .navigator-item {
@@ -655,6 +673,26 @@ main.schedule-view-expanded .navigator {
 }
 
 /* ----- Schedule Calendar View ----- */
+#schedule-load-btn {
+  border: outset;
+  border-top-color: #eeeeee;
+  border-left-color: #eeeeee;
+  border-bottom-color: #bbbbbb;
+  border-right-color: #bbbbbb;
+  border-width: 3px;
+  margin-top: 0;
+}
+
+#schedule-load-btn:hover {
+  color: #808080;
+  text-shadow: -1px -1px #ffffff;
+  border: inset;
+  border-top-color: #bbbbbb;
+  border-left-color: #bbbbbb;
+  border-bottom-color: #eeeeee;
+  border-right-color: #eeeeee;
+}
+
 .schedule-control-row {
   display: flex;
   align-items: center;
