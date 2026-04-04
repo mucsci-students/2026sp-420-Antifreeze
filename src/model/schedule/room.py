@@ -1,8 +1,3 @@
-from scheduler import (
-    Scheduler,
-    load_config_from_file,
-)
-from scheduler.config import CombinedConfig
 
 
 # Manages room entries in the scheduler configuration.
@@ -147,7 +142,6 @@ class room():
     # Parameters: csv_path - path to the CSV schedule file
     # Returns: Dict mapping room name (str) to list of course info dicts
     def get_room_schedule(self, csv_path: str) -> dict[str, list[dict]]:
-        import csv
 
         room_schedule = {}
 

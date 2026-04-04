@@ -1,4 +1,4 @@
-from controller.modifyConfig.utilsCLI import prompt, end_prog
+from controller.modifyConfig.utilsCLI import end_prog
 from controller.modifyConfig import modLab, modRoom, modCourse, modConflict, modFaculty
 
 def print_config_menu():

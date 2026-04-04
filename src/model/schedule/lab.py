@@ -1,8 +1,3 @@
-from scheduler import (
-    Scheduler,
-    load_config_from_file,
-)
-from scheduler.config import CombinedConfig
 
 
 # Manages lab entries in the scheduler configuration.
@@ -138,7 +133,6 @@ class lab():
     # Parameters: csv_path - path to the CSV schedule file
     # Returns: Dict mapping lab name (str) to list of course info dicts
     def get_lab_schedule(self, csv_path: str) -> dict[str, list[dict]]:
-        import csv
 
         lab_schedule = {}
 

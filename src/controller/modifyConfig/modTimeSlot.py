@@ -1,4 +1,4 @@
-from controller.modifyConfig.utilsCLI import prompt, endProg
+from controller.modifyConfig.utilsCLI import prompt
 import re
 
 def modTimeSlot(sched):

@@ -1,4 +1,3 @@
-from model.schedule import schedule
 from controller.modifyConfig import configCli
 from controller.modifyConfig.utilsCLI import end_prog
 

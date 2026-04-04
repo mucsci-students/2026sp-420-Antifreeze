@@ -1,16 +1,4 @@
-from scheduler import (
-    Scheduler,
-    load_config_from_file,
-    FacultyConfig,
-    Faculty,
-    Day,
-    TimeRange,
-    Course,
-    Preference,
-    Room,
-    Lab
-)
-from scheduler.config import CombinedConfig, CourseConfig
+from scheduler.config import CourseConfig
 import csv
 
 
@@ -28,7 +16,7 @@ class course():
     def validate_entry(self, config, course_id: str, operation: str) -> bool:
         
         if not course_id.strip():
-            print(f"Error: Course ID cannot be empty.")
+            print("Error: Course ID cannot be empty.")
             return False
         
         courses = [c.course_id.upper() for c in config.config.courses]

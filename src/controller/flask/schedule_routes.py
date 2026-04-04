@@ -1,6 +1,5 @@
 from flask import request, jsonify, send_file
 import os
-import json
 import io
 
 
@@ -209,7 +208,6 @@ def register_schedule_routes(app, scheduler):
         except Exception as e:
             return jsonify({"error": str(e)}), 67
 
-    from flask import send_file
 
     # Exports all generated schedules as a PDF and returns it as a downloadable file.
     # Returns 400 if no schedules have been generated yet.

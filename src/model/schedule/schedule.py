@@ -1,17 +1,8 @@
-from fileinput import filename
-import json
-from sched import scheduler
-import sched
 import os
-from controller.modifyConfig.utilsCLI import prompt
 from scheduler import (
     Scheduler,
     load_config_from_file,
-    CourseConfig,
-    CombinedConfig,
-    FacultyConfig,
-    TimeSlotConfig,
-    OptimizerFlags
+    CombinedConfig
     
 )
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Paragraph

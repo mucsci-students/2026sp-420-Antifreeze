@@ -56,8 +56,8 @@ def register_lab_routes(app, scheduler):
             # cascade removal from courses
             for course in scheduler.config.config.courses:
                 course.lab = [
-                    l for l in course.lab
-                    if l != lab_name
+                    lab for lab in course.lab
+                    if lab != lab_name
                 ]
 
             print(f"Lab '{lab_name}' deleted successfully.")
@@ -90,8 +90,8 @@ def register_lab_routes(app, scheduler):
             # cascade rename in courses
             for course in scheduler.config.config.courses:
                 course.lab = [
-                    new_name if l == lab_name else l
-                    for l in course.lab
+                    new_name if lab == lab_name else lab
+                    for lab in course.lab
                 ]
 
             return jsonify({"status": "modified"})
