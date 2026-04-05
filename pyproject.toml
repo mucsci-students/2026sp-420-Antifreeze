@@ -10,6 +10,8 @@ dependencies = [
     "langchain>=1.2.15",
     "pytest>=9.0.2",
     "reportlab>=4.0",
+    "ruff>=0.15.9",
+    "ty>=0.0.28",
 ]
 
 [dependency-groups]
