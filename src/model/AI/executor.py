@@ -1,3 +1,5 @@
+from typing import Any
+
 # -------------------------
 # HELPERS (ADD AT TOP)
 # -------------------------
@@ -460,7 +462,7 @@ def _ts_serialize_class(cls):
         meetings = getattr(cls, "meetings", [])
         start_time = getattr(cls, "start_time", None)
         disabled = getattr(cls, "disabled", False)
-    result = {
+    result: dict[str, Any] = {
         "credits": int(credits),
         "meetings": [_ts_serialize_meeting(m) for m in meetings],
         "disabled": bool(disabled),
