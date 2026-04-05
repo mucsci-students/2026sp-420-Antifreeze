@@ -2,7 +2,7 @@ from controller.modifyConfig.utilsCLI import prompt
 import re
 
 
-def modTimeSlot(sched):
+def mod_time_slot(sched):
     try:
         print("Re-enter full Time Slot Configuration")
         print("Press r and enter at any time to return.\n")

@@ -39,7 +39,6 @@ from model.AI.executor import delete_room
 
 # Schedule imports
 from model.AI.executor import run_scheduler
-from model.AI.executor import get_schedule
 from model.AI.executor import open_schedule_tool
 
 # Time slot and range imports
@@ -251,8 +250,8 @@ def run_scheduler_tool(limit, optimize):
     return run_scheduler(_scheduler, limit, optimize)
 
 
-def get_schedule_tool(index):
-    return get_schedule(_scheduler, index)
+# def get_schedule_tool(index):
+#     return get_schedule(_scheduler, index)
 
 
 # -------------------------
