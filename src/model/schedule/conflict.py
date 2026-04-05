@@ -1,3 +1,6 @@
+from scheduler import CombinedConfig
+
+
 # Manages course conflict entries in the scheduler configuration.
 class conflict:
     # Initializes conflict subclass.
@@ -13,10 +16,10 @@ class conflict:
     # Returns: True if validation passes, False otherwise
     def validate_entry(
         self,
-        config: str,
+        config: "CombinedConfig",
         course_id: str,
         operation: str,
-        conflicting_course_id: str = None,
+        conflicting_course_id: str | None = None,
     ) -> bool:
         courses = config.config.courses
 
@@ -49,14 +52,17 @@ class conflict:
                 return False
 
             if operation == "add":
-                if conflicting_course_id in target_course.conflicts:
+                if target_course and conflicting_course_id in target_course.conflicts:
                     print(
                         f"Error: Conflict already exists between '{course_id}' and '{conflicting_course_id}' — returning to menu."
                     )
                     return False
 
             elif operation in ["modify", "delete"]:
-                if conflicting_course_id not in target_course.conflicts:
+                if (
+                    target_course
+                    and conflicting_course_id not in target_course.conflicts
+                ):
                     print(
                         f"Error: Conflict not found between '{course_id}' and '{conflicting_course_id}' — returning to menu."
                     )
@@ -68,7 +74,9 @@ class conflict:
     # Note: unidirectional — call twice for bidirectional conflicts.
     # Parameters: config, course_id, conflicting_course_id
     # Example: add_conflict(config, "CMSC 140", "CMSC 161")
-    def add_conflict(self, config: str, course_id: str, conflicting_course_id: str):
+    def add_conflict(
+        self, config: "CombinedConfig", course_id: str, conflicting_course_id: str
+    ):
 
         # Reference to courses list inside database
         courses = config.config.courses
@@ -99,7 +107,9 @@ class conflict:
     # Removes a conflict between two courses.
     # Parameters: config, course_id, conflicting_course_id
     # Example: delete_conflict(config, "CMSC 140", "CMSC 161")
-    def delete_conflict(self, config: str, course_id: str, conflicting_course_id: str):
+    def delete_conflict(
+        self, config: "CombinedConfig", course_id: str, conflicting_course_id: str
+    ):
 
         # Reference to courses list inside database
         courses = config.config.courses
@@ -132,7 +142,7 @@ class conflict:
     # Example: modify_conflict(config, "CMSC 140", "CMSC 161", "CMSC 162")
     def modify_conflict(
         self,
-        config: str,
+        config: "CombinedConfig",
         course_id: str,
         old_conflicting_course_id: str,
         new_conflicting_course_id: str,
@@ -174,7 +184,7 @@ class conflict:
 
     # Prints all course conflicts in the config.
     # Parameters: config
-    def print_conflicts(self, config: str):
+    def print_conflicts(self, config: "CombinedConfig"):
         courses = config.config.courses
         print("\nCourse Conflicts:")
         for course in courses:

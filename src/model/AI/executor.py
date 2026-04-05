@@ -515,7 +515,7 @@ def add_class_pattern(
     scheduler,
     credits: int,
     meetings: list,
-    start_time: str = None,
+    start_time: str | None = None,
     disabled: bool = False,
 ):
     if not scheduler.time_slot.validate_class_entry(
@@ -533,7 +533,7 @@ def modify_class_pattern(
     index: int,
     credits: int,
     meetings: list,
-    start_time: str = None,
+    start_time: str | None = None,
     disabled: bool = False,
 ):
     if not scheduler.time_slot.validate_class_entry(

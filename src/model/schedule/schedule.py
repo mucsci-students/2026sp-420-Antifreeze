@@ -1,5 +1,5 @@
 import os
-from scheduler import Scheduler, load_config_from_file, CombinedConfig
+from scheduler import Scheduler, load_config_from_file, CombinedConfig, OptimizerFlags
 from typing import cast
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
@@ -13,7 +13,6 @@ from model.schedule.faculty import faculty
 from model.schedule.lab import lab
 from model.schedule.room import room
 from model.schedule.time_slot_config import time_slot_config
-from model.schedule.optimizer_flags import OptimizerFlags
 
 
 class Schedule:
@@ -32,6 +31,9 @@ class Schedule:
         self.config = load_config_from_file(CombinedConfig, empty_path)
         self.empty_config = copy.deepcopy(self.config)
         self.result = []
+        self._empty_prototype: CombinedConfig = load_config_from_file(
+            CombinedConfig, empty_path
+        )
 
     # --------------#
     # FILE MANAGEMENT

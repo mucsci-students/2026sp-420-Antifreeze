@@ -1,3 +1,6 @@
+from scheduler import CombinedConfig
+
+
 # Manages room entries in the scheduler configuration.
 class room:
     # Initializes room subclass.
@@ -9,7 +12,9 @@ class room:
     # For 'modify' or 'delete': fails if room does not exist.
     # Parameters: config, room_name, operation ('add'/'modify'/'delete')
     # Returns: True if validation passes, False otherwise
-    def validate_entry(self, config: str, room_name: str, operation: str) -> bool:
+    def validate_entry(
+        self, config: "CombinedConfig", room_name: str, operation: str
+    ) -> bool:
         rooms = config.config.rooms
 
         # Check for empty input
@@ -31,7 +36,7 @@ class room:
 
     # Adds a room to the config.
     # Parameters: config, room_name
-    def add_room(self, config: str, room_name: str):
+    def add_room(self, config: "CombinedConfig", room_name: str):
 
         # Reference to rooms list in database
         rooms = config.config.rooms
@@ -53,7 +58,7 @@ class room:
     # Deletes a room from the config.
     # Cascades removal to course room lists and faculty room preferences.
     # Parameters: config, room_name
-    def delete_room(self, config: str, room_name: str):
+    def delete_room(self, config: "CombinedConfig", room_name: str):
 
         rooms = config.config.rooms
 
@@ -82,7 +87,7 @@ class room:
     # Renames a room in the config.
     # Cascades the rename to course room lists and faculty room preferences.
     # Parameters: config, old_name, new_name
-    def modify_room(self, config: str, old_name: str, new_name: str):
+    def modify_room(self, config: "CombinedConfig", old_name: str, new_name: str):
 
         rooms = config.config.rooms
 
@@ -117,7 +122,7 @@ class room:
 
     # Prints all rooms in the config.
     # Parameters: config
-    def print_rooms(self, config: str):
+    def print_rooms(self, config: "CombinedConfig"):
         rooms = config.config.rooms
         print("\nRooms:")
         for room in rooms:
@@ -126,7 +131,7 @@ class room:
     # Returns a list of all room names from the config.
     # Parameters: config
     # Returns: List of room name strings
-    def get_room_ids(self, config: str) -> list[str]:
+    def get_room_ids(self, config: "CombinedConfig") -> list[str]:
         rooms = config.config.rooms
         return list(rooms)
 

@@ -1,5 +1,7 @@
-from scheduler.config import CourseConfig
 import csv
+
+from scheduler.config import CourseConfig
+from scheduler import CombinedConfig
 
 
 class course:
@@ -215,7 +217,7 @@ class course:
     # Displays course details including credits, assigned rooms, labs,
     # conflicts, and associated faculty
     # Parameters: Configuration file
-    def print_courses(self, config: str):
+    def print_courses(self, config: "CombinedConfig"):
         courses = config.config.courses
         print("\nCourses:")
         for course in courses:

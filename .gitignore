@@ -3,3 +3,7 @@
 
 # Ignore pyc files
 *.pyc
+
+# Ignore pytest coverage files
+.coverage
+coverage.xml

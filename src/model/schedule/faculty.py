@@ -7,6 +7,7 @@ from scheduler import (
     Preference,
     Room,
     Lab,
+    CombinedConfig,
 )
 
 
@@ -159,7 +160,9 @@ class faculty:
                 f"Name: {prof.name}, \n\tMax Credits: {prof.maximum_credits}, \n\tMax Days: {prof.maximum_days}, \n\tMin Credits: {prof.minimum_credits}, \n\tUnique Course Limit: {prof.unique_course_limit}, \n\tTimes: {prof.times}, \n\tCourse Preferences: {prof.course_preferences}, \n\tRoom Preferences: {prof.room_preferences}, \n\tLab Preferences: {prof.lab_preferences}, \n\tMandatory Days: {prof.mandatory_days}"
             )
 
-    def validate_entry(self, config: str, faculty_name: str, operation: str) -> bool:
+    def validate_entry(
+        self, config: "CombinedConfig", faculty_name: str, operation: str
+    ) -> bool:
 
         # Validates faculty entry based on operation type.
 

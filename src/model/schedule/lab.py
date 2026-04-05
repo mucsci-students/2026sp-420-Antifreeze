@@ -1,3 +1,6 @@
+from scheduler import CombinedConfig
+
+
 # Manages lab entries in the scheduler configuration.
 class lab:
     # Initializes lab subclass.
@@ -9,7 +12,9 @@ class lab:
     # For 'modify' or 'delete': fails if lab does not exist.
     # Parameters: config, lab_name, operation ('add'/'modify'/'delete')
     # Returns: True if validation passes, False otherwise
-    def validate_entry(self, config: str, lab_name: str, operation: str) -> bool:
+    def validate_entry(
+        self, config: "CombinedConfig", lab_name: str, operation: str
+    ) -> bool:
         labs = config.config.labs
 
         # Check for empty input
@@ -32,7 +37,7 @@ class lab:
     # Adds a lab to the config.
     # Parameters: config, lab_name
     # Example: add_lab(config, "Windows")
-    def add_lab(self, config: str, lab_name: str):
+    def add_lab(self, config: "CombinedConfig", lab_name: str):
 
         # Reference to labs list inside database
         labs = config.config.labs
@@ -51,7 +56,7 @@ class lab:
     # Cascades removal to course lab lists and faculty lab preferences.
     # Parameters: config, lab_name
     # Example: delete_lab(config, "Linux")
-    def delete_lab(self, config: str, lab_name: str):
+    def delete_lab(self, config: "CombinedConfig", lab_name: str):
 
         labs = config.config.labs
 
@@ -78,7 +83,7 @@ class lab:
     # Cascades the rename to course lab lists and faculty lab preferences.
     # Parameters: config, old_name, new_name
     # Example: modify_lab(config, "Linux", "Linux_0")
-    def modify_lab(self, config: str, old_name: str, new_name: str):
+    def modify_lab(self, config: "CombinedConfig", old_name: str, new_name: str):
 
         labs = config.config.labs
 
@@ -108,7 +113,7 @@ class lab:
 
     # Prints all labs in the config.
     # Parameters: config
-    def print_labs(self, config: str):
+    def print_labs(self, config: "CombinedConfig"):
         labs = config.config.labs
         print("\nLabs:")
         for lab in labs:
@@ -117,7 +122,7 @@ class lab:
     # Returns a list of all lab names from the config.
     # Parameters: config
     # Returns: List of lab name strings
-    def get_lab_ids(self, config: str) -> list[str]:
+    def get_lab_ids(self, config: "CombinedConfig") -> list[str]:
         labs = config.config.labs
         return list(labs)
 
