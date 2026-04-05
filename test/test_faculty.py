@@ -36,7 +36,7 @@ sys.modules.setdefault("scheduler", scheduler_stub)
 
 
 # Import the class under test
-# ^^^ Can't perform step above due to ruff prohibiting it
+# ^^^^^^ Can't perform step above due to ruff prohibiting it
 
 
 # Helpers
@@ -55,6 +55,7 @@ class MockConfig:
     def __init__(self, names):
         self.config = self
         self.faculty = [MockFacultyMember(n) for n in names]
+        self.courses = []
 
 
 class MockCourse:

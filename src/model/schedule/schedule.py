@@ -1,5 +1,6 @@
 import os
 from scheduler import Scheduler, load_config_from_file, CombinedConfig
+from typing import cast
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
@@ -12,6 +13,7 @@ from model.schedule.faculty import faculty
 from model.schedule.lab import lab
 from model.schedule.room import room
 from model.schedule.time_slot_config import time_slot_config
+from model.schedule.optimizer_flags import OptimizerFlags
 
 
 class Schedule:
@@ -94,13 +96,14 @@ class Schedule:
     def run_scheduler(self, limit: int = 10, optimize: bool = True):
 
         if optimize:
-            self.config.optimizer_flags = [
-                "faculty_course",
-                "faculty_room",
-                "faculty_lab",
-                "same_room",
-                "same_lab",
-                "pack_rooms",
+            config_to_update = cast(CombinedConfig, self.config)
+            config_to_update.optimizer_flags = [
+                OptimizerFlags.FACULTY_COURSE,
+                OptimizerFlags.FACULTY_ROOM,
+                OptimizerFlags.FACULTY_LAB,
+                OptimizerFlags.SAME_ROOM,
+                OptimizerFlags.SAME_LAB,
+                OptimizerFlags.PACK_ROOMS,
             ]
         else:
             self.config.optimizer_flags = []

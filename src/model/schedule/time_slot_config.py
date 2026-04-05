@@ -1,3 +1,6 @@
+from typing import Any
+
+
 # Manages time slot configuration entries in the scheduler configuration.
 # Covers two sub-sections:
 #   - times:   per-day time grids  (start, spacing, end)
@@ -19,7 +22,7 @@ class time_slot_config:
     #             range_index (int, required for modify/delete)
     # Returns: True if validation passes, False otherwise
     def validate_time_entry(
-        self, config, day: str, operation: str, range_index: int = None
+        self, config, day: str, operation: str, range_index: int | None = None
     ) -> bool:
         day = day.upper()
 
@@ -166,9 +169,9 @@ class time_slot_config:
         self,
         config,
         operation: str,
-        class_index: int = None,
-        credits: int = None,
-        meetings: list = None,
+        class_index: int | None = None,
+        credits: int | None = None,
+        meetings: list | None = None,
     ) -> bool:
         classes = config.time_slot_config.classes
 
@@ -213,13 +216,12 @@ class time_slot_config:
         config,
         credits: int,
         meetings: list,
-        start_time: str = None,
+        start_time: str | None = None,
         disabled: bool = False,
     ):
         classes = config.time_slot_config.classes
 
-        new_class = {"credits": credits, "meetings": meetings}
-
+        new_class: dict[str, Any] = {"credits": credits, "meetings": meetings}
         if start_time is not None:
             new_class["start_time"] = start_time
 
@@ -240,7 +242,7 @@ class time_slot_config:
         class_index: int,
         credits: int,
         meetings: list,
-        start_time: str = None,
+        start_time: str = "",
         disabled: bool = False,
     ):
         classes = config.time_slot_config.classes
@@ -249,8 +251,7 @@ class time_slot_config:
             print("Class pattern not found — no changes made.")
             return
 
-        updated = {"credits": credits, "meetings": meetings}
-
+        updated: dict[str, Any] = {"credits": credits, "meetings": meetings}
         if start_time is not None:
             updated["start_time"] = start_time
 
