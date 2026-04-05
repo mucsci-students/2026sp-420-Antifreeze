@@ -111,7 +111,7 @@ A Flask-based web application for generating course schedules. The system is dri
 
 4. Activate the virtual environment:
    - Linux/macOS: `source .venv/bin/activate`
-   - Windows: `.\.venv\Scripts\activate`
+   - Windows: `source .venv/Scripts/activate`
 
 5. Set up your OpenAI API key:
    - Create a `.env` file in the project root:
