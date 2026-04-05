@@ -177,7 +177,9 @@ Delete lab 'WindowsOS'.
 For more complex elements, like adding a faculty member, ensure that you specify all required elements needed for the Faculty member within the prompt.
 
 ```
-Add a faculty member 'Killian' that has 12 min credits, 12 max credits, 3 unique course limit and 3 max days. Ensure that Killian has time slots of MON 12:00-13:00, TUE 12:00-13:00, A course preference for CMSC 476, CMSC 380, a Room preference for Roddy 147, A lab preference for Mac, Linux, and mandatory days 'MON' and 'TUE.'
+Add a faculty member 'Killian' that has 12 min credits, 12 max credits, 3 unique course limit and 3 max days.
+Ensure that Killian has time slots of MON 12:00-13:00, TUE 12:00-13:00, A course preference for CMSC 476,
+CMSC 380, a Room preference for Roddy 147, A lab preference for Mac, Linux, and mandatory days 'MON' and 'TUE.'
 ```
 
 **Generating schedules**
