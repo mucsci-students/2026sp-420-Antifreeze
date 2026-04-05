@@ -184,7 +184,7 @@ Room preference: Roddy 147. Lab preferences: Mac, Linux.
 Mandatory days: MON, TUE.
 ```
 
-**Generating schedules:**
+**Generating schedules**
 
 For generating schedules, specify whether you want the schedule to be optimized or unoptimized, and how many schedules you would like to generate. 
 
