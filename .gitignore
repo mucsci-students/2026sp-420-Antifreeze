@@ -1,6 +1,9 @@
 # Ignore pycache
-__pycache__/
+**/__pycache__/
 
 # Ignore pyc files
 *.pyc
-*.cpython-*.pyc
+
+# Ignore pytest coverage files
+.coverage
+coverage.xml

@@ -1,0 +1,43 @@
+name: Continuous Integration
+run-name: Continuous Integration
+on: [push]
+jobs:
+  continuous_integration:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Sync uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13.12"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run linter
+        run: uv run ruff check .
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Run type checker
+        run: uv run ty check
+      
+      - name: Run pytest
+        run: uv run pytest --cov=./src/model --cov-report=xml --cov-fail-under=80
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          fail_ci_if_error: true

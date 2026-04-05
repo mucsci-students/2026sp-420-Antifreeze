@@ -1,13 +1,12 @@
 from flask import request, jsonify, send_file
 import os
-import json
 import io
 
 
 # Registers all schedule-level REST API routes on the Flask app.
 # Covers config loading/saving, scheduler execution, result retrieval, and PDF export.
 def register_schedule_routes(app, scheduler):
-    
+
     # Resets the scheduler to a clean empty configuration using the stored prototype.
     # No request body needed. Returns {"status": "reset"}.
     @app.route("/load_empty_config", methods=["POST"])
@@ -26,6 +25,9 @@ def register_schedule_routes(app, scheduler):
 
         os.makedirs("uploads", exist_ok=True)
 
+        if not file or not file.filename:
+            return "No file selected", 400
+
         path = os.path.join("uploads", file.filename)
         file.save(path)
 
@@ -42,7 +44,7 @@ def register_schedule_routes(app, scheduler):
             io.BytesIO(file_data.encode()),
             mimetype="application/json",
             as_attachment=True,
-            download_name="schedule_config.json"
+            download_name="schedule_config.json",
         )
 
     # Returns the number of schedules currently held in memory.
@@ -63,9 +65,7 @@ def register_schedule_routes(app, scheduler):
 
             results = scheduler.run_scheduler(limit, optimize)
 
-            return jsonify({
-                "count": len(results)
-            })
+            return jsonify({"count": len(results)})
 
         except Exception as e:
             return jsonify({"error": str(e)}), 67
@@ -76,7 +76,6 @@ def register_schedule_routes(app, scheduler):
     @app.route("/schedule/<int:index>", methods=["GET"])
     def get_schedule(index):
         try:
-
             if not scheduler.result:
                 return jsonify({"error": "No schedules generated"}), 400
 
@@ -90,9 +89,7 @@ def register_schedule_routes(app, scheduler):
             for sch in model:
                 rows.append(sch.as_csv())
 
-            return jsonify({
-                "schedule": rows
-            })
+            return jsonify({"schedule": rows})
 
         except Exception as e:
             return jsonify({"error": str(e)}), 67
@@ -125,18 +122,18 @@ def register_schedule_routes(app, scheduler):
                 if len(parts) < 4:
                     continue
                 course_section = parts[0]
-                faculty_name   = parts[1]
-                room_name      = parts[2]
-                lab_name       = parts[3]
-                meetings       = parts[4:]
+                faculty_name = parts[1]
+                room_name = parts[2]
+                lab_name = parts[3]
+                meetings = parts[4:]
                 course_id, _, section = course_section.partition(".")
 
                 row = {
-                    "course":  course_id,
+                    "course": course_id,
                     "section": section,
                     "faculty": faculty_name,
-                    "room":    room_name,
-                    "lab":     lab_name,
+                    "room": room_name,
+                    "lab": lab_name,
                 }
 
                 for meeting in meetings:
@@ -145,7 +142,7 @@ def register_schedule_routes(app, scheduler):
                         continue
                     # Strip the lab marker '^'
                     is_lab = meeting.endswith("^")
-                    clean  = meeting.rstrip("^").strip()
+                    clean = meeting.rstrip("^").strip()
                     # Expected format: "MON 09:00-09:50"
                     tokens = clean.split(" ", 1)
                     if len(tokens) != 2:
@@ -153,44 +150,69 @@ def register_schedule_routes(app, scheduler):
                     day_abbr, time_range = tokens[0].upper(), tokens[1]
                     if day_abbr not in DAY_ORDER:
                         continue
-                    slot_entries.append({
-                        "day":      day_abbr,
-                        "day_ord":  DAY_ORDER[day_abbr],
-                        "time":     time_range,
-                        "is_lab":   is_lab,
-                        **row,
-                    })
+                    slot_entries.append(
+                        {
+                            "day": day_abbr,
+                            "day_ord": DAY_ORDER[day_abbr],
+                            "time": time_range,
+                            "is_lab": is_lab,
+                            **row,
+                        }
+                    )
 
             # Sort all slot entries: day first, then start-time
             slot_entries.sort(key=lambda e: (e["day_ord"], e["time"]))
 
             # Determine secondary grouping key
             if mode == "faculty":
-                group_key_fn = lambda e: e["faculty"]
+
+                def group_key_fn(e):
+                    return e["faculty"]
+
+                # group_key_fn = lambda e: e["faculty"]
             elif mode == "room":
-                group_key_fn = lambda e: e["room"]
+
+                def group_key_fn(e):
+                    return e["room"]
+
+                # group_key_fn = lambda e: e["room"]
             elif mode == "lab":
-                group_key_fn = lambda e: e["lab"]
+
+                def group_key_fn(e):
+                    return e["lab"]
+
+                # group_key_fn = lambda e: e["lab"]
             else:
-                group_key_fn = None   # no sub-grouping for "course" mode
+
+                def group_key_fn(e):
+                    return None
+
+                # group_key_fn = None   # no sub-grouping for "course" mode
 
             # Build day → (optional sub-group →) list-of-slots structure
-            DAY_NAMES = {"MON": "Monday", "TUE": "Tuesday", "WED": "Wednesday",
-                         "THU": "Thursday", "FRI": "Friday"}
+            DAY_NAMES = {
+                "MON": "Monday",
+                "TUE": "Tuesday",
+                "WED": "Wednesday",
+                "THU": "Thursday",
+                "FRI": "Friday",
+            }
 
-            days_dict = {}   # day_abbr -> { subkey -> [slot, ...] }
+            days_dict = {}  # day_abbr -> { subkey -> [slot, ...] }
             for entry in slot_entries:
                 day = entry["day"]
                 sub = group_key_fn(entry) if group_key_fn else None
-                days_dict.setdefault(day, {}).setdefault(sub, []).append({
-                    "time":    entry["time"],
-                    "is_lab":  entry["is_lab"],
-                    "course":  entry["course"],
-                    "section": entry["section"],
-                    "faculty": entry["faculty"],
-                    "room":    entry["room"],
-                    "lab":     entry["lab"],
-                })
+                days_dict.setdefault(day, {}).setdefault(sub, []).append(
+                    {
+                        "time": entry["time"],
+                        "is_lab": entry["is_lab"],
+                        "course": entry["course"],
+                        "section": entry["section"],
+                        "faculty": entry["faculty"],
+                        "room": entry["room"],
+                        "lab": entry["lab"],
+                    }
+                )
 
             # Serialise into ordered list for JSON
             day_groups = []
@@ -198,23 +220,25 @@ def register_schedule_routes(app, scheduler):
                 if day_abbr not in days_dict:
                     continue
                 sub_groups = []
-                for sub_key in (sorted(days_dict[day_abbr]) if group_key_fn else [None]):
-                    sub_groups.append({
-                        "sub_key": sub_key,
-                        "slots":   days_dict[day_abbr][sub_key],
-                    })
-                day_groups.append({
-                    "day":        day_abbr,
-                    "day_name":   DAY_NAMES[day_abbr],
-                    "sub_groups": sub_groups,
-                })
+                for sub_key in sorted(days_dict[day_abbr]) if group_key_fn else [None]:
+                    sub_groups.append(
+                        {
+                            "sub_key": sub_key,
+                            "slots": days_dict[day_abbr][sub_key],
+                        }
+                    )
+                day_groups.append(
+                    {
+                        "day": day_abbr,
+                        "day_name": DAY_NAMES[day_abbr],
+                        "sub_groups": sub_groups,
+                    }
+                )
 
             return jsonify({"mode": mode, "days": day_groups})
 
         except Exception as e:
             return jsonify({"error": str(e)}), 67
-
-    from flask import send_file
 
     # Exports all generated schedules as a PDF and returns it as a downloadable file.
     # Returns 400 if no schedules have been generated yet.
@@ -230,5 +254,5 @@ def register_schedule_routes(app, scheduler):
             pdf,
             mimetype="application/pdf",
             as_attachment=True,
-            download_name="schedules.pdf"
+            download_name="schedules.pdf",
         )

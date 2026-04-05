@@ -3,33 +3,33 @@ import os
 import types
 import pytest
 
+from src.model.schedule.lab import lab
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 scheduler_stub = types.ModuleType("scheduler")
-scheduler_stub.Scheduler = object
-scheduler_stub.load_config_from_file = lambda *a, **kw: None
+setattr(scheduler_stub, "Scheduler", object)
+setattr(scheduler_stub, "load_config_from_file", lambda *a, **kw: None)
 sys.modules.setdefault("scheduler", scheduler_stub)
 
 scheduler_config_stub = types.ModuleType("scheduler.config")
-scheduler_config_stub.CombinedConfig = object
+setattr(scheduler_config_stub, "CombinedConfig", object)
 sys.modules.setdefault("scheduler.config", scheduler_config_stub)
-
-
-from src.model.schedule.lab import lab
 
 
 # Mock objects
 
+
 class MockConfig:
     """Lightweight stand-in for the real config object."""
+
     def __init__(self, labs):
         self.config = self
         self.labs = list(labs)
         self.courses = []
         self.faculty = []
-        
+
+
 class MockCourse:
     def __init__(self, labs):
         self.lab = labs
@@ -38,6 +38,7 @@ class MockCourse:
 class MockFaculty:
     def __init__(self, prefs):
         self.lab_preferences = prefs
+
 
 SAMPLE_CSV_CONTENT = """\
 Schedule 1:
@@ -97,8 +98,8 @@ def sample_schedule(L, sample_csv):
     return L.get_lab_schedule(sample_csv)
 
 
-
 # validate_entry — add
+
 
 class TestValidateEntryAdd:
     def test_valid_new_lab_returns_true(self, L):
@@ -114,8 +115,8 @@ class TestValidateEntryAdd:
         assert L.validate_entry(cfg, "", "add") is False
 
 
-
 # validate_entry — modify
+
 
 class TestValidateEntryModify:
     def test_existing_lab_returns_true(self, L):
@@ -131,8 +132,8 @@ class TestValidateEntryModify:
         assert L.validate_entry(cfg, "", "modify") is False
 
 
-
 # validate_entry — delete
+
 
 class TestValidateEntryDelete:
     def test_existing_lab_returns_true(self, L):
@@ -147,10 +148,9 @@ class TestValidateEntryDelete:
         cfg = MockConfig(["Linux", "Mac"])
         assert L.validate_entry(cfg, "", "delete") is False
 
-  
-
 
 # add_lab
+
 
 class TestAddLab:
     def test_new_lab_is_appended(self, L):
@@ -169,8 +169,8 @@ class TestAddLab:
         assert cfg.config.labs.count("Linux") == 1
 
 
-
 # delete_lab
+
 
 class TestDeleteLab:
     def test_lab_is_removed(self, L):
@@ -188,27 +188,23 @@ class TestDeleteLab:
         L.delete_lab(cfg, "Linux")
         L.delete_lab(cfg, "Linux")  # already gone — must not raise
         assert len(cfg.config.labs) == 1
-      
+
     def test_delete_removes_lab_from_courses(self, L):
         cfg = MockConfig(["Linux", "Mac"])
-        cfg.config.courses = [
-            MockCourse(["Linux", "Mac"]),
-            MockCourse(["Linux"])
-        ]
+        cfg.config.courses = [MockCourse(["Linux", "Mac"]), MockCourse(["Linux"])]
         L.delete_lab(cfg, "Linux")
         assert "Linux" not in cfg.config.courses[0].lab
         assert "Linux" not in cfg.config.courses[1].lab
 
     def test_delete_removes_lab_preferences(self, L):
         cfg = MockConfig(["Linux", "Mac"])
-        cfg.config.faculty = [
-            MockFaculty({"Linux": 1, "Mac": 2})
-        ]
+        cfg.config.faculty = [MockFaculty({"Linux": 1, "Mac": 2})]
         L.delete_lab(cfg, "Linux")
         assert "Linux" not in cfg.config.faculty[0].lab_preferences
 
 
 # modify_lab
+
 
 class TestModifyLab:
     def test_old_name_is_removed(self, L):
@@ -240,29 +236,25 @@ class TestModifyLab:
         cfg = MockConfig(["Linux", "Mac"])
         L.modify_lab(cfg, "Linux", "Mac")  # "Mac" already exists
         assert "Linux" in cfg.config.labs
-    
+
     def test_modify_updates_course_labs(self, L):
         cfg = MockConfig(["Linux", "Mac"])
-        cfg.config.courses = [
-            MockCourse(["Linux"])
-        ]
+        cfg.config.courses = [MockCourse(["Linux"])]
         L.modify_lab(cfg, "Linux", "Linux_0")
         assert "Linux_0" in cfg.config.courses[0].lab
         assert "Linux" not in cfg.config.courses[0].lab
-        
+
     def test_modify_updates_faculty_preferences(self, L):
         cfg = MockConfig(["Linux", "Mac"])
-        cfg.config.faculty = [
-            MockFaculty({"Linux": 1})
-        ]
+        cfg.config.faculty = [MockFaculty({"Linux": 1})]
         L.modify_lab(cfg, "Linux", "Linux_0")
         prefs = cfg.config.faculty[0].lab_preferences
         assert "Linux_0" in prefs
         assert "Linux" not in prefs
 
 
-
 # get_lab_ids
+
 
 class TestGetLabIds:
     def test_returns_a_list(self, L):
@@ -288,8 +280,8 @@ class TestGetLabIds:
         assert "Phantom" not in cfg.config.labs
 
 
-
 # get_lab_schedule — structure
+
 
 class TestGetLabScheduleStructure:
     def test_returns_a_dict(self, sample_schedule):
@@ -308,8 +300,8 @@ class TestGetLabScheduleStructure:
         assert "" not in sample_schedule
 
 
-
 # get_lab_schedule — Linux entries
+
 
 class TestGetLabScheduleLinux:
     def test_linux_has_eight_entries(self, sample_schedule):
@@ -333,8 +325,8 @@ class TestGetLabScheduleLinux:
         assert "CMSC 140" not in course_ids
 
 
-
 # get_lab_schedule — Mac entries
+
 
 class TestGetLabScheduleMac:
     def test_mac_has_seven_entries(self, sample_schedule):
@@ -354,16 +346,19 @@ class TestGetLabScheduleMac:
         )
 
 
-
 # get_lab_schedule — entry field correctness (spot-check CMSC 161.01)
+
 
 class TestGetLabScheduleEntryFields:
     @pytest.fixture
     def entry_161_01(self, sample_schedule):
         return next(
-            (e for e in sample_schedule["Linux"]
-             if e["course_id"] == "CMSC 161" and e["section"] == "01"),
-            None
+            (
+                e
+                for e in sample_schedule["Linux"]
+                if e["course_id"] == "CMSC 161" and e["section"] == "01"
+            ),
+            None,
         )
 
     def test_entry_exists(self, entry_161_01):
@@ -397,8 +392,8 @@ class TestGetLabScheduleEntryFields:
         assert any("^" in m for m in entry_161_01["meetings"])
 
 
-
 # get_lab_schedule — edge cases
+
 
 class TestGetLabScheduleEdgeCases:
     def test_empty_csv_returns_empty_dict(self, L, tmp_path):
@@ -409,7 +404,6 @@ class TestGetLabScheduleEdgeCases:
     def test_all_none_lab_rows_returns_empty_dict(self, L, tmp_path):
         f = tmp_path / "none_labs.csv"
         f.write_text(
-            "Schedule 1:\n"
-            "CMSC 140.01,Hardy,Roddy 136,None,MON 09:00-09:50\n\n"
+            "Schedule 1:\nCMSC 140.01,Hardy,Roddy 136,None,MON 09:00-09:50\n\n"
         )
         assert L.get_lab_schedule(str(f)) == {}
