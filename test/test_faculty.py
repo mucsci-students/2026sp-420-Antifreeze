@@ -24,14 +24,14 @@ class _FacultyConfig:
             setattr(self, k, v)
 
 
-scheduler_stub.FacultyConfig = _FacultyConfig
-scheduler_stub.Faculty = str
-scheduler_stub.Day = str
-scheduler_stub.TimeRange = str
-scheduler_stub.Course = str
-scheduler_stub.Preference = int
-scheduler_stub.Room = str
-scheduler_stub.Lab = str
+setattr(scheduler_stub, "FacultyConfig", _FacultyConfig)
+setattr(scheduler_stub, "Faculty", str)
+setattr(scheduler_stub, "Day", str)
+setattr(scheduler_stub, "TimeRange", str)
+setattr(scheduler_stub, "Course", str)
+setattr(scheduler_stub, "Preference", int)
+setattr(scheduler_stub, "Room", str)
+setattr(scheduler_stub, "Lab", str)
 sys.modules.setdefault("scheduler", scheduler_stub)
 
 
@@ -198,7 +198,8 @@ class TestValidateEntryDelete:
     def test_delete_cascade_removes_from_courses(self, F):
         cfg = MockConfig(["Zoppetti"])
 
-        cfg.config.courses = [MockCourse(["Zoppetti", "Hardy"])]
+        setattr(cfg.config, "courses", [MockCourse(["Zoppetti", "Hardy"])])
+        # cfg.config.courses = [MockCourse(["Zoppetti", "Hardy"])]
 
         F.delete_faculty(cfg, "Zoppetti")
 

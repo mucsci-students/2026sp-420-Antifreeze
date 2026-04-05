@@ -1,0 +1,6 @@
+course-constraint-scheduler>=2.6.1
+flask>=3.0
+pytest>=9.0.2
+reportlab>=4.0
+ruff>=0.15.8
+ty>=0.0.27

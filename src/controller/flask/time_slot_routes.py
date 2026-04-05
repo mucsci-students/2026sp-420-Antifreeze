@@ -1,5 +1,6 @@
 import re as _re
 from flask import request, jsonify
+from typing import Any
 
 
 _VALID_DAYS = {"MON", "TUE", "WED", "THU", "FRI"}
@@ -61,7 +62,7 @@ def _serialize_class(cls):
         start_time = getattr(cls, "start_time", None)
         disabled = getattr(cls, "disabled", False)
 
-    result = {
+    result: dict[str, Any] = {
         "credits": int(credits),
         "meetings": [_serialize_meeting(m) for m in meetings],
         "disabled": bool(disabled),

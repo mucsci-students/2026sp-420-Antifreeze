@@ -25,6 +25,9 @@ def register_schedule_routes(app, scheduler):
 
         os.makedirs("uploads", exist_ok=True)
 
+        if not file or not file.filename:
+            return "No file selected", 400
+
         path = os.path.join("uploads", file.filename)
         file.save(path)
 
@@ -181,7 +184,7 @@ def register_schedule_routes(app, scheduler):
                 # group_key_fn = lambda e: e["lab"]
             else:
 
-                def group_key_fn():
+                def group_key_fn(e):
                     return None
 
                 # group_key_fn = None   # no sub-grouping for "course" mode
