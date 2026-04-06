@@ -1,38 +1,45 @@
-from model.schedule import schedule
 from controller.modifyConfig import configCli
 from controller.modifyConfig.utilsCLI import end_prog
 
-#Print Main Menu
-#Displays the main program menu options
+
+# Print Main Menu
+# Displays the main program menu options
 def print_main():
-    print("\nPress the key associated with the command you would like to issue, then press enter.")
+    print(
+        "\nPress the key associated with the command you would like to issue, then press enter."
+    )
     print("1: Load/Modify/Save config")
     print("2: Run/Print Scheduler")
-    print("q: exit program\n==> ",end="")
-    
-#Print Run Scheduler Menu
-#Displays the scheduler execution and display options
+    print("q: exit program\n==> ", end="")
+
+
+# Print Run Scheduler Menu
+# Displays the scheduler execution and display options
 def print_run_scheduler_menu():
-    print("\nPress the key associated with the command you would like to issue, then press enter.")
+    print(
+        "\nPress the key associated with the command you would like to issue, then press enter."
+    )
     print("1: Run Scheduler")
     print("2: Print Schedule")
     print("r: return to main")
-    print("q: exit program\n==> ",end="")
+    print("q: exit program\n==> ", end="")
 
-#Check if Config is Loaded
-#Validates that a configuration file has been loaded before running scheduler
-#Returns True if config is loaded, False otherwise
+
+# Check if Config is Loaded
+# Validates that a configuration file has been loaded before running scheduler
+# Returns True if config is loaded, False otherwise
 def is_config_loaded(sched):
     if sched.config is None or not sched.config.config.courses:
         sched.load_config("2026sp-420-Antifreeze\\src\\schedule\\empty.json")
     return True
-            
-#Run Scheduler Menu
-#Handles user interaction for running and printing schedules
-#Routes user input to scheduler execution or schedule display
-#Parameters: Scheduler object
+
+
+# Run Scheduler Menu
+# Handles user interaction for running and printing schedules
+# Routes user input to scheduler execution or schedule display
+# Parameters: Scheduler object
 def run_scheduler(sched):
-    while(True):
+    while True:
         print_run_scheduler_menu()
         user_command = input()
         if user_command == "1":
@@ -46,21 +53,22 @@ def run_scheduler(sched):
                 return
             sched.print_schedule()
         elif user_command.lower() == "r":
-            return 
+            return
         elif user_command.lower() == "q":
             end_prog()
 
-#Main CLI
-#Primary command-line interface control loop
-#Routes user input to configuration or scheduler menus
-#Parameters: Scheduler object
+
+# Main CLI
+# Primary command-line interface control loop
+# Routes user input to configuration or scheduler menus
+# Parameters: Scheduler object
 def cli(sched):
-    while(True):
+    while True:
         print_main()
         user_command = input()
-        if(user_command.lower() == "q"):
+        if user_command.lower() == "q":
             end_prog()
-        elif(user_command == "1"):
+        elif user_command == "1":
             configCli.config(sched)
-        elif(user_command == "2"):
+        elif user_command == "2":
             run_scheduler(sched)

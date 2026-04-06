@@ -5,17 +5,23 @@ from flask import request, jsonify
 # All handlers close over `scheduler` for access to the config and course model.
 def register_course_routes(app, scheduler):
 
-    # Returns a JSON array of all courses with their course_id and credits.
+    # Returns a JSON array of all courses with their full configuration.
     @app.route("/courses", methods=["GET"])
     def get_courses():
         try:
             courses = []
 
             for c in scheduler.config.config.courses:
-                courses.append({
-                    "course_id": c.course_id,
-                    "credits": c.credits
-                })
+                courses.append(
+                    {
+                        "course_id": c.course_id,
+                        "credits": c.credits,
+                        "room": list(c.room),
+                        "lab": list(c.lab),
+                        "conflicts": list(c.conflicts),
+                        "faculty": list(c.faculty),
+                    }
+                )
 
             return jsonify(courses)
 
@@ -43,7 +49,7 @@ def register_course_routes(app, scheduler):
                 data["room"],
                 data["lab"],
                 data["conflicts"],
-                data["faculty"]
+                data["faculty"],
             )
 
             return jsonify({"status": "added"})
@@ -63,7 +69,11 @@ def register_course_routes(app, scheduler):
             existing = [c.course_id.upper() for c in scheduler.config.config.courses]
 
             if course_id.upper() not in existing:
-                return jsonify({"error": f'"{course_id}" was not found. Please check the course ID and try again.'}), 404
+                return jsonify(
+                    {
+                        "error": f'"{course_id}" was not found. Please check the course ID and try again.'
+                    }
+                ), 404
 
             scheduler.course.delete_course(scheduler.config, course_id)
 
@@ -98,20 +108,22 @@ def register_course_routes(app, scheduler):
 
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-        
+
     @app.route("/courses/<int:index>", methods=["GET"])
     def get_course(index):
         try:
             course = scheduler.config.config.courses[index]
 
-            return jsonify({
-                "course_id": course.course_id,
-                "credits": course.credits,
-                "room": course.room,
-                "lab": course.lab,
-                "conflicts": course.conflicts,
-                "faculty": course.faculty
-            })
+            return jsonify(
+                {
+                    "course_id": course.course_id,
+                    "credits": course.credits,
+                    "room": course.room,
+                    "lab": course.lab,
+                    "conflicts": course.conflicts,
+                    "faculty": course.faculty,
+                }
+            )
 
         except IndexError:
             return jsonify({"error": "Invalid course index"}), 404

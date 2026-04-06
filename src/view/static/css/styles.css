@@ -4,16 +4,19 @@ body {
   background-repeat: no-repeat;
   font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
     "Lucida Sans", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
 }
 
 #wrapper {
-  margin-top: 30px;
-  margin-bottom: 30px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 20px auto;
   width: 80%;
+  height: calc(100vh - 40px);
   background-color: #e6e6e6;
-  display: block;
+  display: flex;
+  flex-direction: column;
   border: outset;
   border-top-color: #ffffff;
   border-left-color: #ffffff;
@@ -23,6 +26,8 @@ body {
   box-shadow: 3px 3px #464646;
   min-width: 960px;
   max-width: 2048px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* ----- Header ----- */
@@ -129,6 +134,15 @@ hr {
 button:disabled {
   cursor: not-allowed;
   pointer-events: none;
+}
+
+.edit-bar {
+  display: flex;
+  align-items: center;
+}
+
+#chat-toggle {
+  margin-left: auto;
 }
 
 .edit-bar button {
@@ -341,6 +355,37 @@ button:disabled {
 /* ----- Schedule Tab ----- */
 #schedule-button {
   text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #ac86ff;
+  border: outset;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #956CEE;
+  border-right-color: #956CEE;
+  border-width: 3px;
+}
+
+#schedule-button:hover {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+  background-color: #c4a8ff;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #ac86ff;
+  border-right-color: #ac86ff;
+}
+
+#schedule-button:focus {
+  background-color: #956CEE;
+  border: inset;
+  border-top-color: #8d63e6;
+  border-left-color: #8d63e6;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
+}
+
+/* ----- Time Slots Tab ----- */
+#time-slots-button {
+  width: 115px;
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
   background-color: #41b9f2;
   border: outset;
   border-top-color: #ffffff;
@@ -350,7 +395,7 @@ button:disabled {
   border-width: 3px;
 }
 
-#schedule-button:hover {
+#time-slots-button:hover {
   text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
   background-color: #6bd0ff;
   border-top-color: #ffffff;
@@ -359,7 +404,7 @@ button:disabled {
   border-right-color: #2bb1ef;
 }
 
-#schedule-button:focus {
+#time-slots-button:focus {
   background-color: #2daae4;
   border: inset;
   border-top-color: #0f82b7;
@@ -371,7 +416,10 @@ button:disabled {
 /* ----- Main Body ----- */
 main {
   background-color: #ffffff;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   margin-left: 3px;
   margin-right: 3px;
   border: inset;
@@ -381,14 +429,13 @@ main {
   border-right-color: #ffffff;
   min-width: 92%;
   max-width: 2048px;
-  min-height: 405px;
-  max-height: 1080px;
+  overflow: auto;
 }
 
 .navigator {
   display: block;
-  cursor: pointer;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* ----- Fields Display ----- */
@@ -402,6 +449,7 @@ main {
   border-bottom-color: #1394d1;
   border-right-color: #1394d1;
   width: 98%;
+  height: 20px;
   color: white;
   padding-left: 10px;
   padding-top: 2px;
@@ -472,36 +520,297 @@ footer#config-name {
   background-color: #e6e6e6;
   color: #484848;
   font-size: small;
-  padding: 6px 10px;
-  margin-top: 4px;
   margin-left: 2px;
   margin-right: 4px;
+  margin-top: 4px;
   margin-bottom: 5px;
+  padding: 6px 10px;
   border: inset;
   border-top-color: #bbbbbb;
   border-left-color: #bbbbbb;
   border-bottom-color: #ffffff;
   border-right-color: #ffffff;
   border-width: 2px;
-  border-left: 4px solid #2bb971;
-  opacity: 0;
+  border-left: 3px solid #808080;
   box-sizing: border-box;
 }
 
-footer#config-name.visible {
-  animation: footer-fade 10.3s ease forwards;
+/* ----- Chat Side Panel ----- */
+#chat-toggle {
+  display: block;
+  text-align: center;
+  align-content: center;
+  background-position: center;
+  margin-right: 30px;
+  width: 45px;
 }
 
-@keyframes footer-fade {
-  0% {
-    opacity: 1;
-  }
+#main-container {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
 
-  85% {
-    opacity: 1;
-  }
+#main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-  100% {
-    opacity: 0;
-  }
+#chat-container {
+  width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: #e6e6e6;
+  border: inset;
+  border-top-color: #bbbbbb;
+  border-left-color: #bbbbbb;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
+  transition: width 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chat-open #chat-container {
+  width: 320px;
+}
+
+#chat-box {
+  height: 400px;
+  margin: 6px;
+  background-color: #ffffff;
+  border: inset;
+  border-top-color: #bbbbbb;
+  border-left-color: #bbbbbb;
+  border-bottom-color: #bbbbbb;
+  border-right-color: #ffffff;
+  overflow-y: auto;
+  padding: 6px;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+  font-size: 13px;
+}
+
+#chat-input-row {
+  display: flex;
+  margin: 6px;
+  border: inset;
+  border-top-color: #bbbbbb;
+  border-left-color: #bbbbbb;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
+}
+
+#chat-input {
+  flex: 1;
+  border: none;
+  padding: 6px;
+  background-color: #ffffff;
+}
+
+#chat-send {
+  border: none;
+  padding: 6px 10px;
+  background-color: #e6e6e6;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 9px;
+}
+
+.chat-msg {
+  margin-bottom: 6px;
+}
+
+.chat-user {
+  color: #484848;
+}
+
+.chat-ai {
+  color: #2bb971;
+}
+
+/* ----- Navigator List Items ----- */
+.navigator-list {
+  list-style: none;
+  margin: 6px 0;
+  padding-left: 10px;
+}
+
+.navigator-section-header {
+  font-weight: bold;
+  padding-top: 8px;
+}
+
+.navigator-item {
+  padding: 5px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+  user-select: none;
+}
+
+.navigator-item:hover {
+  background-color: #d8eeff;
+}
+
+.navigator-item.selected {
+  background-color: #b0d8ff;
+  font-weight: bold;
+  border-left: 4px solid #1394d1;
+  padding-left: 8px;
+}
+
+/* ----- Schedule Calendar Expanded Main ----- */
+main.schedule-view-expanded {
+  max-height: none;
+}
+
+main.schedule-view-expanded .navigator {
+  overflow-y: visible;
+}
+
+/* ----- Schedule Calendar View ----- */
+#schedule-load-btn {
+  border: outset;
+  border-top-color: #eeeeee;
+  border-left-color: #eeeeee;
+  border-bottom-color: #bbbbbb;
+  border-right-color: #bbbbbb;
+  border-width: 3px;
+  margin-top: 0;
+}
+
+#schedule-load-btn:hover {
+  color: #808080;
+  text-shadow: -1px -1px #ffffff;
+  border: inset;
+  border-top-color: #bbbbbb;
+  border-left-color: #bbbbbb;
+  border-bottom-color: #eeeeee;
+  border-right-color: #eeeeee;
+}
+
+.schedule-control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 8px;
+}
+
+.schedule-control-row label {
+  width: 140px;
+  display: inline-block;
+}
+
+.schedule-of-label {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.schedule-section-title {
+  margin: 8px 8px 4px 8px;
+  font-size: 0.95em;
+  color: #555;
+  font-weight: normal;
+}
+
+.schedule-calendar-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 10px;
+}
+
+.schedule-calendar-card {
+  border: 2px solid #bbb;
+  background: #f9f9f9;
+  box-shadow: 2px 2px #ccc;
+  flex: 0 0 auto;
+}
+
+.calendar-card-title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1em;
+  padding: 4px 12px;
+  background: linear-gradient(to right,
+      rgba(254, 82, 58, 0.6),
+      rgba(82, 134, 254, 0.4));
+  color: #fff;
+  text-shadow: 1px 1px #444;
+}
+
+.calendar-table {
+  border-collapse: collapse;
+  font-size: 0.78em;
+}
+
+.cal-time-header {
+  min-width: 60px;
+  border-bottom: 2px solid #999;
+  padding: 3px 4px;
+}
+
+.cal-day-header {
+  min-width: 95px;
+  border-bottom: 2px solid #999;
+  border-left: 1px solid #ccc;
+  padding: 3px 6px;
+  text-align: center;
+  font-weight: bold;
+  background: #e8e8e8;
+}
+
+.cal-time-cell {
+  color: #888;
+  font-size: 0.85em;
+  padding: 4px 5px;
+  vertical-align: top;
+  border-top: 1px solid #e0e0e0;
+  white-space: nowrap;
+}
+
+.cal-day-cell {
+  border-left: 1px solid #ccc;
+  border-top: 1px solid #e0e0e0;
+  vertical-align: top;
+  padding: 2px;
+  min-width: 95px;
+  min-height: 20px;
+}
+
+.cal-course-block {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+  padding: 3px 5px;
+  margin: 2px 1px;
+  font-size: 0.9em;
+  line-height: 1.35;
+  cursor: default;
+}
+
+.cal-course-id {
+  font-weight: bold;
+}
+
+.cal-course-detail {
+  color: #444;
+}
+
+.cal-course-time {
+  color: #666;
+  font-size: 0.85em;
+}
+
+.cal-lab-badge {
+  display: inline-block;
+  background: #e0a000;
+  color: #fff;
+  font-size: 0.72em;
+  padding: 0 3px;
+  border-radius: 2px;
+  margin-top: 2px;
 }
