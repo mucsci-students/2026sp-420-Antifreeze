@@ -1181,62 +1181,147 @@ View.delete_button.addEventListener("click", async () => {
 });
 
 // Print button
+// Print button — exports a PDF with faculty, room, and lab schedule tables.
 View.print_button.addEventListener("click", () => {
-  if (Model.csv_mode) {
-    print_csv_schedules_pdf();
-  } else {
-    window.open("/print_schedules", "_blank");
-  }
+  print_schedules_pdf().catch(err => {
+    console.error("PDF export error:", err);
+    alert("PDF export failed: " + err.message);
+  });
 });
 
-// Generates and downloads a PDF from the in-memory parsed CSV schedules.
-// Mirrors the layout produced by the backend's export_schedules_pdf().
-function print_csv_schedules_pdf() {
-  const { jsPDF } = window.jspdf;
+// Generates and downloads a PDF with one page per entity (faculty member, room,
+// or lab) across all schedules.  Each page shows a grid: courses as rows,
+// Mon–Fri as columns, with formatted times in cells and a trailing info column.
+// Works for both CSV-loaded schedules and backend-generated schedules.
+async function print_schedules_pdf() {
+  const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+  if (!jsPDF) throw new Error("jsPDF library not loaded. Check your internet connection.");
+
+  // Determine how many schedules to export
+  let schedule_count;
+  if (Model.csv_mode) {
+    schedule_count = Model.csv_schedules.length;
+  } else {
+    const count_data = await Model.api_get_schedule_count();
+    schedule_count = count_data.count || 0;
+  }
+
+  if (schedule_count === 0) {
+    alert("No schedules to print.");
+    return;
+  }
+
+  // Convert "HH:MM-HH:MM" (24-hour) to "H:MM — H:MM am/pm"
+  function fmt_time(t) {
+    const [start, end] = t.split("-");
+    const [sh, sm] = start.split(":").map(Number);
+    const [eh, em] = end.split(":").map(Number);
+    const h12  = h => h % 12 || 12;
+    const ampm = h => h < 12 ? "am" : "pm";
+    const s_str = `${h12(sh)}:${String(sm).padStart(2, "0")}`;
+    const e_str = `${h12(eh)}:${String(em).padStart(2, "0")}`;
+    return ampm(sh) === ampm(eh)
+      ? `${s_str} \u2014 ${e_str} ${ampm(eh)}`
+      : `${s_str} ${ampm(sh)} \u2014 ${e_str} ${ampm(eh)}`;
+  }
+
   const doc = new jsPDF({ orientation: "landscape" });
+  const MODES    = ["faculty", "room", "lab"];
+  const MODE_LABELS = { faculty: "Faculty", room: "Room", lab: "Lab" };
+  // Day columns shown in the grid, matching day_name.substring(0,3)
+  const DAY_COLS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+  // Trailing info column(s) per mode
+  const EXTRA_HEADERS = { faculty: ["Room"], room: ["Faculty"], lab: ["Faculty", "Room"] };
 
-  const DAY_ORDER = ["MON", "TUE", "WED", "THU", "FRI"];
+  let first_page = true;
 
-  Model.csv_schedules.forEach((schedule, i) => {
-    if (i > 0) doc.addPage();
+  for (let i = 0; i < schedule_count; i++) {
+    for (const mode of MODES) {
+      const data = Model.csv_mode
+        ? Model.get_csv_schedule_view(i, mode)
+        : await Model.api_get_schedule_view(i, mode);
 
-    doc.setFontSize(14);
-    doc.setFont(undefined, "bold");
-    doc.text(`Schedule ${i + 1}`, 14, 16);
+      if (data.error) continue;
 
-    // Build rows sorted by day then time, matching the Course view mode
-    const rows = [];
-    for (const entry of schedule) {
-      for (const m of entry.meetings) {
-        rows.push({
-          day: m.day,
-          time: m.time_range + (m.is_lab ? " *" : ""),
-          course: entry.course_id,
-          section: entry.section,
-          faculty: entry.faculty,
-          room: entry.room,
-          lab: entry.lab === "None" ? "—" : entry.lab
+      // Two-level pivot: entity → course_key → { days: {Mon: str, ...}, extra: string[] }
+      const entity_map = {};
+
+      for (const day_group of data.days) {
+        const day_abbr = (day_group.day_name || day_group.day).substring(0, 3);
+
+        for (const sg of day_group.sub_groups) {
+          const entity = sg.sub_key || "—";
+          if (!entity_map[entity]) entity_map[entity] = {};
+
+          for (const slot of sg.slots) {
+            // Lab meetings belong only in the Lab section
+            if (mode === "room" && slot.is_lab) continue;
+
+            const course_key = slot.section
+              ? `${slot.course}.${slot.section}`
+              : slot.course;
+
+            if (!entity_map[entity][course_key]) {
+              // Derive trailing column value(s) from this slot
+              const extra =
+                mode === "faculty" ? [slot.room    || "—"] :
+                mode === "room"    ? [slot.faculty || "—"] :
+                /* lab */            [slot.faculty || "—", slot.room || "—"];
+              entity_map[entity][course_key] = { days: {}, extra };
+            }
+
+            const entry = entity_map[entity][course_key];
+            const time_str = fmt_time(slot.time) + (slot.is_lab ? " *" : "");
+            // Multiple meetings on the same day are separated by a newline
+            entry.days[day_abbr] = entry.days[day_abbr]
+              ? entry.days[day_abbr] + "\n" + time_str
+              : time_str;
+          }
+        }
+      }
+
+      const entities = Object.keys(entity_map).sort();
+      if (entities.length === 0) continue;
+
+      // One page per entity
+      for (const entity of entities) {
+        const courses = entity_map[entity];
+        const course_keys = Object.keys(courses).sort();
+        if (course_keys.length === 0) continue;
+
+        if (!first_page) doc.addPage();
+        first_page = false;
+
+        // Page header: entity name + schedule label
+        doc.setFontSize(14);
+        doc.setFont(undefined, "bold");
+        doc.text(entity, 14, 16);
+        doc.setFontSize(10);
+        doc.setFont(undefined, "normal");
+        doc.text(`Schedule ${i + 1} \u2014 ${MODE_LABELS[mode]}`, 14, 23);
+
+        // Grid table: [Course, Mon, Tue, Wed, Thu, Fri, ...extra]
+        const col_headers = ["Course", ...DAY_COLS, ...EXTRA_HEADERS[mode]];
+        const rows = course_keys.map(ck => {
+          const c = courses[ck];
+          return [ck, ...DAY_COLS.map(d => c.days[d] || ""), ...c.extra];
+        });
+
+        doc.autoTable({
+          startY: 27,
+          head: [col_headers],
+          body: rows,
+          styles:             { fontSize: 9, cellPadding: 3 },
+          headStyles:         { fillColor: [200, 200, 200], textColor: 0, fontStyle: "bold" },
+          alternateRowStyles: { fillColor: [245, 245, 245] },
+          foot:               [["* = lab session"]],
+          footStyles:         { fillColor: 255, textColor: 120, fontStyle: "italic", fontSize: 7 },
+          margin:             { left: 14, right: 14 },
+          columnStyles:       { 0: { cellWidth: 30 } },
         });
       }
     }
-    rows.sort((a, b) => {
-      const d = DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day);
-      return d !== 0 ? d : a.time.localeCompare(b.time);
-    });
-
-    const table_rows = rows.map(r => [r.time, r.course, r.section, r.faculty, r.room, r.lab]);
-
-    doc.autoTable({
-      startY: 22,
-      head: [["Time", "Course", "Section", "Faculty", "Room", "Lab"]],
-      body: table_rows,
-      styles: { fontSize: 9, cellPadding: 3 },
-      headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: "bold" },
-      alternateRowStyles: { fillColor: [245, 245, 245] },
-      foot: [["* = lab session"]],
-      footStyles: { fillColor: 255, textColor: 120, fontStyle: "italic", fontSize: 8 }
-    });
-  });
+  }
 
   doc.save("schedules.pdf");
 }
