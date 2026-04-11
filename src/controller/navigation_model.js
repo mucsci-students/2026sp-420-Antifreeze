@@ -56,7 +56,7 @@ export function clear_forward_stack() { forward_stack = []; }
 // ---------------------------------------------------------------------------
 
 export async function api_load_empty_config() {
- return await fetch("/load_empty_config", { method: "POST" });
+  return await fetch("/load_empty_config", { method: "POST" });
 }
 
 export async function api_load_config(file) {
@@ -267,7 +267,7 @@ export async function api_get_schedule_count() {
 
 // Parses a multi-schedule CSV file into an array of schedules.
 // Each schedule is an array of course-entry objects.
-// CSV format per row: COURSE.SECTION,FACULTY,ROOM,LAB,TIME1,TIME2,...
+// CSV format per row: COURSE.SECTION,FACULTY,ROOM,LAB,TIME1,TIME2,....
 // Times are "DAY HH:MM-HH:MM" with an optional trailing "^" marking a lab meeting.
 // "Schedule N:" lines are used as delimiters between schedules.
 export function parse_csv_schedules(text) {
