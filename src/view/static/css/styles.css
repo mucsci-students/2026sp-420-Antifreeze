@@ -670,6 +670,7 @@ main.schedule-view-expanded {
 
 main.schedule-view-expanded .navigator {
   overflow-y: visible;
+  overflow-x: auto;
 }
 
 /* ----- Schedule Calendar View ----- */
@@ -786,7 +787,7 @@ main.schedule-view-expanded .navigator {
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 3px;
   padding: 3px 5px;
-  margin: 2px 1px;
+  margin: 0;
   font-size: 0.9em;
   line-height: 1.35;
   cursor: default;

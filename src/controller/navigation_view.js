@@ -704,6 +704,8 @@ export function render_schedule_view_inline(index, on_load_click, on_group_chang
 // Renders calendar grids into #schedule-calendar-container.
 // For faculty/room/lab modes: one card per entity with a Mon–Fri grid.
 // For course mode: a single grid with all courses.
+// Classes are absolutely positioned by their actual start/end times so that
+// heights are proportional to duration and the time axis has no duplicate labels.
 // Parameters: data - schedule view object from API or get_csv_schedule_view,
 //             index - 0-based schedule index, mode - grouping mode string
 export function render_schedule_calendar(data, index, mode) {
@@ -748,6 +750,33 @@ export function render_schedule_calendar(data, index, mode) {
     }
   }
 
+  // Compute the global time range from all time slot strings so the axis
+  // is consistent across every card.
+  let global_min = Infinity, global_max = -Infinity;
+  for (const ts of time_slots) {
+    const parts = ts.split("-");
+    const s = _parse_time_minutes(parts[0].trim());
+    const e = _parse_time_minutes(parts.length > 1 ? parts[1].trim() : parts[0].trim());
+    if (s < global_min) global_min = s;
+    if (e > global_max) global_max = e;
+  }
+  // Round outward to the nearest 30-minute boundary for clean tick alignment
+  global_min = Math.floor(global_min / 30) * 30;
+  global_max = Math.ceil(global_max / 30) * 30;
+
+  const PX_PER_MIN  = 2.0;   // vertical scale: pixels per minute
+  const TICK_MIN    = 30;    // draw a grid line every 30 minutes
+  const HEADER_H    = 26;    // px height of day-name header row
+  const BOTTOM_PAD  = 12;    // extra px below last tick so its label isn't clipped
+  const total_height = (global_max - global_min) * PX_PER_MIN;
+
+  // Format minutes-since-midnight as "HH:MM"
+  function fmt_min(minutes) {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  }
+
   groups.forEach(group => {
     const card = document.createElement("div");
     card.className = "schedule-calendar-card";
@@ -759,60 +788,139 @@ export function render_schedule_calendar(data, index, mode) {
       card.appendChild(title);
     }
 
-    const table = document.createElement("table");
-    table.className = "calendar-table";
-
     // Only show days that have at least one event for this group
     const active_days = DAY_ABBREVS.filter(d =>
       group.day_map[d] && Object.keys(group.day_map[d]).length > 0
     );
     const display_days = active_days.length > 0 ? active_days : DAY_ABBREVS;
 
-    // Header row
-    const thead = document.createElement("thead");
-    const head_row = document.createElement("tr");
-    const blank_th = document.createElement("th");
-    blank_th.className = "cal-time-header";
-    head_row.appendChild(blank_th);
+    // ── Outer row: time-axis column + one column per displayed day ──────────
+    const grid_outer = document.createElement("div");
+    grid_outer.style.display = "flex";
+    grid_outer.style.alignItems = "flex-start";
+
+    // ---- Time-axis column ----
+    const time_col = document.createElement("div");
+    time_col.style.flexShrink = "0";
+    time_col.style.width = "48px";
+    time_col.style.display = "flex";
+    time_col.style.flexDirection = "column";
+
+    // Blank cell to align vertically with the day-name headers
+    const time_blank = document.createElement("div");
+    time_blank.style.height = HEADER_H + "px";
+    time_blank.style.flexShrink = "0";
+    time_col.appendChild(time_blank);
+
+    // Time label strip
+    const time_axis = document.createElement("div");
+    time_axis.style.position = "relative";
+    time_axis.style.height = (total_height + BOTTOM_PAD) + "px";
+    for (let t = global_min; t <= global_max; t += TICK_MIN) {
+      const lbl = document.createElement("div");
+      lbl.style.position = "absolute";
+      lbl.style.top = ((t - global_min) * PX_PER_MIN) + "px";
+      lbl.style.transform = "translateY(-50%)";
+      lbl.style.fontSize = "0.70em";
+      lbl.style.color = "#888";
+      lbl.style.right = "4px";
+      lbl.style.whiteSpace = "nowrap";
+      lbl.textContent = fmt_min(t);
+      time_axis.appendChild(lbl);
+    }
+    time_col.appendChild(time_axis);
+    grid_outer.appendChild(time_col);
+
+    // ---- One column per displayed day ----
     display_days.forEach(day => {
-      const th = document.createElement("th");
-      th.className = "cal-day-header";
-      th.textContent = DAY_LABELS[day];
-      head_row.appendChild(th);
-    });
-    thead.appendChild(head_row);
-    table.appendChild(thead);
+      const day_slot_map = group.day_map[day] || {};
+      const max_concurrent = Object.values(day_slot_map).reduce(
+        (mx, slots) => Math.max(mx, slots.length), 1
+      );
+      const day_wrap = document.createElement("div");
+      day_wrap.style.flex = "1";
+      day_wrap.style.minWidth = (max_concurrent * 90) + "px";
+      day_wrap.style.display = "flex";
+      day_wrap.style.flexDirection = "column";
+      day_wrap.style.borderLeft = "1px solid #ccc";
 
-    // One row per unique time slot
-    const tbody = document.createElement("tbody");
-    time_slots.forEach(time => {
-      const row = document.createElement("tr");
+      // Day-name header
+      const day_hdr = document.createElement("div");
+      day_hdr.style.height = HEADER_H + "px";
+      day_hdr.style.display = "flex";
+      day_hdr.style.alignItems = "center";
+      day_hdr.style.justifyContent = "center";
+      day_hdr.style.fontWeight = "bold";
+      day_hdr.style.fontSize = "0.78em";
+      day_hdr.style.background = "#e8e8e8";
+      day_hdr.style.borderBottom = "2px solid #999";
+      day_hdr.textContent = DAY_LABELS[day];
+      day_wrap.appendChild(day_hdr);
 
-      const time_td = document.createElement("td");
-      time_td.className = "cal-time-cell";
-      time_td.textContent = time.split("-")[0].trim();
-      row.appendChild(time_td);
+      // Day body — fixed height, relative for absolute children
+      const day_body = document.createElement("div");
+      day_body.style.position = "relative";
+      day_body.style.height = (total_height + BOTTOM_PAD) + "px";
+      day_body.style.overflow = "hidden";
+      day_body.style.background = "#fff";
 
-      display_days.forEach(day => {
-        const cell_td = document.createElement("td");
-        cell_td.className = "cal-day-cell";
+      // Horizontal grid lines
+      for (let t = global_min; t <= global_max; t += TICK_MIN) {
+        const line = document.createElement("div");
+        line.style.position = "absolute";
+        line.style.top = ((t - global_min) * PX_PER_MIN) + "px";
+        line.style.left = "0";
+        line.style.right = "0";
+        line.style.height = "1px";
+        line.style.background = t % 60 === 0 ? "#d0d0d0" : "#efefef";
+        day_body.appendChild(line);
+      }
 
-        const slots = (group.day_map[day] && group.day_map[day][time]) || [];
-        slots.forEach(slot => {
+      // Absolutely-positioned class blocks
+      const day_slots = day_slot_map;
+      for (const [time_str, slots] of Object.entries(day_slots)) {
+        const parts = time_str.split("-");
+        const start_min = _parse_time_minutes(parts[0].trim());
+        const end_min   = _parse_time_minutes(parts.length > 1 ? parts[1].trim() : parts[0].trim());
+        const duration  = Math.max(end_min - start_min, 10); // guard against zero-length
+
+        const top_px    = (start_min - global_min) * PX_PER_MIN;
+        const height_px = Math.max(duration * PX_PER_MIN - 3, 14);
+        const n = slots.length;
+
+        slots.forEach((slot, si) => {
           const block = document.createElement("div");
           block.className = "cal-course-block";
+          block.style.position = "absolute";
+          block.style.top = top_px + "px";
+          block.style.height = height_px + "px";
+          block.style.left = `calc(${(si / n) * 100}% + 2px)`;
+          block.style.width = `calc(${(1 / n) * 100}% - 4px)`;
           block.style.backgroundColor = course_colors[slot.course] || "#e0e0e0";
+          block.style.overflow = "hidden";
+          block.style.boxSizing = "border-box";
+          block.style.margin = "0";
 
-          const id_line = document.createElement("div");
-          id_line.className = "cal-course-id";
-          id_line.textContent = slot.section ? `${slot.course}.${slot.section}` : slot.course;
-          block.appendChild(id_line);
-
-          // Secondary detail depends on group mode
           const detail = mode === "faculty" ? slot.room
                        : mode === "room"    ? slot.faculty
                        : mode === "lab"     ? slot.faculty
                        :                      slot.faculty;
+          const course_label = slot.section ? `${slot.course}.${slot.section}` : slot.course;
+
+          // Always put everything in a tooltip so no info is ever truly lost
+          const tooltip_parts = [course_label];
+          if (detail && detail !== "None" && detail !== "—") tooltip_parts.push(detail);
+          tooltip_parts.push(time_str);
+          if (slot.is_lab) tooltip_parts.push("LAB");
+          block.title = tooltip_parts.join(" | ");
+
+          // Course ID is always shown
+          const id_line = document.createElement("div");
+          id_line.className = "cal-course-id";
+          id_line.textContent = course_label;
+          block.appendChild(id_line);
+
+          // Detail (faculty/room)
           if (detail && detail !== "None" && detail !== "—") {
             const detail_line = document.createElement("div");
             detail_line.className = "cal-course-detail";
@@ -820,9 +928,10 @@ export function render_schedule_calendar(data, index, mode) {
             block.appendChild(detail_line);
           }
 
+          // Time range
           const time_line = document.createElement("div");
           time_line.className = "cal-course-time";
-          time_line.textContent = time;
+          time_line.textContent = time_str;
           block.appendChild(time_line);
 
           if (slot.is_lab) {
@@ -832,17 +941,15 @@ export function render_schedule_calendar(data, index, mode) {
             block.appendChild(badge);
           }
 
-          cell_td.appendChild(block);
+          day_body.appendChild(block);
         });
+      }
 
-        row.appendChild(cell_td);
-      });
-
-      tbody.appendChild(row);
+      day_wrap.appendChild(day_body);
+      grid_outer.appendChild(day_wrap);
     });
 
-    table.appendChild(tbody);
-    card.appendChild(table);
+    card.appendChild(grid_outer);
     grid_wrap.appendChild(card);
   });
 }
@@ -880,10 +987,11 @@ function _transform_to_calendar(data) {
     groups = [{ name: null, day_map: _build_day_time_map(all_slots) }];
   } else {
     const key_fn = mode === "faculty" ? s => s.faculty
-                 : mode === "room"    ? s => s.room
+                 : mode === "room"    ? s => (s.is_lab ? s.lab : s.room)
                  :                      s => s.lab;
+    const slots_to_group = mode === "lab" ? all_slots.filter(s => s.is_lab) : all_slots;
     const group_map = {};
-    for (const slot of all_slots) {
+    for (const slot of slots_to_group) {
       const key = key_fn(slot);
       if (!group_map[key]) group_map[key] = [];
       group_map[key].push(slot);
