@@ -670,6 +670,7 @@ main.schedule-view-expanded {
 
 main.schedule-view-expanded .navigator {
   overflow-y: visible;
+  overflow-x: auto;
 }
 
 /* ----- Schedule Calendar View ----- */

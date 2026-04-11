@@ -833,9 +833,13 @@ export function render_schedule_calendar(data, index, mode) {
 
     // ---- One column per displayed day ----
     display_days.forEach(day => {
+      const day_slot_map = group.day_map[day] || {};
+      const max_concurrent = Object.values(day_slot_map).reduce(
+        (mx, slots) => Math.max(mx, slots.length), 1
+      );
       const day_wrap = document.createElement("div");
       day_wrap.style.flex = "1";
-      day_wrap.style.minWidth = "90px";
+      day_wrap.style.minWidth = (max_concurrent * 90) + "px";
       day_wrap.style.display = "flex";
       day_wrap.style.flexDirection = "column";
       day_wrap.style.borderLeft = "1px solid #ccc";
@@ -873,7 +877,7 @@ export function render_schedule_calendar(data, index, mode) {
       }
 
       // Absolutely-positioned class blocks
-      const day_slots = group.day_map[day] || {};
+      const day_slots = day_slot_map;
       for (const [time_str, slots] of Object.entries(day_slots)) {
         const parts = time_str.split("-");
         const start_min = _parse_time_minutes(parts[0].trim());
