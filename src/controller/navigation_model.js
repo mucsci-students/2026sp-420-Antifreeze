@@ -359,12 +359,14 @@ export function get_csv_schedule_view(index, mode) {
   // Group by day, then optionally sub-group by mode key
   const key_fn = {
     faculty: s => s.faculty,
-    room: s => s.room,
+    room: s => (s.is_lab ? s.lab : s.room),
     lab: s => s.lab
   }[mode] || null;
 
+  const view_slots = mode === "lab" ? all_slots.filter(s => s.is_lab) : all_slots;
+
   const days_map = {};
-  for (const slot of all_slots) {
+  for (const slot of view_slots) {
     (days_map[slot.day] = days_map[slot.day] || []).push(slot);
   }
 

@@ -983,10 +983,11 @@ function _transform_to_calendar(data) {
     groups = [{ name: null, day_map: _build_day_time_map(all_slots) }];
   } else {
     const key_fn = mode === "faculty" ? s => s.faculty
-                 : mode === "room"    ? s => s.room
+                 : mode === "room"    ? s => (s.is_lab ? s.lab : s.room)
                  :                      s => s.lab;
+    const slots_to_group = mode === "lab" ? all_slots.filter(s => s.is_lab) : all_slots;
     const group_map = {};
-    for (const slot of all_slots) {
+    for (const slot of slots_to_group) {
       const key = key_fn(slot);
       if (!group_map[key]) group_map[key] = [];
       group_map[key].push(slot);
