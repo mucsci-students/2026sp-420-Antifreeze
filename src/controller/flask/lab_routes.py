@@ -2,9 +2,14 @@ from flask import request, jsonify
 
 
 def register_lab_routes(app, scheduler):
+    """Registers all lab REST API routes on the Flask app.
+
+    All handlers close over `scheduler` for access to the config and lab list.
+    """
 
     @app.route("/labs", methods=["GET"])
     def get_labs():
+        """Return a JSON array of all lab names in the current config."""
         try:
             labs = []
 
@@ -18,6 +23,9 @@ def register_lab_routes(app, scheduler):
 
     @app.route("/labs", methods=["POST"])
     def add_lab():
+        """Add a new lab. Expects JSON body with key 'name'.
+        Returns 409 if the lab already exists (case-insensitive check).
+        """
         try:
             data = request.json
             name = data["name"]
@@ -41,6 +49,9 @@ def register_lab_routes(app, scheduler):
 
     @app.route("/labs/<lab_name>", methods=["DELETE"])
     def delete_lab(lab_name):
+        """Delete the named lab and cascade removal to course lab lists.
+        Returns 404 if the lab does not exist.
+        """
         try:
             labs = scheduler.config.config.labs
 
@@ -66,6 +77,10 @@ def register_lab_routes(app, scheduler):
 
     @app.route("/labs/<lab_name>", methods=["PUT"])
     def modify_lab(lab_name):
+        """Rename a lab and cascade the change to all course lab lists.
+        Expects JSON body with key 'name' (new name).
+        Returns 404 if the old name is not found; 409 if the new name already exists.
+        """
         try:
             data = request.json
             new_name = data["name"]

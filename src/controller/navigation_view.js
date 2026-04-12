@@ -389,6 +389,9 @@ export function clear_field_containers() {
 // Schedule renderers
 // ---------------------------------------------------------------------------
 
+// Renders the initial schedule generator form into navigator_div.
+// Parameters: count - initial value for the schedule-count input,
+//             optimize - initial checked state for the optimize checkbox
 export function render_schedule_form(count = 10, optimize = true) {
   main.classList.remove("schedule-view-expanded");
   navigator_div.innerHTML = `
@@ -409,6 +412,10 @@ export function render_schedule_form(count = 10, optimize = true) {
   `;
 }
 
+// Re-renders the schedule form with a status message and progress bar container.
+// Called during and after schedule generation.
+// Parameters: count - number of schedules requested, optimize - optimize flag,
+//             status_message - text to display in the #schedule-status div
 export function render_schedule_status(count, optimize, status_message) {
   navigator_div.innerHTML = `
     <h3 id="schedule-generator">Schedule Generator</h3>
@@ -431,6 +438,11 @@ export function render_schedule_status(count, optimize, status_message) {
   `;
 }
 
+// Animates the #progress-bar div from 0% to 100% at a speed scaled by count.
+// Stops advancing at 99% while status_message indicates work is in progress,
+// then jumps to 100% once finished.
+// Parameters: count - number of schedules (affects animation interval speed),
+//             status_message - used to detect whether generation is still running
 export function render_progress_bar(count, status_message) {
   var progress_bar = document.getElementById("progress-bar");
   var width = 0;
@@ -460,6 +472,8 @@ export function render_progress_bar(count, status_message) {
   progress_bar.innerHTML = '100%';
 }
 
+// Enables and highlights the View and Print toolbar buttons after schedules
+// have been successfully generated or a CSV schedule file has been loaded.
 export function render_schedules_generated_buttons() {
   view_img.src = "/static/images/view.png";
   print_img.src = "/static/images/print.png";
@@ -713,7 +727,7 @@ export function render_schedule_calendar(data, index, mode) {
   if (!container) return;
   container.innerHTML = "";
 
-  const { groups, time_slots, DAY_ABBREVS, DAY_LABELS } = _transform_to_calendar(data);
+  const { groups, time_slots, DAY_ABBREVS, DAY_LABELS } = transform_to_calendar(data);
 
   if (groups.length === 0 || time_slots.length === 0) {
     container.textContent = "No schedule data to display.";
@@ -755,8 +769,8 @@ export function render_schedule_calendar(data, index, mode) {
   let global_min = Infinity, global_max = -Infinity;
   for (const ts of time_slots) {
     const parts = ts.split("-");
-    const s = _parse_time_minutes(parts[0].trim());
-    const e = _parse_time_minutes(parts.length > 1 ? parts[1].trim() : parts[0].trim());
+    const s = parse_time_minutes(parts[0].trim());
+    const e = parse_time_minutes(parts.length > 1 ? parts[1].trim() : parts[0].trim());
     if (s < global_min) global_min = s;
     if (e > global_max) global_max = e;
   }
@@ -880,8 +894,8 @@ export function render_schedule_calendar(data, index, mode) {
       const day_slots = day_slot_map;
       for (const [time_str, slots] of Object.entries(day_slots)) {
         const parts = time_str.split("-");
-        const start_min = _parse_time_minutes(parts[0].trim());
-        const end_min   = _parse_time_minutes(parts.length > 1 ? parts[1].trim() : parts[0].trim());
+        const start_min = parse_time_minutes(parts[0].trim());
+        const end_min   = parse_time_minutes(parts.length > 1 ? parts[1].trim() : parts[0].trim());
         const duration  = Math.max(end_min - start_min, 10); // guard against zero-length
 
         const top_px    = (start_min - global_min) * PX_PER_MIN;
@@ -956,7 +970,7 @@ export function render_schedule_calendar(data, index, mode) {
 
 // Transforms API schedule data { mode, days } into calendar-grid format.
 // Returns { groups, time_slots, DAY_ABBREVS, DAY_LABELS }.
-function _transform_to_calendar(data) {
+export function transform_to_calendar(data) {
   const DAY_ABBREVS = ["MON", "TUE", "WED", "THU", "FRI"];
   const DAY_LABELS = { MON: "Monday", TUE: "Tuesday", WED: "Wednesday", THU: "Thursday", FRI: "Friday" };
   // Reverse lookup used when day_group only has day_name (CSV mode)
@@ -978,13 +992,13 @@ function _transform_to_calendar(data) {
   // Unique time strings sorted by start time
   const time_set = new Set(all_slots.map(s => s.time));
   const time_slots = [...time_set].sort((a, b) =>
-    _parse_time_minutes(a.split("-")[0].trim()) - _parse_time_minutes(b.split("-")[0].trim())
+    parse_time_minutes(a.split("-")[0].trim()) - parse_time_minutes(b.split("-")[0].trim())
   );
 
   const mode = data.mode;
   let groups;
   if (mode === "course") {
-    groups = [{ name: null, day_map: _build_day_time_map(all_slots) }];
+    groups = [{ name: null, day_map: build_day_time_map(all_slots) }];
   } else {
     const key_fn = mode === "faculty" ? s => s.faculty
                  : mode === "room"    ? s => (s.is_lab ? s.lab : s.room)
@@ -998,14 +1012,14 @@ function _transform_to_calendar(data) {
     }
     groups = Object.entries(group_map)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([name, slots]) => ({ name, day_map: _build_day_time_map(slots) }));
+      .map(([name, slots]) => ({ name, day_map: build_day_time_map(slots) }));
   }
 
   return { groups, time_slots, DAY_ABBREVS, DAY_LABELS };
 }
 
 // Builds a nested { day: { time: [slots] } } map from a flat slots array.
-function _build_day_time_map(slots) {
+export function build_day_time_map(slots) {
   const day_map = {};
   for (const slot of slots) {
     if (!day_map[slot.day]) day_map[slot.day] = {};
@@ -1017,7 +1031,7 @@ function _build_day_time_map(slots) {
 
 // Parses a time string to minutes since midnight.
 // Handles "9:00", "09:00", "9:00AM", "10:00AM" formats.
-function _parse_time_minutes(t) {
+export function parse_time_minutes(t) {
   const is_pm = /PM/i.test(t);
   const is_am = /AM/i.test(t);
   const clean = t.replace(/[APMapm\s]/g, "");
@@ -1707,11 +1721,13 @@ export function render_modify_time_slots_popup(prefill) {
 // Popup helpers
 // ---------------------------------------------------------------------------
 
+// Shows the AMD popup and disables pointer events on the main wrapper.
 export function show_popup() {
   amd_popup.classList.remove("popup-hidden");
   wrapper.style.pointerEvents = "none";
 }
 
+// Clears the popup form, hides the popup, and restores pointer events.
 export function hide_popup() {
   popup_form.innerHTML = "";
   amd_popup.classList.add("popup-hidden");

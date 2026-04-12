@@ -2,9 +2,14 @@ from flask import request, jsonify
 
 
 def register_room_routes(app, scheduler):
+    """Registers all room REST API routes on the Flask app.
+
+    All handlers close over `scheduler` for access to the config and room list.
+    """
 
     @app.route("/rooms", methods=["GET"])
     def get_rooms():
+        """Return a JSON array of all room names in the current config."""
         try:
             rooms = []
 
@@ -18,6 +23,9 @@ def register_room_routes(app, scheduler):
 
     @app.route("/rooms", methods=["POST"])
     def add_room():
+        """Add a new room. Expects JSON body with key 'name'.
+        Returns 409 if the room already exists (case-insensitive check).
+        """
         try:
             data = request.json
             name = data["name"]
@@ -41,6 +49,9 @@ def register_room_routes(app, scheduler):
 
     @app.route("/rooms/<room_name>", methods=["DELETE"])
     def delete_room(room_name):
+        """Delete the named room and cascade removal to course room lists.
+        Returns 404 if the room does not exist.
+        """
         try:
             rooms = scheduler.config.config.rooms
 
@@ -66,6 +77,10 @@ def register_room_routes(app, scheduler):
 
     @app.route("/rooms/<room_name>", methods=["PUT"])
     def modify_room(room_name):
+        """Rename a room and cascade the change to all course room lists.
+        Expects JSON body with key 'name' (new name).
+        Returns 404 if the old name is not found; 409 if the new name already exists.
+        """
         try:
             data = request.json
             new_name = data["name"]

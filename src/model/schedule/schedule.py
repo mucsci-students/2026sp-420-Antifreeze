@@ -59,7 +59,11 @@ class Schedule:
                 return
 
     def load_empty_prototype(self):
+        """Reset the scheduler to a clean empty configuration.
 
+        Deep-copies the stored empty prototype so the original is never mutated.
+        Also clears any previously-generated schedule results.
+        """
         self.config = copy.deepcopy(self._empty_prototype)
         self.result = []
         return
@@ -131,7 +135,10 @@ class Schedule:
     # Prints courses, faculty assignments, classes, time slots, and misc settings
     # Requires a loaded configuration
     def print_schedule(self, count: int = 1):
+        """Return up to `count` generated schedules as lists of CSV row strings.
 
+        Returns an empty list if no schedules have been generated yet.
+        """
         if not self.result:
             return []
 
@@ -150,6 +157,10 @@ class Schedule:
         return output
 
     def export_schedule_csv(self, index: int):
+        """Return the schedule at the given index as a newline-joined CSV string.
+
+        Returns an empty string if no schedules have been generated.
+        """
         if not self.result:
             return ""
 
@@ -163,7 +174,12 @@ class Schedule:
         return "\n".join(lines)
 
     def export_schedules_pdf(self):
+        """Export all generated schedules as a PDF using ReportLab.
 
+        Each schedule is rendered as a titled table with course, faculty, room, lab,
+        and time columns.  Returns a BytesIO buffer positioned at the start, or
+        None if no schedules have been generated.
+        """
         if not self.result:
             return None
 
