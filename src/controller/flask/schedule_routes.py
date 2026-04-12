@@ -171,11 +171,12 @@ def register_schedule_routes(app, scheduler):
 
                 # group_key_fn = lambda e: e["faculty"]
             elif mode == "room":
+                slot_entries = [e for e in slot_entries if not e["is_lab"]]
 
                 def group_key_fn(e):
-                    return e["lab"] if e["is_lab"] else e["room"]
+                    return e["room"]
 
-                # group_key_fn = lambda e: e["lab"] if e["is_lab"] else e["room"]
+                # group_key_fn = lambda e: e["room"]
             elif mode == "lab":
                 slot_entries = [e for e in slot_entries if e["is_lab"]]
 
