@@ -30,6 +30,13 @@
             <a id="save-csv" href="path_to_file" download="proposed_file_name">... as .csv</a>
           </div>
         </div>
+        <div id="secret-toggle">
+          <span class="secret-hover">Enable for Secret</span>
+          <label class="switch">
+            <input type="checkbox">
+            <span class="slider"></span>
+          </label>
+        </div>
       </div>
       <hr />
       <div class="edit-bar">
@@ -66,7 +73,11 @@
           <div class="speech-bubble"></div>
         </div>
         <button id="chat-toggle">
-          <img src="/static/images/thinking.gif" alt="Chat" />Chat
+          <img id="clippy-think" src="/static/images/thinking.gif" alt="Chat" />
+          <img id="clippy-idle" src="/static/images/clippy_large.png" alt="Chat" />
+          <img id="clippy-poke" src="/static/images/poke.gif" alt="Chat" />
+          <img id="clippy-idle" src="/static/images/clippy_large.png" alt="Chat" />
+          <p>Chat</p>
         </button>
       </div>
       <hr />
@@ -78,14 +89,20 @@
         <button id="rooms-button">ROOMS</button>
         <button id="time-slots-button">TIME SLOTS</button>
         <button id="schedule-button">SCHEDULE</button>
-        <div class="sound-toggle">
-          <button id="text-to-speech-button">
-            <img src="/static/images/no_tts.png" alt="Text to Speech" />
-          </button>
-          <button id="speech-to-text-button">
-            <img src="/static/images/no_stt.png" alt="Speech to Text" />
-          </button>
-        </div>
+      </div>
+      <div id="text-to-speech">
+        <span class="text-to-speech-hover">Text-to-speech</span>
+        <label class="switch">
+          <input type="checkbox">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div id="speech-to-text">
+        <span class="speech-to-text-hover">Speech-to-text</span>
+        <label class="switch">
+          <input type="checkbox">
+          <span class="slider"></span>
+        </label>
       </div>
     </nav>
     <div id="main-container">
