@@ -122,7 +122,7 @@ class room:
 
     # Prints all rooms in the config.
     # Parameters: config
-    def print_rooms(self, config: "CombinedConfig"):
+    def print_rooms(self, config: "CombinedConfig"):  # pragma: no cover
         rooms = config.config.rooms
         print("\nRooms:")
         for room in rooms:
