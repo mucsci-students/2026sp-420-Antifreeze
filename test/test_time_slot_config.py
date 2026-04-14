@@ -412,7 +412,7 @@ class TestValidateClassEntryModifyDelete:
         assert T.validate_class_entry(cfg, "delete", class_index=0) is False
 
 
-# validate_class_entry — modify / delete
+# validate_class_entry — neither
 
 
 class TestValidateClassEntryNeither:
