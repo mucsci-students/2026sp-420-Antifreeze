@@ -412,6 +412,14 @@ class TestValidateClassEntryModifyDelete:
         assert T.validate_class_entry(cfg, "delete", class_index=0) is False
 
 
+# validate_class_entry — modify / delete
+
+
+class TestValidateClassEntryNeither:
+    def test_invalid_call_to_validate_class_entry(self, T, classes_cfg):
+        assert T.validate_class_entry(classes_cfg, "neither", class_index=None) is True
+
+
 # add_class
 
 
