@@ -125,11 +125,16 @@ hr {
   cursor: pointer;
 }
 
+#save-button {
+  margin-top: 7px;
+}
+
 #save-button a {
   text-decoration: none;
   color: #484848;
 }
 
+/* ----- Save Button Dropdown ----- */
 .dropdown-content {
   display: none;
   position: absolute;
@@ -163,6 +168,84 @@ hr {
 
 .save-dropdown:hover #save-button {
   color: #808080;
+}
+
+/* ----- FNAF Toggle ----- */
+.switch {
+  position: relative;
+  margin-top: 8px;
+  margin-left: 1050px;
+  width: 55px;
+  height: 24px;
+  float: right;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  border-style: inset;
+  border-top-color: #bbbbbb;
+  border-left-color: #bbbbbb;
+  border-bottom-color: #ffffff;
+  border-right-color: #ffffff;
+  border-width: 3px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 15px;
+  width: 15px;
+  left: 4px;
+  bottom: 3px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2d958a;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2d958a;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+.secret-hover {
+  visibility: hidden;
+  width: 150px;
+  background-color: rgba(0, 0, 0, 0.558);;
+  color: #ffffff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  position: absolute;
+  right: 172px;
+  top: 100px;
+  z-index: 2;
+}
+
+#secret-toggle:hover .secret-hover {
+  visibility: visible;
 }
 
 /* ----- Edit Bar ----- */
@@ -261,9 +344,9 @@ button:disabled {
   color: #808080;
 }
 
-/* ----- Selection Bar ----- */
+/* ----- Selection and Sound Bar ----- */
 .selection-bar {
-  display: flex;
+  display: inline-flex;
 }
 
 .selection-bar p {
@@ -280,6 +363,55 @@ button:disabled {
   width: 95px;
   height: 25px;
   padding-bottom: 2px;
+}
+
+#text-to-speech {
+  position: absolute;
+  right: 236px;
+  top: 209px;
+  z-index: 1;
+}
+
+.text-to-speech-hover {
+  visibility: hidden;
+  width: 130px;
+  background-color: rgba(0, 0, 0, 0.558);;
+  color: #ffffff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  position: absolute;
+  right: 0;
+  top: 35px;
+  z-index: 2;
+}
+
+#text-to-speech:hover .text-to-speech-hover {
+  visibility: visible;
+}
+
+#speech-to-text {
+  position: absolute;
+  right: 171px;
+  top: 209px;
+}
+
+.speech-to-text-hover {
+  visibility: hidden;
+  width: 130px;
+  background-color: rgba(0, 0, 0, 0.558);
+  color: #ffffff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  position: absolute;
+  right: 0;
+  top: 35px;
+  z-index: 2;
+}
+
+#speech-to-text:hover .speech-to-text-hover {
+  visibility: visible;
 }
 
 /* ----- Faculty Tab ----- */
