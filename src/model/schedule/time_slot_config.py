@@ -136,7 +136,7 @@ class time_slot_config:
 
     # Prints all time ranges for every day.
     # Parameters: config
-    def print_times(self, config):
+    def print_times(self, config):  # pragma: no cover
         times = config.time_slot_config.times
         print("\nTime Slot Grid:")
         for day in ["MON", "TUE", "WED", "THU", "FRI"]:
@@ -278,7 +278,7 @@ class time_slot_config:
 
     # Prints all class meeting patterns in the config.
     # Parameters: config
-    def print_classes(self, config):
+    def print_classes(self, config):  # pragma: no cover
         classes = config.time_slot_config.classes
         print("\nClass Meeting Patterns:")
         for i, cls in enumerate(classes):
@@ -317,6 +317,6 @@ class time_slot_config:
     # CONVENIENCE / PRINT ALL
     # Prints the full time slot configuration (times + classes).
     # Parameters: config
-    def print_time_slot_config(self, config):
+    def print_time_slot_config(self, config):  # pragma: no cover
         self.print_times(config)
         self.print_classes(config)
