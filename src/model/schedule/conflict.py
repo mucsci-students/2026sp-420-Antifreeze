@@ -184,7 +184,7 @@ class conflict:
 
     # Prints all course conflicts in the config.
     # Parameters: config
-    def print_conflicts(self, config: "CombinedConfig"):
+    def print_conflicts(self, config: "CombinedConfig"):  # pragma: no cover
         courses = config.config.courses
         print("\nCourse Conflicts:")
         for course in courses:
