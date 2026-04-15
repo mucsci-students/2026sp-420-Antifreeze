@@ -20,6 +20,9 @@ export const modify_button = document.getElementById("modify-button");
 export const delete_button = document.getElementById("delete-button");
 export const view_button = document.getElementById("view-button");
 export const print_button = document.getElementById("print-button");
+export const undo_button = document.getElementById("undo-button");
+export const redo_button = document.getElementById("redo-button");
+export const chat_button = document.getElementById("chat-toggle");
 export function get_chat_button() {
     return document.getElementById("chat-toggle");
 }
@@ -39,6 +42,9 @@ export const modify_img = modify_button.querySelector("img");
 export const delete_img = delete_button.querySelector("img");
 export const view_img = view_button.querySelector("img");
 export const print_img = print_button.querySelector("img");
+export const undo_img = undo_button.querySelector("img");
+export const redo_img = redo_button.querySelector("img");
+export const clippy_img = chat_button.querySelector("img");
 
 // Whitespace where information is printed
 export const navigator_div = document.querySelector(".navigator");
@@ -222,6 +228,27 @@ export function render_amd_images(current_field, item_selected = false) {
     }
   }
 }
+
+// Updates Clippy chat image based on a randomized time interval between three images
+function update_clippy() {
+  let current_image = 1;
+  let background_images = document.querySelectorAll("#chat-toggle img");
+  let time = Math.floor(Math.random() * 40000) + 10000;
+  setInterval(() => {
+        // if first image (current_image = 0), then unload last image
+        let previous_image = current_image? current_image - 1: bgImgs.length-1;
+
+        background_images[previous_image].style.opacity = 0;
+        background_images[current_image].style.opacity = 1;
+        current_image++;
+
+        // if last image, go back to first image
+        if (current_image >= background_images.length) {
+            current_image = 0;
+        }
+  }, time);
+}
+window.onload = update_clippy;
 
 // ---------------------------------------------------------------------------
 // Field list renderers

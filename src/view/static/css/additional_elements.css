@@ -14,26 +14,6 @@
     width: 0%;
     height: 20px;
 }
-/* ----- Sound Toggles ----- */
-.sound-toggle {
-  display: flex;
-}
-
-.sound-toggle button {
-  float: right;
-  margin-top: 0;
-  margin-bottom: 5px;
-  width: auto;
-  padding-bottom: 2px;
-}
-
-.sound-toggle button img {
-  height: 25px;
-}
-
-#text-to-speech-button {
-  margin-left: 455px;
-}
 
 /* ----- Clippy Speech Bubble ----- */
 #speech {
@@ -74,6 +54,39 @@
   background-position: center;
   margin-right: 30px;
   width: 45px;
+  position: relative;
+}
+
+#chat-toggle img {
+  position: absolute;
+  top: -30px;
+  z-index: 1;
+  opacity: 0;
+  transition-delay: 0s;
+  transition: opacity 0s;
+}
+
+#chat-toggle p {
+  position: absolute;
+  top: 0px;
+}
+
+#chat-toggle #clippy-think {
+  opacity: 1;
+}
+
+#chat-toggle #clippy-idle {
+  position: absolute;
+  top: -32px;
+  left: 6px;
+  zoom: 0.95;
+}
+
+#chat-toggle #clippy-poke {
+  position: absolute;
+  top: -28px;
+  left: 0px;
+  zoom: 1.1;
 }
 
 #main-container {
