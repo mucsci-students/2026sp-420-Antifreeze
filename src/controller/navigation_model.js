@@ -1,7 +1,7 @@
-// ===============================
+// ---------------------------------------------------------------------------
 // MODEL
 //    Application states and all API/data operations
-// ===============================
+// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // States
@@ -42,12 +42,35 @@ export function set_csv_mode(val) { csv_mode = val; }
 export function set_selected_item_data(val) { selected_item_data = val; }
 
 // ---------------------------------------------------------------------------
+// Memento pattern
+// ---------------------------------------------------------------------------
+
+// Only NavigationOriginator can create/read instances of NavigationMemento.
+class NavigationMemento {
+  #field;
+
+  constructor(field) {
+    this.#field = field;
+  }
+
+  get_field() {
+    return this.#field;
+  }
+}
+
+// Saves/restores state using NavigationMementos.
+export const NavigationOriginator = {
+  save() { return new NavigationMemento(current_content); },
+  restore(memento) { current_content = memento.get_field(); }
+};
+
+// ---------------------------------------------------------------------------
 // History stack helpers
 // ---------------------------------------------------------------------------
 
-export function push_back_stack(val) { back_stack.push(val); }
+export function push_back_stack(memento) { back_stack.push(memento); }
 export function pop_back_stack() { return back_stack.pop(); }
-export function push_forward_stack(val) { forward_stack.push(val); }
+export function push_forward_stack(memento) { forward_stack.push(memento); }
 export function pop_forward_stack() { return forward_stack.pop(); }
 export function clear_forward_stack() { forward_stack = []; }
 

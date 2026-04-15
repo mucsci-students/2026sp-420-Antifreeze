@@ -424,6 +424,7 @@ button:disabled {
   border-bottom-color: #cd3329;
   border-right-color: #cd3329;
   border-width: 3px;
+  z-index: 3;
 }
 
 #faculty-button:hover {
@@ -454,6 +455,7 @@ button:disabled {
   border-bottom-color: #e97e26;
   border-right-color: #e97e26;
   border-width: 3px;
+  z-index: 3;
 }
 
 #courses-button:hover {
@@ -484,6 +486,7 @@ button:disabled {
   border-bottom-color: #e1ba11;
   border-right-color: #e1ba11;
   border-width: 3px;
+  z-index: 3;
 }
 
 #labs-button:hover {
@@ -513,6 +516,7 @@ button:disabled {
   border-left-color: #ffffff;
   border-bottom-color: #21a442;
   border-right-color: #21a442;
+  z-index: 3;
 }
 
 #rooms-button:hover {
@@ -543,6 +547,7 @@ button:disabled {
   border-bottom-color: #956CEE;
   border-right-color: #956CEE;
   border-width: 3px;
+  z-index: 3;
 }
 
 #schedule-button:hover {
@@ -574,6 +579,7 @@ button:disabled {
   border-bottom-color: #1394d1;
   border-right-color: #1394d1;
   border-width: 3px;
+  z-index: 3;
 }
 
 #time-slots-button:hover {

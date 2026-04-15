@@ -4,6 +4,7 @@
 // ---------------------------------------------------------------------------
 
 import * as Model from "./navigation_model.js";
+import { NavigationOriginator } from "./navigation_model.js";
 import * as View from "./navigation_view.js";
 
 // ---------------------------------------------------------------------------
@@ -367,7 +368,7 @@ async function check_response_error(res, fallback) {
 // Parameters: field - field name string
 function navigate_to(field) {
   if (Model.current_content !== field) {
-    Model.push_back_stack(Model.current_content);
+    Model.push_back_stack(NavigationOriginator.save());
     Model.set_current_content(field);
     Model.clear_forward_stack();
     View.render_button_images(Model.back_stack, Model.forward_stack);
@@ -1022,8 +1023,8 @@ View.time_slots_button.addEventListener("click", () => {
 // Back button
 View.back_button.addEventListener("click", async () => {
   if (Model.back_stack.length > 0) {
-    Model.push_forward_stack(Model.current_content);
-    Model.set_current_content(Model.pop_back_stack());
+    Model.push_forward_stack(NavigationOriginator.save());
+    NavigationOriginator.restore(Model.pop_back_stack());
     await go_to_field(Model.current_content);
     View.render_button_images(Model.back_stack, Model.forward_stack);
   }
@@ -1032,8 +1033,8 @@ View.back_button.addEventListener("click", async () => {
 // Forward button
 View.forward_button.addEventListener("click", async () => {
   if (Model.forward_stack.length > 0) {
-    Model.push_back_stack(Model.current_content);
-    Model.set_current_content(Model.pop_forward_stack());
+    Model.push_back_stack(NavigationOriginator.save());
+    NavigationOriginator.restore(Model.pop_forward_stack());
     await go_to_field(Model.current_content);
     View.render_button_images(Model.back_stack, Model.forward_stack);
   }
