@@ -152,7 +152,7 @@ class faculty:
     # Displays faculty attributes including credit limits, day limits, time availability,
     # course preferences, room preferences, lab preferences, and mandatory days
     # Parameters: Configuration file
-    def print_faculty(self, config):
+    def print_faculty(self, config):  # pragma: no cover
         faculty = config.config.faculty
         print("\nFaculty:")
         for prof in faculty:
