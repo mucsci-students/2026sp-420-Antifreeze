@@ -236,7 +236,7 @@ function update_clippy() {
   let time = Math.floor(Math.random() * 40000) + 10000;
   setInterval(() => {
         // if first image (current_image = 0), then unload last image
-        let previous_image = current_image? current_image - 1: bgImgs.length-1;
+        let previous_image = current_image? current_image - 1: background_images.length-1;
 
         background_images[previous_image].style.opacity = 0;
         background_images[current_image].style.opacity = 1;

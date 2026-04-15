@@ -1,5 +1,5 @@
 # Scheduler GUI Application
-## CMSC420-f26
+## CMSC420-s26
 
 ---
 
@@ -109,7 +109,7 @@ A Flask-based web application for generating course schedules. The system is dri
    uv sync
    ```
 
-4. Activate the virtual environment:
+4. If it isn't already, activate the virtual environment:
    - Linux/macOS: `source .venv/bin/activate`
    - Windows: `source .venv/Scripts/activate`
 
