@@ -242,6 +242,29 @@ def register_schedule_routes(app, scheduler):
         except Exception as e:
             return jsonify({"error": str(e)}), 67
 
+    # Exports all generated schedules as a single CSV file with "Schedule N:" section headers.
+    # Returns 400 if no schedules have been generated yet.
+    @app.route("/schedule/export_csv", methods=["GET"])
+    def export_schedules_csv():
+        if not scheduler.result:
+            return jsonify({"error": "No schedules generated"}), 400
+
+        sections = []
+        for i, model in enumerate(scheduler.result):
+            lines = [f"Schedule {i + 1}:"]
+            for sch in model:
+                lines.append(sch.as_csv())
+            sections.append("\n".join(lines))
+
+        csv_data = "\n\n".join(sections)
+
+        return send_file(
+            io.BytesIO(csv_data.encode()),
+            mimetype="text/csv",
+            as_attachment=True,
+            download_name="schedules.csv",
+        )
+
     # Exports all generated schedules as a PDF and returns it as a downloadable file.
     # Returns 400 if no schedules have been generated yet.
     @app.route("/print_schedules", methods=["GET"])

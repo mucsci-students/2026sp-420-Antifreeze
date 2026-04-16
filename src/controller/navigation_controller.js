@@ -1069,6 +1069,44 @@ View.save_button.addEventListener("click", async (e) => {
   URL.revokeObjectURL(url);
 });
 
+// Save schedule as CSV
+View.save_csv.addEventListener("click", async (e) => {
+  e.preventDefault();
+  if (!Model.schedules_generated) return;
+
+  let csvText;
+
+  if (Model.csv_mode) {
+    // Reconstruct CSV from the in-memory parsed schedules
+    const sections = Model.csv_schedules.map((schedule, i) => {
+      const rows = schedule.map(entry => {
+        const course_section = `${entry.course_id}.${entry.section}`;
+        const meetings = entry.meetings.map(m =>
+          `${m.day} ${m.time_range}${m.is_lab ? "^" : ""}`
+        );
+        return [course_section, entry.faculty, entry.room, entry.lab, ...meetings].join(",");
+      });
+      return [`Schedule ${i + 1}:`, ...rows].join("\n");
+    });
+    csvText = sections.join("\n\n");
+  } else {
+    // Fetch all generated schedules from the backend
+    const res = await fetch("/schedule/export_csv");
+    if (!res.ok) return;
+    csvText = await res.text();
+  }
+
+  const blob = new Blob([csvText], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "schedules.csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
 // Load file input
 View.file_input.addEventListener("change", async function () {
   const file = View.file_input.files[0];
