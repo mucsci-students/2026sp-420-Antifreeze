@@ -191,7 +191,7 @@ export function render_button_images(back_stack, forward_stack) {
 // Updates add/modify/delete button images based on field and item selection state.
 // Add is enabled whenever a field is active. Modify/Delete only light up when an
 // item is also selected in the list. item_selected defaults to false.
-// Parameters: current_field - active field string or null, item_selected - boolean
+// Parameters: current_field (active field string or null), item_selected (boolean).
 export function render_amd_images(current_field, item_selected = false) {
   if (current_field == null || current_field == "Schedule") {
     add_img.src = "/static/images/add_shadow.png";
@@ -227,6 +227,30 @@ export function render_amd_images(current_field, item_selected = false) {
       modify_button.disabled = true;
       delete_button.disabled = true;
     }
+  }
+}
+
+// Updates the visual state of the undo and redo buttons.
+// Parameter: command_history (holds undo and redo stacks).
+export function render_undo_redo_state(command_history) {
+  undo_button.disabled = !command_history.can_undo;
+  if (undo_button.disabled === true) {
+    undo_img.src = "/static/images/undo_shadow.png";
+    undo_button.style.color = "#808080";
+  }
+  else {
+    undo_img.src = "/static/images/undo.png";
+    undo_button.style.color = "#484848";
+  }
+
+  redo_button.disabled = !command_history.can_redo;
+  if (redo_button.disabled === true) {
+    redo_img.src = "/static/images/redo_shadow.png";
+    redo_button.style.color = "#808080";
+  }
+  else {
+    redo_img.src = "/static/images/redo.png";
+    redo_button.style.color = "#484848";
   }
 }
 
