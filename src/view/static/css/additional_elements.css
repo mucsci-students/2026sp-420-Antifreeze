@@ -46,6 +46,14 @@
 	margin-right: -16px;
 }
 
+#fnaf-image {
+  position: fixed;
+  bottom: 100px;
+  right: 80px;
+  z-index: 9999;
+  display: none;
+  width: 100px;
+}
 /* ----- Chat Side Panel ----- */
 #chat-toggle {
   display: block;

@@ -228,6 +228,22 @@ export function render_amd_images(current_field, item_selected = false) {
     }
   }
 }
+// Spawns in a jumpscare of a specific character based on the page pressed
+export function spawn_jumpscare(){
+  document.getElementById("faculty-button").addEventListener("click",() =>{
+
+  
+  // Only trigger at a random chance, e.g. 30% of the time
+    let reaction = document.getElementById("fnaf-image"); 
+    reaction.style.display = "block";
+    // Hide it again after a few seconds
+    setTimeout(() => {
+      reaction.style.display = "none";
+    }, 3000);
+});
+}
+window.onload = spawn_jumpscare(); 
+
 
 // Updates Clippy chat image based on a randomized time interval between three images
 function update_clippy() {
