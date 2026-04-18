@@ -4,7 +4,7 @@
 // ---------------------------------------------------------------------------
 
 import * as Model from "./navigation_model.js";
-import { NavigationOriginator } from "./navigation_model.js";
+import { NavigationOriginator, command_history } from "./navigation_model.js";
 import * as View from "./navigation_view.js";
 
 // ---------------------------------------------------------------------------
@@ -655,6 +655,8 @@ function read_faculty_form_fields() {
 // Dispatches the popup Save button click to the correct API call based on
 // the current field and operation (add / modify / delete).
 // Validates form inputs first; exits early and shows inline errors on failure.
+// After each successful mutation a Command is pushed onto command_history so
+// the Undo / Redo buttons can reverse or replay the action.
 async function handle_popup_save() {
   console.log("SAVE CLICKED", Model.current_field, Model.current_operation);
 
@@ -670,25 +672,54 @@ async function handle_popup_save() {
 
       const fields = read_faculty_form_fields();
       if (!fields) return;
+      const data = { name, ...fields };
 
-      const add_res = await Model.api_add_faculty({ name, ...fields });
+      const add_res = await Model.api_add_faculty(data);
       if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
+
+      command_history.push({
+        label: `Add Faculty "${name}"`,
+        field: "Faculty",
+        execute: async () => { await Model.api_add_faculty(data); },
+        unexecute: async () => { await Model.api_delete_faculty(name); },
+      });
 
     } else if (Model.current_operation === "delete") {
 
       const del_res = await Model.api_delete_faculty(name);
       if (await check_response_error(del_res, `"${name}" was not found. Please check the name and try again.`)) return;
 
+      // Take snapshot of record so it can be restored on undo.
+      const snapshot = Model.selected_item_data ? { ...Model.selected_item_data } : { name };
+      command_history.push({
+        label: `Delete Faculty "${name}"`,
+        field: "Faculty",
+        execute: async () => { await Model.api_delete_faculty(name); },
+        unexecute: async () => { await Model.api_add_faculty(snapshot); },
+      });
+
     } else if (Model.current_operation === "modify") {
 
       const fields = read_faculty_form_fields();
       if (!fields) return;
-
+      const new_data = { name, ...fields };
       const original_name = Model.selected_item_data ? Model.selected_item_data.name : name;
-      const mod_res = await Model.api_modify_faculty(original_name, { name, ...fields });
+      const old_data = Model.selected_item_data ? { ...Model.selected_item_data } : null;
+
+      const mod_res = await Model.api_modify_faculty(original_name, new_data);
       if (await check_response_error(mod_res, `"${original_name}" was not found. Please check the name and try again.`)) return;
+
+      command_history.push({
+        label: `Modify Faculty "${original_name}"`,
+        field: "Faculty",
+        execute: async () => { await Model.api_modify_faculty(original_name, new_data); },
+        unexecute: async () => {
+          if (old_data) await Model.api_modify_faculty(name, old_data);
+        },
+      });
     }
 
+    View.render_undo_redo_state(command_history);
     await load_faculty();
 
   } else if (Model.current_field === "Courses") {
@@ -736,14 +767,28 @@ async function handle_popup_save() {
     if (Model.current_operation === "add") {
 
       const add_res = await Model.api_add_course(course_data);
-
       if (await check_response_error(add_res, `"${course_id}" could not be added.`)) return;
+
+      command_history.push({
+        label: `Add Course "${course_id}"`,
+        field: "Courses",
+        execute: async () => { await Model.api_add_course(course_data); },
+        unexecute: async () => { await Model.api_delete_course(course_id); },
+      });
 
     } else if (Model.current_operation === "delete") {
 
       const del_res = await Model.api_delete_course(course_id);
-
       if (await check_response_error(del_res, `"${course_id}" was not found. Please check the course ID and try again.`)) return;
+
+      const snapshot = Model.selected_item_data ? { ...Model.selected_item_data } : course_data;
+      const snap_index = Model.selected_item_data?._list_index ?? null;
+      command_history.push({
+        label: `Delete Course "${course_id}"`,
+        field: "Courses",
+        execute: async () => { await Model.api_delete_course(course_id); },
+        unexecute: async () => { await Model.api_add_course(snapshot); },
+      });
 
     } else if (Model.current_operation === "modify") {
 
@@ -752,11 +797,22 @@ async function handle_popup_save() {
         View.show_field_error(id_input, "No course selected. Please click a course from the list first.");
         return;
       }
-      const mod_res = await Model.api_modify_course(index, course_data);
+      const old_data = Model.selected_item_data ? { ...Model.selected_item_data } : null;
 
+      const mod_res = await Model.api_modify_course(index, course_data);
       if (await check_response_error(mod_res, `"${course_id}" could not be modified.`)) return;
+
+      command_history.push({
+        label: `Modify Course "${course_id}"`,
+        field: "Courses",
+        execute: async () => { await Model.api_modify_course(index, course_data); },
+        unexecute: async () => {
+          if (old_data) await Model.api_modify_course(index, old_data);
+        },
+      });
     }
 
+    View.render_undo_redo_state(command_history);
     await load_courses();
 
   } else if (Model.current_field === "Labs") {
@@ -775,16 +831,28 @@ async function handle_popup_save() {
       if (!validate_labs_form()) return;
 
       const add_res = await Model.api_add_lab(name);
-
       if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
+
+      command_history.push({
+        label: `Add Lab "${name}"`,
+        field: "Labs",
+        execute: async () => { await Model.api_add_lab(name); },
+        unexecute: async () => { await Model.api_delete_lab(name); },
+      });
 
     } else if (Model.current_operation === "delete") {
 
       if (!validate_labs_form()) return;
 
       const del_res = await Model.api_delete_lab(name);
-
       if (await check_response_error(del_res, `"${name}" was not found. Please check the name and try again.`)) return;
+
+      command_history.push({
+        label: `Delete Lab "${name}"`,
+        field: "Labs",
+        execute: async () => { await Model.api_delete_lab(name); },
+        unexecute: async () => { await Model.api_add_lab(name); },
+      });
 
     } else if (Model.current_operation === "modify") {
 
@@ -802,10 +870,17 @@ async function handle_popup_save() {
       }
 
       const mod_res = await Model.api_modify_lab(name, new_name);
-
       if (await check_response_error(mod_res, `"${name}" was not found. Please check the name and try again.`)) return;
+
+      command_history.push({
+        label: `Rename Lab "${name}" â†’ "${new_name}"`,
+        field: "Labs",
+        execute: async () => { await Model.api_modify_lab(name, new_name); },
+        unexecute: async () => { await Model.api_modify_lab(new_name, name); },
+      });
     }
 
+    View.render_undo_redo_state(command_history);
     await load_labs();
 
   } else if (Model.current_field === "Rooms") {
@@ -823,15 +898,28 @@ async function handle_popup_save() {
       if (!validate_rooms_form()) return;
 
       const add_res = await Model.api_add_room(name);
-
       if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
 
+      command_history.push({
+        label: `Add Room "${name}"`,
+        field: "Rooms",
+        execute: async () => { await Model.api_add_room(name); },
+        unexecute: async () => { await Model.api_delete_room(name); },
+      });
+
     } else if (Model.current_operation === "delete") {
+      
       if (!validate_rooms_form()) return;
 
       const del_res = await Model.api_delete_room(name);
-
       if (await check_response_error(del_res, `"${name}" was not found. Please check the name and try again.`)) return;
+
+      command_history.push({
+        label: `Delete Room "${name}"`,
+        field: "Rooms",
+        execute: async () => { await Model.api_delete_room(name); },
+        unexecute: async () => { await Model.api_add_room(name); },
+      });
 
     } else if (Model.current_operation === "modify") {
 
@@ -849,10 +937,17 @@ async function handle_popup_save() {
       }
 
       const mod_res = await Model.api_modify_room(name, new_name);
-
       if (await check_response_error(mod_res, `"${name}" was not found. Please check the name and try again.`)) return;
+
+      command_history.push({
+        label: `Rename Room "${name}" â†’ "${new_name}"`,
+        field: "Rooms",
+        execute: async () => { await Model.api_modify_room(name, new_name); },
+        unexecute: async () => { await Model.api_modify_room(new_name, name); },
+      });
     }
 
+    View.render_undo_redo_state(command_history);
     await load_rooms();
 
   } else if (Model.current_field === "Time Slots") {
@@ -868,9 +963,20 @@ async function handle_popup_save() {
         const start = document.getElementById("ts-start")?.value.trim() || "";
         const spacing = parseInt(document.getElementById("ts-spacing")?.value) || 0;
         const end = document.getElementById("ts-end")?.value.trim() || "";
+        const time_data = { day, start, spacing, end };
 
-        const res = await Model.api_add_time_range({ day, start, spacing, end });
+        const res = await Model.api_add_time_range(time_data);
         if (await check_response_error(res, "Time range could not be added.")) return;
+
+        const ts_after = await Model.api_get_time_slots();
+        const day_ranges = ts_after?.times?.[day] ?? [];
+        const new_index = day_ranges.length - 1;
+        command_history.push({
+          label: `Add Time Range (${day} ${start}â€“${end})`,
+          field: "Time Slots",
+          execute: async () => { await Model.api_add_time_range(time_data); },
+          unexecute: async () => { await Model.api_delete_time_range(day, new_index); },
+        });
 
       } else {
         if (!validate_class_pattern_form()) return;
@@ -889,12 +995,19 @@ async function handle_popup_save() {
           lab: lab_cbs[i]?.checked || false
         })).filter(m => m.day && m.duration > 0);
 
-        const res = await Model.api_add_class_pattern({
-          credits, meetings,
-          start_time: start_time || null,
-          disabled
-        });
+        const pattern_data = { credits, meetings, start_time: start_time || null, disabled };
+
+        const res = await Model.api_add_class_pattern(pattern_data);
         if (await check_response_error(res, "Class pattern could not be added.")) return;
+
+        const ts_after = await Model.api_get_time_slots();
+        const new_index = (ts_after?.classes?.length ?? 1) - 1;
+        command_history.push({
+          label: `Add Class Pattern (${credits} credits)`,
+          field: "Time Slots",
+          execute: async () => { await Model.api_add_class_pattern(pattern_data); },
+          unexecute: async () => { await Model.api_delete_class_pattern(new_index); },
+        });
       }
 
     } else if (Model.current_operation === "modify") {
@@ -907,9 +1020,18 @@ async function handle_popup_save() {
         const start = document.getElementById("ts-start")?.value.trim() || "";
         const spacing = parseInt(document.getElementById("ts-spacing")?.value) || 0;
         const end = document.getElementById("ts-end")?.value.trim() || "";
+        const new_time_data = { start, spacing, end };
+        const old_time_data = { start: item.start, spacing: item.spacing, end: item.end };
 
-        const res = await Model.api_modify_time_range(item._day, item._index, { start, spacing, end });
+        const res = await Model.api_modify_time_range(item._day, item._index, new_time_data);
         if (await check_response_error(res, "Time range could not be modified.")) return;
+
+        command_history.push({
+          label: `Modify Time Range (${item._day})`,
+          field: "Time Slots",
+          execute: async () => { await Model.api_modify_time_range(item._day, item._index, new_time_data); },
+          unexecute: async () => { await Model.api_modify_time_range(item._day, item._index, old_time_data); },
+        });
 
       } else {
         if (!validate_class_pattern_form()) return;
@@ -928,15 +1050,27 @@ async function handle_popup_save() {
           lab: lab_cbs[i]?.checked || false
         })).filter(m => m.day && m.duration > 0);
 
-        const res = await Model.api_modify_class_pattern(item._index, {
-          credits, meetings,
-          start_time: start_time || null,
-          disabled
-        });
+        const new_pattern_data = { credits, meetings, start_time: start_time || null, disabled };
+        const old_pattern_data = {
+          credits: item.credits,
+          meetings: item.meetings,
+          start_time: item.start_time || null,
+          disabled: item.disabled || false,
+        };
+
+        const res = await Model.api_modify_class_pattern(item._index, new_pattern_data);
         if (await check_response_error(res, "Class pattern could not be modified.")) return;
+
+        command_history.push({
+          label: `Modify Class Pattern (${credits} credits)`,
+          field: "Time Slots",
+          execute: async () => { await Model.api_modify_class_pattern(item._index, new_pattern_data); },
+          unexecute: async () => { await Model.api_modify_class_pattern(item._index, old_pattern_data); },
+        });
       }
     }
 
+    View.render_undo_redo_state(command_history);
     await load_time_slots();
   }
 }
@@ -965,6 +1099,7 @@ function load_file_content(input) {
 window.addEventListener("DOMContentLoaded", async () => {
   await Model.api_load_empty_config();
   View.config_name.textContent = "Config loaded: empty.json";
+  View.render_undo_redo_state(command_history);
 });
 
 View.faculty_button.addEventListener("click", () => {
@@ -1040,7 +1175,23 @@ View.forward_button.addEventListener("click", async () => {
   }
 });
 
-// View button
+// Undo button: undoes the most-recently done mutation.
+View.undo_button.addEventListener("click", async () => {
+  const cmd = await command_history.undo();
+  if (!cmd) return;
+  await go_to_field(cmd.field);
+  View.render_undo_redo_state(command_history);
+});
+
+// Redo button: redoes the most-recently undone mutation.
+View.redo_button.addEventListener("click", async () => {
+  const cmd = await command_history.redo();
+  if (!cmd) return;
+  await go_to_field(cmd.field);
+  View.render_undo_redo_state(command_history);
+});
+
+// View button: allows viewing of schedules.
 View.view_button.addEventListener("click", () => {
   if (!Model.schedules_generated) return;
   view_schedule(0);
@@ -1153,6 +1304,10 @@ View.file_input.addEventListener("change", async function () {
       View.time_slots_button.disabled = false;
       View.view_button.disabled = false;
 
+      // New config means prior undo/redo history no longer applies.
+      command_history.clear();
+      View.render_undo_redo_state(command_history);
+
       const timestamp = new Date().toLocaleTimeString();
       View.config_name.textContent = `✔ Config loaded: "${file.name}" at ${timestamp}`;
       View.config_name.classList.remove("visible");
@@ -1214,30 +1369,105 @@ View.delete_button.addEventListener("click", async () => {
   const item = Model.selected_item_data;
 
   if (field === "Faculty") {
+
+    const snapshot = { ...item };
+
     const res = await Model.api_delete_faculty(item.name);
     if (await check_response_error(res, `"${item.name}" could not be deleted.`)) return;
+   
+    command_history.push({
+      label: `Delete Faculty "${item.name}"`,
+      field: "Faculty",
+      execute: async () => { await Model.api_delete_faculty(snapshot.name); },
+      unexecute: async () => { await Model.api_add_faculty(snapshot); },
+    });
+
+    View.render_undo_redo_state(command_history);
     await load_faculty();
+
   } else if (field === "Courses") {
+
+    const snapshot = { ...item };
+
     const res = await Model.api_delete_course(item.course_id);
     if (await check_response_error(res, `"${item.course_id}" could not be deleted.`)) return;
+    
+    command_history.push({
+      label: `Delete Course "${item.course_id}"`,
+      field: "Courses",
+      execute: async () => { await Model.api_delete_course(snapshot.course_id); },
+      unexecute: async () => { await Model.api_add_course(snapshot); },
+    });
+
+    View.render_undo_redo_state(command_history);
     await load_courses();
+
   } else if (field === "Labs") {
+
     const res = await Model.api_delete_lab(item.name);
     if (await check_response_error(res, `"${item.name}" could not be deleted.`)) return;
+    
+    command_history.push({
+      label: `Delete Lab "${item.name}"`,
+      field: "Labs",
+      execute: async () => { await Model.api_delete_lab(item.name); },
+      unexecute: async () => { await Model.api_add_lab(item.name); },
+    });
+    
+    View.render_undo_redo_state(command_history);
     await load_labs();
+  
   } else if (field === "Rooms") {
+
     const res = await Model.api_delete_room(item.name);
     if (await check_response_error(res, `"${item.name}" could not be deleted.`)) return;
+    
+    command_history.push({
+      label: `Delete Room "${item.name}"`,
+      field: "Rooms",
+      execute: async () => { await Model.api_delete_room(item.name); },
+      unexecute: async () => { await Model.api_add_room(item.name); },
+    });
+    
+    View.render_undo_redo_state(command_history);
     await load_rooms();
+  
   } else if (field === "Time Slots") {
+
     if (item._type === "time") {
+      const snapshot = { day: item._day, index: item._index, start: item.start, spacing: item.spacing, end: item.end };
+      
       const res = await Model.api_delete_time_range(item._day, item._index);
       if (await check_response_error(res, "Time range could not be deleted.")) return;
+     
+      command_history.push({
+        label: `Delete Time Range (${snapshot.day})`,
+        field: "Time Slots",
+        execute: async () => { await Model.api_delete_time_range(snapshot.day, snapshot.index); },
+        unexecute: async () => {
+          await Model.api_add_time_range({ day: snapshot.day, start: snapshot.start, spacing: snapshot.spacing, end: snapshot.end });
+        },
+      });
+
     } else {
+      const snapshot = { index: item._index, credits: item.credits, meetings: item.meetings, start_time: item.start_time || null, disabled: item.disabled || false };
+      
       const res = await Model.api_delete_class_pattern(item._index);
       if (await check_response_error(res, "Class pattern could not be deleted.")) return;
+      
+      command_history.push({
+        label: `Delete Class Pattern (${snapshot.credits} credits)`,
+        field: "Time Slots",
+        execute: async () => { await Model.api_delete_class_pattern(snapshot.index); },
+        unexecute: async () => {
+          await Model.api_add_class_pattern({ credits: snapshot.credits, meetings: snapshot.meetings, start_time: snapshot.start_time, disabled: snapshot.disabled });
+        },
+      });
     }
+
+    View.render_undo_redo_state(command_history);
     await load_time_slots();
+
   }
 });
 

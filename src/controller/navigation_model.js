@@ -42,7 +42,7 @@ export function set_csv_mode(val) { csv_mode = val; }
 export function set_selected_item_data(val) { selected_item_data = val; }
 
 // ---------------------------------------------------------------------------
-// Memento pattern
+// Memento pattern (back/forward)
 // ---------------------------------------------------------------------------
 
 // Only NavigationOriginator can create/read instances of NavigationMemento.
@@ -65,7 +65,7 @@ export const NavigationOriginator = {
 };
 
 // ---------------------------------------------------------------------------
-// History stack helpers
+// History stack helpers 
 // ---------------------------------------------------------------------------
 
 export function push_back_stack(memento) { back_stack.push(memento); }
@@ -73,6 +73,53 @@ export function pop_back_stack() { return back_stack.pop(); }
 export function push_forward_stack(memento) { forward_stack.push(memento); }
 export function pop_forward_stack() { return forward_stack.pop(); }
 export function clear_forward_stack() { forward_stack = []; }
+
+// ---------------------------------------------------------------------------
+// Command pattern (undo/redo)
+// ---------------------------------------------------------------------------
+
+// CommandHistory holds undo and redo stacks.
+class CommandHistory {
+  #undo_stack = [];
+  #redo_stack = [];
+
+  // Push a new command and clear redo stack (new action invalidates future).
+  push(command) {
+    this.#undo_stack.push(command);
+    this.#redo_stack = [];
+  }
+
+  // Undo most-recent command and move it into redo stack.
+  // Returns the command that was undone, or null if nothing to undo.
+  async undo() {
+    if (this.#undo_stack.length === 0) return null;
+    const cmd = this.#undo_stack.pop();
+    await cmd.unexecute();
+    this.#redo_stack.push(cmd);
+    return cmd;
+  }
+
+  // Redo most-recently undone command and move it into undo stack.
+  // Returns the command that was redone, or null if nothing to redo.
+  async redo() {
+    if (this.#redo_stack.length === 0) return null;
+    const cmd = this.#redo_stack.pop();
+    await cmd.execute();
+    this.#undo_stack.push(cmd);
+    return cmd;
+  }
+
+  get can_undo() { return this.#undo_stack.length > 0; }
+  get can_redo() { return this.#redo_stack.length > 0; }
+
+  // Discard all history.
+  clear() {
+    this.#undo_stack = [];
+    this.#redo_stack = [];
+  }
+}
+
+export const command_history = new CommandHistory();
 
 // ---------------------------------------------------------------------------
 // Config API
