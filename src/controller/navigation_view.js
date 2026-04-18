@@ -70,6 +70,70 @@ export const popup_header = document.getElementById("popup-header");
 // File input when loading a config
 export const file_input = document.getElementById("load");
 
+// Clippy's popup dialogue elements
+export const speech_bubble = document.querySelector(".speech-bubble");
+export const speech_div = document.getElementById("speech");
+export const jokes = "How do robots eat pizza? One byte at a time.\n"
+  + "Why don’t avatars trust binary? It makes up everything in the virtual world.\n"
+  + "How do dolphins compute? They use a Central Porpoising Unit.\n"
+  + "I had a joke about variables but sadly I can’t remember it.\n"
+  + "I have a joke about my work as a software engineer, but it only works for me.\n"
+  + "I have a joke about recursion, but I have a joke about recursion, but I have a joke about recursion, but I ...\n"
+  + "[“hip”,”hip”] hip hip array!\n"
+  + "What’s the most iconic pudding for chocolate loving computer scientists? A GUI chocolate brownie!\n"
+  + "What are digital native’s favorite puddings? Crumble and Raspberry Pi.\n"
+  + "How did the lobster make sure its virtual Christmas cards arrived ok? By sending them with an Error-Correcting Cod.\n"
+  + "There are 10 types of people: those who understand binary, and those who don’t.\n"
+  + "Two bits walked into an expensive bar, but were thrown out because they didn’t have enough for a byte.\n"
+  + "An SQL query goes into a bar, walks up to two tables and asks, “Can I join you?”\n"
+  + "What do you get if you cross a computer with an elephant? Lots of memory.\n"
+  + "Why did the robot cross the road? Because the chicken programmed it to.\n"
+  + "Which came first the chicken or the robot? The chicken. Otherwise, who else would program the robot to cross the road?\n"
+  + "How easy is it to count in binary? It's as easy as 01 10 11.\n"
+  + "How did the first program die? It was executed.\n"
+  + "How did the second program die? From a bug.\n"
+  + "What do trees do on computers? They branch out.\n"
+  + "How do cleaners put their mops in to order? They Bucket sort them.\n"
+  + "How do botanists order their plant samples? Using a tree sort.\n"
+  + "How many computer scientists does it take to change a lightbulb? None, they can see fine by the light of their laptop.\n"
+  + "How many help desk people does it take to change a light bulb? The lightbulb doesn’t need changing. It works fine here in the systems office when I try it. Ticket closed.\n"
+  + "How many software engineers does it take to change a light bulb? It can’t be done. It’s a hardware problem.\n"
+  + "What is a Linux user's favorite game? sudo ku.\n"
+  + "Why do vampire's use Linux? Because they don't like Windows in their house.\n"
+  + "Why did C++ decide to not go out with C? Because quite frankly, C just has no class.";
+
+// ---------------------------------------------------------------------------
+// Clippy dialogue popups feature
+// ---------------------------------------------------------------------------
+export const lines = jokes.split("\n");
+
+// Shuffles the lines array every time the window is loaded
+// Parameters: lines - the array containing the jokes written for Clippy to say
+export function shuffle_lines(lines) {
+  let current_index = lines.length;
+
+  while (current_index != 0) {
+    let random_index = Math.floor(Math.random() * current_index);
+    current_index--;
+
+    [lines[current_index], lines[random_index]] = [lines[random_index], lines[current_index]];
+  }
+}
+
+// Randomizes the appearance of the speech bubble as long as the window is open
+export function change_bubble_display() {
+  let time = Math.floor(Math.random() * 60000) + 20000;
+  // Check to see if an interval has already been set up
+  setInterval(switch_opacity, 1000);
+}
+
+// Changes the opacity of the speech bubble and its content
+export function switch_opacity(lines, index) {
+  speech_div.className = speech_div.className === "hidden" ? "shown" : "hidden";
+  speech_bubble.innerHTML = lines[index];
+  index++;
+}
+
 // ---------------------------------------------------------------------------
 // Inline error helpers
 // ---------------------------------------------------------------------------

@@ -723,7 +723,6 @@ async function handle_popup_save() {
     await load_faculty();
 
   } else if (Model.current_field === "Courses") {
-
     if (Model.current_operation === "add" && !validate_courses_form(true)) return;
     if (Model.current_operation === "modify" && !validate_courses_form(false)) return;
     if (Model.current_operation === "delete" && !validate_courses_delete_form()) return;
@@ -765,7 +764,6 @@ async function handle_popup_save() {
     const course_data = { course_id, credits, room: rooms, lab: labs, conflicts, faculty };
 
     if (Model.current_operation === "add") {
-
       const add_res = await Model.api_add_course(course_data);
       if (await check_response_error(add_res, `"${course_id}" could not be added.`)) return;
 
@@ -777,7 +775,6 @@ async function handle_popup_save() {
       });
 
     } else if (Model.current_operation === "delete") {
-
       const del_res = await Model.api_delete_course(course_id);
       if (await check_response_error(del_res, `"${course_id}" was not found. Please check the course ID and try again.`)) return;
 
@@ -791,7 +788,6 @@ async function handle_popup_save() {
       });
 
     } else if (Model.current_operation === "modify") {
-
       const index = Model.selected_item_data?._list_index ?? null;
       if (index === null) {
         View.show_field_error(id_input, "No course selected. Please click a course from the list first.");
@@ -816,7 +812,6 @@ async function handle_popup_save() {
     await load_courses();
 
   } else if (Model.current_field === "Labs") {
-
     const name_input = document.getElementById("labs-name");
 
     if (!name_input) {
@@ -827,7 +822,6 @@ async function handle_popup_save() {
     const name = name_input.value.trim();
 
     if (Model.current_operation === "add") {
-
       if (!validate_labs_form()) return;
 
       const add_res = await Model.api_add_lab(name);
@@ -841,7 +835,6 @@ async function handle_popup_save() {
       });
 
     } else if (Model.current_operation === "delete") {
-
       if (!validate_labs_form()) return;
 
       const del_res = await Model.api_delete_lab(name);
@@ -855,7 +848,6 @@ async function handle_popup_save() {
       });
 
     } else if (Model.current_operation === "modify") {
-
       if (!name) {
         View.show_field_error(name_input, "Current lab name is required.");
         return;
@@ -884,7 +876,6 @@ async function handle_popup_save() {
     await load_labs();
 
   } else if (Model.current_field === "Rooms") {
-
     const name_input = document.getElementById("rooms-name");
 
     if (!name_input) {
@@ -908,7 +899,6 @@ async function handle_popup_save() {
       });
 
     } else if (Model.current_operation === "delete") {
-      
       if (!validate_rooms_form()) return;
 
       const del_res = await Model.api_delete_room(name);
@@ -922,7 +912,6 @@ async function handle_popup_save() {
       });
 
     } else if (Model.current_operation === "modify") {
-
       if (!name) {
         View.show_field_error(name_input, "Current room name is required.");
         return;
@@ -951,7 +940,6 @@ async function handle_popup_save() {
     await load_rooms();
 
   } else if (Model.current_field === "Time Slots") {
-
     if (Model.current_operation === "add") {
       const type_sel = document.getElementById("ts-add-type");
       const add_type = type_sel ? type_sel.value : "time";
@@ -1093,7 +1081,7 @@ function load_file_content(input) {
 }
 
 // ---------------------------------------------------------------------------
-// Event Listeners
+// Event listeners
 // ---------------------------------------------------------------------------
 
 window.addEventListener("DOMContentLoaded", async () => {
@@ -1197,9 +1185,11 @@ View.view_button.addEventListener("click", () => {
   view_schedule(0);
 });
 
-// Save config button
-// Loads content of json or csv file
-// load_button.addEventListener("change", function () { })
+// ---------------------------------------------------------------------------
+// Save button functionality
+// ---------------------------------------------------------------------------
+
+// Save schedule as JSON
 View.save_button.addEventListener("click", async (e) => {
   e.preventDefault();  // stops redirect / form submit
 
@@ -1258,6 +1248,10 @@ View.save_csv.addEventListener("click", async (e) => {
   URL.revokeObjectURL(url);
 });
 
+// ---------------------------------------------------------------------------
+// Load button functionality
+// ---------------------------------------------------------------------------
+
 // Load file input
 View.file_input.addEventListener("change", async function () {
   const file = View.file_input.files[0];
@@ -1266,7 +1260,7 @@ View.file_input.addEventListener("change", async function () {
   const ext = file.name.split(".").pop().toLowerCase();
 
   if (ext === "csv") {
-    // ---- Load a previously-exported CSV schedule ----
+    // Load a previously-exported CSV schedule
     const text = await file.text();
     const schedules = Model.parse_csv_schedules(text);
 
@@ -1288,7 +1282,7 @@ View.file_input.addEventListener("change", async function () {
     View.config_name.classList.add("visible");
 
   } else {
-    // ---- Load a JSON config file ----
+    // Load a JSON config file
     Model.set_csv_mode(false);
 
     const res = await Model.api_load_config(file);
@@ -1332,6 +1326,10 @@ async function get_course_options() {
     faculty: faculty.map(f => f.name),
   };
 }
+
+// ---------------------------------------------------------------------------
+// Add/Modify/Delete buttons functionality
+// ---------------------------------------------------------------------------
 
 // Add button: sets current_operation and opens the Add popup for the active field.
 View.add_button.addEventListener("click", async () => {
@@ -1471,8 +1469,11 @@ View.delete_button.addEventListener("click", async () => {
   }
 });
 
-// Print button
-// Print button — exports a PDF matching the schedule calendar view.
+// ---------------------------------------------------------------------------
+// Print button functionality
+// ---------------------------------------------------------------------------
+
+// Print button: exports a PDF matching the schedule calendar view.
 View.print_button.addEventListener("click", () => {
   const btn = View.print_button;
   const original_html = btn.innerHTML;
@@ -1801,6 +1802,10 @@ async function print_schedules_pdf() {
   doc.save("schedules.pdf");
 }
 
+// ---------------------------------------------------------------------------
+// Misc. functionalities
+// ---------------------------------------------------------------------------
+
 // Popup save button
 View.popup_save.addEventListener("click", handle_popup_save);
 
@@ -1830,6 +1835,21 @@ focus_containers.forEach(el => {
   });
 });
 
+// Randomizes Clippy's speech bubble's appearance and its content
+async function activate_speech_bubble() {
+  let shuffled_lines = View.shuffle_lines(View.lines);
+  let index = 0;
+
+  while (index < shuffled_lines.length) {
+    View.switch_opacity(shuffled_lines, index);
+    View.change_bubble_display();
+    index++;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// AI chat functionality
+// ---------------------------------------------------------------------------
 
 const chat_button = View.get_chat_button();
 

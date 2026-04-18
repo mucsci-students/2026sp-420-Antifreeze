@@ -17,11 +17,18 @@
 
 /* ----- Clippy Speech Bubble ----- */
 #speech {
-    opacity: 1;
     position: relative;
     float: right;
     margin-right: 50px;
     display: flex;
+}
+
+#speech .hidden {
+  opacity: 0;
+}
+
+#speech .shown {
+  opacity: 1;
 }
 
 .speech-bubble {
