@@ -230,16 +230,32 @@ export function render_amd_images(current_field, item_selected = false) {
 }
 // Spawns in a jumpscare of a specific character based on the page pressed
 export function spawn_jumpscare(){
-  document.getElementById("faculty-button").addEventListener("click",() =>{
+  let reaction = document.getElementById("fnaf-image"); 
+  const toggle = document.querySelector("#secret-toggle input[type='checkbox']");
+  const scare = new Audio("/static/audio/five-nights-at-freddys-2-full-scream-sound.mp3");
+  document.addEventListener("click",(b) =>{
+  if (!toggle.checked) return;
 
-  
-  // Only trigger at a random chance, e.g. 30% of the time
-    let reaction = document.getElementById("fnaf-image"); 
+  if( b.target.id == "faculty-button" && Math.random() < 1/2){
+   
+    scare.play();
+  // Only trigger at a random chance, e.g. 1/80 of the time
+   
+    
+    reaction.src = "";
+    reaction.src = "/static/images/foxy-jumpscare.gif";
     reaction.style.display = "block";
-    // Hide it again after a few seconds
+    
     setTimeout(() => {
       reaction.style.display = "none";
     }, 3000);
+  }
+  else{
+    scare.pause()
+    scare.currentTime = 0;
+    reaction.style.display = "none";
+    reaction.src = "";
+  }
 });
 }
 window.onload = spawn_jumpscare(); 
