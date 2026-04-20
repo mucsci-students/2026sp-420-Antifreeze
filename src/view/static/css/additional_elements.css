@@ -52,7 +52,8 @@
   left: 50%;
   transform: translate(-50%, -25%);
   z-index: 9999;         
-  display: none;          
+  display: none;        
+  pointer-events: none;  
   width: 1000px;
   height:auto;
 }
