@@ -17,7 +17,18 @@
 
 /* ----- Clippy Speech Bubble ----- */
 #speech {
-    opacity: 1;
+    position: relative;
+    float: right;
+    margin-right: 50px;
+    display: flex;
+}
+
+#speech .hidden {
+  opacity: 0;
+}
+
+#speech .shown {
+  opacity: 1;
 }
 
 .speech-bubble {
@@ -70,7 +81,7 @@
 
 #chat-toggle img {
   position: absolute;
-  top: -30px;
+  top: 10px;
   z-index: 1;
   opacity: 0;
   transition-delay: 0s;
@@ -79,7 +90,7 @@
 
 #chat-toggle p {
   position: absolute;
-  top: 0px;
+  top: 40px;
 }
 
 #chat-toggle #clippy-think {
@@ -88,14 +99,14 @@
 
 #chat-toggle #clippy-idle {
   position: absolute;
-  top: -32px;
+  top: 10px;
   left: 6px;
   zoom: 0.95;
 }
 
 #chat-toggle #clippy-poke {
   position: absolute;
-  top: -28px;
+  top: 8px;
   left: 0px;
   zoom: 1.1;
 }

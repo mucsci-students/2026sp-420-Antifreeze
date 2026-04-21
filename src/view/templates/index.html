@@ -69,10 +69,10 @@
         <button id="print-button">
           <img src="/static/images/print_shadow.png" alt="Print" />Print
         </button>
-        <div id="speech">
-          <div class="speech-bubble"></div>
-        </div>
         <button id="chat-toggle">
+          <div id="speech">
+            <div class="speech-bubble"></div>
+          </div>
           <img id="clippy-think" src="/static/images/thinking.gif" alt="Chat" />
           <img id="clippy-idle" src="/static/images/clippy_large.png" alt="Chat" />
           <img id="clippy-poke" src="/static/images/poke.gif" alt="Chat" />
@@ -90,19 +90,21 @@
         <button id="time-slots-button">TIME SLOTS</button>
         <button id="schedule-button">SCHEDULE</button>
       </div>
-      <div id="text-to-speech">
-        <span class="text-to-speech-hover">Text-to-speech</span>
-        <label class="switch">
-          <input type="checkbox">
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div id="speech-to-text">
-        <span class="speech-to-text-hover">Speech-to-text</span>
-        <label class="switch">
-          <input type="checkbox">
-          <span class="slider"></span>
-        </label>
+      <div class="tts-and-stt">
+        <div id="text-to-speech">
+          <span class="text-to-speech-hover">Text-to-speech</span>
+          <label class="switch">
+            <input type="checkbox">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="speech-to-text">
+          <span class="speech-to-text-hover">Speech-to-text</span>
+          <label class="switch">
+            <input type="checkbox">
+            <span class="slider"></span>
+          </label>
+        </div>
       </div>
     </nav>
     <div id="main-container">
