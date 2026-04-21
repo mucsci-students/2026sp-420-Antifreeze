@@ -1851,7 +1851,9 @@ async function activate_speech_bubble() {
 // AI chat functionality
 // ---------------------------------------------------------------------------
 
-
+//  below code is for tts/stt and chat interface. currently using stream to 
+// backend whisper for stt and browser's built in speech synthesis for tts, 
+// but can be easily adapted to use other services or APIs.
 // ---------------------------------------------------------------------------
 // STT + TTS 
 // ---------------------------------------------------------------------------
@@ -1867,7 +1869,7 @@ let audioChunks = [];
 // -------------------------
 async function startRecording() {
   try {
-    if (isRecording) return; // prevent duplicates
+    if (isRecording) return; 
 
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     currentStream = stream;
@@ -1898,7 +1900,6 @@ async function startRecording() {
         console.log("Segment ready:", blob.size);
         await sendToLocalWhisper(blob);
 
-        // 🔁 Start next segment WITHOUT restarting whole system
         startSegment();
       };
 

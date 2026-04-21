@@ -6,6 +6,7 @@ import os
 
 model = WhisperModel("tiny", device="cpu", compute_type="int8")
 
+
 # Registers the AI chat REST API route on the Flask app.
 # Parameters: app - Flask application instance, scheduler - shared Schedule object
 def register_chat_route(app, scheduler):
@@ -25,14 +26,13 @@ def register_chat_route(app, scheduler):
             return jsonify({"result": result})
         except Exception as e:
             return jsonify({"result": f"Error: {str(e)}"}), 500
-        
-        
+
     @app.route("/transcribe", methods=["POST"])
     def transcribe():
         try:
             audio = request.files["audio"]
 
-            # save temp file
+            # save temp file to be deleted
             with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as tmp:
                 audio.save(tmp.name)
                 tmp_path = tmp.name
