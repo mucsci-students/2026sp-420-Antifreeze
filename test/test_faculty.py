@@ -59,6 +59,8 @@ class MockConfig:
 
 
 class MockCourse:
+    """Minimal stand-in for a course with a faculty assignment list."""
+
     def __init__(self, faculty):
         self.faculty = faculty
 
@@ -119,11 +121,13 @@ ALL_FACULTY = [
 
 @pytest.fixture
 def F():
+    """Return a fresh faculty instance for each test."""
     return faculty()
 
 
 @pytest.fixture
 def sample_csv(tmp_path):
+    """Write the sample CSV to a temp file and return its path."""
     f = tmp_path / "example.csv"
     f.write_text(SAMPLE_CSV_CONTENT)
     return str(f)
@@ -131,6 +135,7 @@ def sample_csv(tmp_path):
 
 @pytest.fixture
 def sample_schedule(F, sample_csv):
+    """Pre-parsed schedule dict so CSV tests don't repeat the parse call."""
     return F.get_faculty_schedule(sample_csv)
 
 

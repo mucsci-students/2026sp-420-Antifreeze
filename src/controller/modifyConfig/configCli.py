@@ -9,6 +9,8 @@ from controller.modifyConfig import (
 )
 
 
+# Print Config Menu
+# Displays the top-level configuration management menu options
 def print_config_menu():
     print(
         "\nPress the key associated with the command you would like to issue, then press enter."
@@ -21,6 +23,8 @@ def print_config_menu():
     print("q: exit program\n==> ", end="")
 
 
+# Print Modify Config Menu
+# Displays the sub-menu for selecting which config entity to modify
 def print_mod_config_menu():
     print(
         "\nPress the key associated with the command you would like to issue, then press enter."
@@ -44,6 +48,10 @@ def is_config_loaded(sched):
     return True
 
 
+# Config Modification Loop
+# Interactive loop for selecting and executing config modification operations
+# Routes user input to the appropriate entity modifier (lab, room, course, conflict, faculty, time slot)
+# Parameters: Scheduler object
 def conf_loop(sched):
     while True:
         print_mod_config_menu()
@@ -68,6 +76,10 @@ def conf_loop(sched):
             print("Invalid command, try again.")
 
 
+# Config
+# Main configuration management loop
+# Handles loading, modifying, saving, and printing the scheduler configuration
+# Parameters: Scheduler object
 def config(sched):
     while True:
         print_config_menu()
