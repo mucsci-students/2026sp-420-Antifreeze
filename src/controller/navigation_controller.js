@@ -328,7 +328,7 @@ async function check_response_error(res, fallback) {
 
   let raw_text = "";
   try {
-    raw_text = await res.text();
+    raw_   = await res.text();
   } catch (_) {
     View.show_field_error(input_el, fallback);
     return true;
@@ -1851,11 +1851,165 @@ async function activate_speech_bubble() {
 // AI chat functionality
 // ---------------------------------------------------------------------------
 
+
+// ---------------------------------------------------------------------------
+// STT + TTS 
+// ---------------------------------------------------------------------------
+
+let mediaRecorder = null;
+let isRecording = false;
+let currentStream = null;
+let chunkBuffer = [];
+let audioChunks = [];
+
+// -------------------------
+// Start Recording
+// -------------------------
+async function startRecording() {
+  try {
+    if (isRecording) return; // prevent duplicates
+
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    currentStream = stream;
+    let mimeType = "audio/webm";
+    if (!MediaRecorder.isTypeSupported("audio/webm")) {
+      if (MediaRecorder.isTypeSupported("audio/ogg")) {
+        mimeType = "audio/ogg";
+      }
+    }
+
+    isRecording = true;
+
+    function startSegment() {
+      if (!sttToggle.checked) return;
+
+      mediaRecorder = new MediaRecorder(stream, { mimeType });
+      audioChunks = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunks.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(audioChunks, { type: mimeType });
+
+        console.log("Segment ready:", blob.size);
+        await sendToLocalWhisper(blob);
+
+        // 🔁 Start next segment WITHOUT restarting whole system
+        startSegment();
+      };
+
+      mediaRecorder.start();
+
+      // stop after 4s
+      setTimeout(() => {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop();
+        }
+      }, 4000);
+    }
+
+    startSegment();
+
+  } catch (err) {
+    console.error("Mic error:", err);
+    sttToggle.checked = false;
+  }
+}
+// -------------------------
+// Stop Recording
+// -------------------------
+function stopRecording() {
+  if (mediaRecorder && isRecording) {
+    isRecording = false;
+    mediaRecorder.stop();
+
+    // stop mic stream
+    if (currentStream) {
+      currentStream.getTracks().forEach(track => track.stop());
+      currentStream = null;
+    }
+  }
+}
+
+
+async function sendToLocalWhisper(blob) {   
+  const formData = new FormData();
+  formData.append("audio", blob, "speech.webm");
+  console.log("Sending blob:", blob.size);
+  try {
+    const res = await fetch("/transcribe", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+    console.log("Response:", data);
+    if (data.text) {
+      let text = data.text || "";
+
+      text = text.replace(/\.\.\.+/g, "");  
+      text = text.replace(/[.,!?]+$/g, ""); 
+
+      if (text.trim().length > 0) {
+        chat_input.value += " " + text.trim();
+      }
+    } else {
+      console.error("No transcription:", data);
+    }
+
+  } catch (err) {
+    console.error("Transcription failed:", err);
+  }
+}
+
+// -------------------------
+// TTS
+// -------------------------
+function speak(text) {
+  if (!text || !ttsToggle?.checked) return;
+
+  // pause STT to avoid feedback loop
+  if (isRecording) stopRecording();
+
+  speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  utterance.onend = () => {
+    if (sttToggle.checked) startRecording();
+  };
+
+  speechSynthesis.speak(utterance);
+}
+
+// -------------------------
+// Toggle handling
+// -------------------------
+sttToggle.addEventListener("change", () => {
+  console.log("Toggle changed:", sttToggle.checked);
+
+  if (sttToggle.checked) {
+    setTimeout(() => {
+      startRecording();
+    }, 0);
+  } else {
+    stopRecording();
+  }
+});
+
+// -------------------------
+// Chat UI toggle 
+// -------------------------
 const chat_button = View.get_chat_button();
 
 chat_button.addEventListener("click", () => {
   document.body.classList.toggle("chat-open");
 });
+
 
 const chat_send = document.getElementById("chat-send");
 const chat_input = document.getElementById("chat-input");
@@ -1927,10 +2081,15 @@ async function send_message() {
       response_text = "Something went wrong.";
     }
 
+
     // Always render response
     chat_box.innerHTML += `<div class="chat-msg chat-ai"><b>Clippy:</b> ${response_text}</div>`;
     chat_box.scrollTop = chat_box.scrollHeight;
 
+    //TTS hook
+    if (ttsToggle && ttsToggle.checked) {
+      speak(response_text);
+    }
     await refresh_current_field();
 
   } catch (err) {

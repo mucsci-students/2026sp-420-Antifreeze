@@ -26,6 +26,7 @@ export const redo_button = document.getElementById("redo-button");
 export const chat_button = document.getElementById("chat-toggle");
 export function get_chat_button() {
     return document.getElementById("chat-toggle");
+    
 }
 // Field Buttons
 export const faculty_button = document.getElementById("faculty-button");
@@ -70,6 +71,10 @@ export const popup_header = document.getElementById("popup-header");
 // File input when loading a config
 export const file_input = document.getElementById("load");
 
+//Clippy TTS / STT
+export const ttsToggle = document.getElementById("ttsToggle");
+export const sttToggle = document.getElementById("sttToggle");
+
 // Clippy's popup dialogue elements
 export const speech_bubble = document.querySelector(".speech-bubble");
 export const speech_div = document.getElementById("speech");
@@ -101,6 +106,9 @@ export const jokes = "How do robots eat pizza? One byte at a time.\n"
   + "What is a Linux user's favorite game? sudo ku.\n"
   + "Why do vampire's use Linux? Because they don't like Windows in their house.\n"
   + "Why did C++ decide to not go out with C? Because quite frankly, C just has no class.";
+
+
+
 
 // ---------------------------------------------------------------------------
 // Clippy dialogue popups feature
