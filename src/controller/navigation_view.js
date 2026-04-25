@@ -126,20 +126,34 @@ export function shuffle_lines(lines) {
 
     [lines[current_index], lines[random_index]] = [lines[random_index], lines[current_index]];
   }
+
+  return lines;
 }
 
 // Randomizes the appearance of the speech bubble as long as the window is open
 export function change_bubble_display() {
-  let time = Math.floor(Math.random() * 60000) + 20000;
-  // Check to see if an interval has already been set up
-  setInterval(switch_opacity, 1000);
-}
+  const shuffled = shuffle_lines([...lines]);
+  let index = 0;
 
-// Changes the opacity of the speech bubble and its content
-export function switch_opacity(lines, index) {
-  speech_div.className = speech_div.className === "hidden" ? "shown" : "hidden";
-  speech_bubble.innerHTML = lines[index];
-  index++;
+  function show_next() {
+    // Set joke text
+    speech_bubble.textContent = shuffled[index % shuffled.length];
+    speech_bubble.classList.remove("hidden");
+    speech_bubble.classList.add("shown");
+    ++index;
+
+    // Show joke for random period of time then hide 
+    const visible_time = Math.floor(Math.random() * 60000) + 20000;
+    setTimeout(() => {
+      speech_bubble.classList.remove("shown");
+      speech_bubble.classList.add("hidden");
+      // ause before next joke
+      setTimeout(show_next, 3000);
+    }, visible_time);
+  }
+
+  // Small delay before first joke
+  setTimeout(show_next, 5000);
 }
 
 // ---------------------------------------------------------------------------
@@ -327,7 +341,7 @@ export function render_undo_redo_state(command_history) {
 }
 
 // Updates Clippy chat image based on a randomized time interval between three images
-function update_clippy() {
+export function update_clippy() {
   let current_image = 1;
   let background_images = document.querySelectorAll("#chat-toggle img");
   let time = Math.floor(Math.random() * 40000) + 10000;
@@ -345,7 +359,6 @@ function update_clippy() {
         }
   }, time);
 }
-window.onload = update_clippy;
 
 // ---------------------------------------------------------------------------
 // Field list renderers
