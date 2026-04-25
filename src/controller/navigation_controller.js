@@ -678,7 +678,6 @@ async function handle_popup_save() {
       if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
 
       command_history.push({
-        label: `Add Faculty "${name}"`,
         field: "Faculty",
         execute: async () => { await Model.api_add_faculty(data); },
         unexecute: async () => { await Model.api_delete_faculty(name); },
@@ -692,7 +691,6 @@ async function handle_popup_save() {
       // Take snapshot of record so it can be restored on undo.
       const snapshot = Model.selected_item_data ? { ...Model.selected_item_data } : { name };
       command_history.push({
-        label: `Delete Faculty "${name}"`,
         field: "Faculty",
         execute: async () => { await Model.api_delete_faculty(name); },
         unexecute: async () => { await Model.api_add_faculty(snapshot); },
@@ -710,7 +708,6 @@ async function handle_popup_save() {
       if (await check_response_error(mod_res, `"${original_name}" was not found. Please check the name and try again.`)) return;
 
       command_history.push({
-        label: `Modify Faculty "${original_name}"`,
         field: "Faculty",
         execute: async () => { await Model.api_modify_faculty(original_name, new_data); },
         unexecute: async () => {
@@ -768,7 +765,6 @@ async function handle_popup_save() {
       if (await check_response_error(add_res, `"${course_id}" could not be added.`)) return;
 
       command_history.push({
-        label: `Add Course "${course_id}"`,
         field: "Courses",
         execute: async () => { await Model.api_add_course(course_data); },
         unexecute: async () => { await Model.api_delete_course(course_id); },
@@ -781,7 +777,6 @@ async function handle_popup_save() {
       const snapshot = Model.selected_item_data ? { ...Model.selected_item_data } : course_data;
       const snap_index = Model.selected_item_data?._list_index ?? null;
       command_history.push({
-        label: `Delete Course "${course_id}"`,
         field: "Courses",
         execute: async () => { await Model.api_delete_course(course_id); },
         unexecute: async () => { await Model.api_add_course(snapshot); },
@@ -799,7 +794,6 @@ async function handle_popup_save() {
       if (await check_response_error(mod_res, `"${course_id}" could not be modified.`)) return;
 
       command_history.push({
-        label: `Modify Course "${course_id}"`,
         field: "Courses",
         execute: async () => { await Model.api_modify_course(index, course_data); },
         unexecute: async () => {
@@ -828,7 +822,6 @@ async function handle_popup_save() {
       if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
 
       command_history.push({
-        label: `Add Lab "${name}"`,
         field: "Labs",
         execute: async () => { await Model.api_add_lab(name); },
         unexecute: async () => { await Model.api_delete_lab(name); },
@@ -841,7 +834,6 @@ async function handle_popup_save() {
       if (await check_response_error(del_res, `"${name}" was not found. Please check the name and try again.`)) return;
 
       command_history.push({
-        label: `Delete Lab "${name}"`,
         field: "Labs",
         execute: async () => { await Model.api_delete_lab(name); },
         unexecute: async () => { await Model.api_add_lab(name); },
@@ -865,7 +857,6 @@ async function handle_popup_save() {
       if (await check_response_error(mod_res, `"${name}" was not found. Please check the name and try again.`)) return;
 
       command_history.push({
-        label: `Rename Lab "${name}" â†’ "${new_name}"`,
         field: "Labs",
         execute: async () => { await Model.api_modify_lab(name, new_name); },
         unexecute: async () => { await Model.api_modify_lab(new_name, name); },
@@ -892,7 +883,6 @@ async function handle_popup_save() {
       if (await check_response_error(add_res, `"${name}" could not be added.`)) return;
 
       command_history.push({
-        label: `Add Room "${name}"`,
         field: "Rooms",
         execute: async () => { await Model.api_add_room(name); },
         unexecute: async () => { await Model.api_delete_room(name); },
@@ -905,7 +895,6 @@ async function handle_popup_save() {
       if (await check_response_error(del_res, `"${name}" was not found. Please check the name and try again.`)) return;
 
       command_history.push({
-        label: `Delete Room "${name}"`,
         field: "Rooms",
         execute: async () => { await Model.api_delete_room(name); },
         unexecute: async () => { await Model.api_add_room(name); },
@@ -929,7 +918,6 @@ async function handle_popup_save() {
       if (await check_response_error(mod_res, `"${name}" was not found. Please check the name and try again.`)) return;
 
       command_history.push({
-        label: `Rename Room "${name}" â†’ "${new_name}"`,
         field: "Rooms",
         execute: async () => { await Model.api_modify_room(name, new_name); },
         unexecute: async () => { await Model.api_modify_room(new_name, name); },
@@ -960,7 +948,6 @@ async function handle_popup_save() {
         const day_ranges = ts_after?.times?.[day] ?? [];
         const new_index = day_ranges.length - 1;
         command_history.push({
-          label: `Add Time Range (${day} ${start}â€“${end})`,
           field: "Time Slots",
           execute: async () => { await Model.api_add_time_range(time_data); },
           unexecute: async () => { await Model.api_delete_time_range(day, new_index); },
@@ -991,7 +978,6 @@ async function handle_popup_save() {
         const ts_after = await Model.api_get_time_slots();
         const new_index = (ts_after?.classes?.length ?? 1) - 1;
         command_history.push({
-          label: `Add Class Pattern (${credits} credits)`,
           field: "Time Slots",
           execute: async () => { await Model.api_add_class_pattern(pattern_data); },
           unexecute: async () => { await Model.api_delete_class_pattern(new_index); },
@@ -1015,7 +1001,6 @@ async function handle_popup_save() {
         if (await check_response_error(res, "Time range could not be modified.")) return;
 
         command_history.push({
-          label: `Modify Time Range (${item._day})`,
           field: "Time Slots",
           execute: async () => { await Model.api_modify_time_range(item._day, item._index, new_time_data); },
           unexecute: async () => { await Model.api_modify_time_range(item._day, item._index, old_time_data); },
@@ -1050,7 +1035,6 @@ async function handle_popup_save() {
         if (await check_response_error(res, "Class pattern could not be modified.")) return;
 
         command_history.push({
-          label: `Modify Class Pattern (${credits} credits)`,
           field: "Time Slots",
           execute: async () => { await Model.api_modify_class_pattern(item._index, new_pattern_data); },
           unexecute: async () => { await Model.api_modify_class_pattern(item._index, old_pattern_data); },
@@ -1374,7 +1358,6 @@ View.delete_button.addEventListener("click", async () => {
     if (await check_response_error(res, `"${item.name}" could not be deleted.`)) return;
    
     command_history.push({
-      label: `Delete Faculty "${item.name}"`,
       field: "Faculty",
       execute: async () => { await Model.api_delete_faculty(snapshot.name); },
       unexecute: async () => { await Model.api_add_faculty(snapshot); },
@@ -1391,7 +1374,6 @@ View.delete_button.addEventListener("click", async () => {
     if (await check_response_error(res, `"${item.course_id}" could not be deleted.`)) return;
     
     command_history.push({
-      label: `Delete Course "${item.course_id}"`,
       field: "Courses",
       execute: async () => { await Model.api_delete_course(snapshot.course_id); },
       unexecute: async () => { await Model.api_add_course(snapshot); },
@@ -1406,7 +1388,6 @@ View.delete_button.addEventListener("click", async () => {
     if (await check_response_error(res, `"${item.name}" could not be deleted.`)) return;
     
     command_history.push({
-      label: `Delete Lab "${item.name}"`,
       field: "Labs",
       execute: async () => { await Model.api_delete_lab(item.name); },
       unexecute: async () => { await Model.api_add_lab(item.name); },
@@ -1421,7 +1402,6 @@ View.delete_button.addEventListener("click", async () => {
     if (await check_response_error(res, `"${item.name}" could not be deleted.`)) return;
     
     command_history.push({
-      label: `Delete Room "${item.name}"`,
       field: "Rooms",
       execute: async () => { await Model.api_delete_room(item.name); },
       unexecute: async () => { await Model.api_add_room(item.name); },
@@ -1437,9 +1417,8 @@ View.delete_button.addEventListener("click", async () => {
       
       const res = await Model.api_delete_time_range(item._day, item._index);
       if (await check_response_error(res, "Time range could not be deleted.")) return;
-     
+
       command_history.push({
-        label: `Delete Time Range (${snapshot.day})`,
         field: "Time Slots",
         execute: async () => { await Model.api_delete_time_range(snapshot.day, snapshot.index); },
         unexecute: async () => {
@@ -1454,7 +1433,6 @@ View.delete_button.addEventListener("click", async () => {
       if (await check_response_error(res, "Class pattern could not be deleted.")) return;
       
       command_history.push({
-        label: `Delete Class Pattern (${snapshot.credits} credits)`,
         field: "Time Slots",
         execute: async () => { await Model.api_delete_class_pattern(snapshot.index); },
         unexecute: async () => {
@@ -1835,17 +1813,15 @@ focus_containers.forEach(el => {
   });
 });
 
-// Randomizes Clippy's speech bubble's appearance and its content
-async function activate_speech_bubble() {
-  let shuffled_lines = View.shuffle_lines(View.lines);
-  let index = 0;
-
-  while (index < shuffled_lines.length) {
-    View.switch_opacity(shuffled_lines, index);
-    View.change_bubble_display();
-    index++;
-  }
+// Starts Clippy's speech bubble joke cycle
+function activate_speech_bubble() {
+  View.change_bubble_display();
 }
+
+window.onload = () => {
+  View.update_clippy();
+  activate_speech_bubble();
+};
 
 // ---------------------------------------------------------------------------
 // AI chat functionality
