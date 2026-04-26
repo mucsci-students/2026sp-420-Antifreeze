@@ -132,6 +132,7 @@ export function shuffle_lines(lines) {
 
 // Randomizes the appearance of the speech bubble as long as the window is open
 export function change_bubble_display() {
+  speech_bubble.classList.add("hidden");
   const shuffled = shuffle_lines([...lines]);
   let index = 0;
 
@@ -143,12 +144,12 @@ export function change_bubble_display() {
     ++index;
 
     // Show joke for random period of time then hide 
-    const visible_time = Math.floor(Math.random() * 60000) + 20000;
+    const visible_time = Math.floor(Math.random() * 15000) + 5000;
     setTimeout(() => {
       speech_bubble.classList.remove("shown");
       speech_bubble.classList.add("hidden");
-      // ause before next joke
-      setTimeout(show_next, 3000);
+      // Pause before next joke
+      setTimeout(show_next, 20000);
     }, visible_time);
   }
 
