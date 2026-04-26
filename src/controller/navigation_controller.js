@@ -1186,6 +1186,27 @@ View.save_button.addEventListener("click", async (e) => {
   URL.revokeObjectURL(url);
 });
 
+// Save config as JSON (dropdown option)
+View.save_json.addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  const config = await Model.api_save_config();
+
+  const blob = new Blob(
+    [JSON.stringify(config, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "schedule_config.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
 // Save schedule as CSV
 View.save_csv.addEventListener("click", async (e) => {
   e.preventDefault();

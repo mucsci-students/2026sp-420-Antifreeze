@@ -108,17 +108,22 @@ class faculty:
                     for f in course.faculty
                 ]
 
-        # Update faculty fields
-        target.name = new_name
-        target.maximum_credits = maximum_credits
-        target.maximum_days = maximum_days
-        target.minimum_credits = minimum_credits
-        target.unique_course_limit = unique_course_limit
-        target.times = times
-        target.course_preferences = course_preferences
-        target.room_preferences = room_preferences
-        target.lab_preferences = lab_preferences
-        target.mandatory_days = mandatory_days
+        # Replace target with a new validated object so cross-field validators
+        # (e.g. min_credits <= max_credits) see the final state, not intermediate state.
+        updated = target.model_copy(update={
+            "name": new_name,
+            "maximum_credits": maximum_credits,
+            "maximum_days": maximum_days,
+            "minimum_credits": minimum_credits,
+            "unique_course_limit": unique_course_limit,
+            "times": times,
+            "course_preferences": course_preferences,
+            "room_preferences": room_preferences,
+            "lab_preferences": lab_preferences,
+            "mandatory_days": mandatory_days,
+        })
+        idx = fac.index(target)
+        fac[idx] = updated
 
         print(f"Faculty member '{old_name}' modified successfully.")
 
