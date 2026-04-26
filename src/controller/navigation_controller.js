@@ -328,7 +328,7 @@ async function check_response_error(res, fallback) {
 
   let raw_text = "";
   try {
-    raw_   = await res.text();
+    raw_text = await res.text();
   } catch (_) {
     View.show_field_error(input_el, fallback);
     return true;
@@ -339,25 +339,17 @@ async function check_response_error(res, fallback) {
     const body = JSON.parse(raw_text);
     if (body && typeof body.error === "string" && body.error.trim() !== "") {
       message = body.error;
-    } else if (body && typeof body.message === "string" && body.message.trim() !== "") {
-      message = body.message;
     }
-  } catch (_) {
-    if (raw_text.trim() !== "") message = raw_text.trim();
-  }
-
-  if (message) {
-    View.show_field_error(input_el, message);
-    return true;
-  }
+  } catch (_) {}
 
   if (!res.ok) {
-    View.show_field_error(input_el, fallback);
+    View.show_field_error(input_el, message || fallback);
     return true;
   }
 
   return false;
 }
+
 
 // ---------------------------------------------------------------------------
 // Navigation history helpers
@@ -1869,7 +1861,7 @@ async function startRecording() {
           audioChunks.push(event.data);
         }
       };
-
+      
       mediaRecorder.onstop = async () => {
         const blob = new Blob(audioChunks, { type: mimeType });
 
