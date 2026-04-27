@@ -50,7 +50,7 @@ class Trap extends Jumpscares{
     }
 }
 // this calls a different jumpscare for each button pressed 
-class JumpscareTotallity {
+class JumpscareContext {
   constructor(reaction, chance = 1/2) {
     this.reaction = reaction;
     this.chance = chance;
