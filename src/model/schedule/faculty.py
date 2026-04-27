@@ -110,20 +110,19 @@ class faculty:
 
         # Replace target with a new validated object so cross-field validators
         # (e.g. min_credits <= max_credits) see the final state, not intermediate state.
-        updated = target.model_copy(
-            update={
-                "name": new_name,
-                "maximum_credits": maximum_credits,
-                "maximum_days": maximum_days,
-                "minimum_credits": minimum_credits,
-                "unique_course_limit": unique_course_limit,
-                "times": times,
-                "course_preferences": course_preferences,
-                "room_preferences": room_preferences,
-                "lab_preferences": lab_preferences,
-                "mandatory_days": mandatory_days,
-            }
-        )
+        updated = FacultyConfig.model_validate({
+            **target.model_dump(),
+            "name": new_name,
+            "maximum_credits": maximum_credits,
+            "maximum_days": maximum_days,
+            "minimum_credits": minimum_credits,
+            "unique_course_limit": unique_course_limit,
+            "times": times,
+            "course_preferences": course_preferences,
+            "room_preferences": room_preferences,
+            "lab_preferences": lab_preferences,
+            "mandatory_days": mandatory_days,
+        })
         idx = fac.index(target)
         fac[idx] = updated
 
