@@ -13,6 +13,7 @@ export const wrapper = document.getElementById("wrapper");
 // Navigation Buttons
 export const load_button = document.getElementById("load-button");
 export const save_button = document.getElementById("save-button");
+export const save_json = document.getElementById("save-json");
 export const save_csv = document.getElementById("save-csv");
 export const back_button = document.getElementById("back-button");
 export const forward_button = document.getElementById("forward-button");
