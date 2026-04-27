@@ -107,6 +107,7 @@ def add_faculty_tool(
     lab_preferences=None,
     mandatory_days=None,
 ):
+    """LangChain tool wrapper: delegates to executor.add_faculty with the shared scheduler."""
     return add_faculty(
         _scheduler,
         name,
@@ -135,6 +136,7 @@ def modify_faculty_tool(
     lab_preferences=None,
     mandatory_days=None,
 ):
+    """LangChain tool wrapper: delegates to executor.modify_faculty with the shared scheduler."""
     return modify_faculty(
         _scheduler,
         old_name,
@@ -152,59 +154,72 @@ def modify_faculty_tool(
 
 
 def delete_faculty_tool(name):
+    """LangChain tool wrapper: delegates to executor.delete_faculty with the shared scheduler."""
     return delete_faculty(_scheduler, name)
 
 
 def list_faculty_tool():
+    """LangChain tool wrapper: delegates to executor.list_faculty with the shared scheduler."""
     return list_faculty(_scheduler)
 
 
 def get_faculty_details_tool(name):
+    """LangChain tool wrapper: delegates to executor.get_faculty_details with the shared scheduler."""
     return get_faculty_details(_scheduler, name)
 
 
 # COURSES
 def get_course_details_tool(course_id):
+    """LangChain tool wrapper: delegates to executor.get_course_details with the shared scheduler."""
     return get_course_details(_scheduler, course_id)
 
 
 def add_course_tool(course_id, credits, room, lab, conflicts, faculty):
+    """LangChain tool wrapper: delegates to executor.add_course with the shared scheduler."""
     return add_course(_scheduler, course_id, credits, room, lab, conflicts, faculty)
 
 
 def modify_course_tool(index, course_id, credits, room, lab, conflicts, faculty):
+    """LangChain tool wrapper: delegates to executor.modify_course with the shared scheduler."""
     return modify_course(
         _scheduler, index, course_id, credits, room, lab, conflicts, faculty
     )
 
 
 def delete_course_tool(course_id):
+    """LangChain tool wrapper: delegates to executor.delete_course with the shared scheduler."""
     return delete_course(_scheduler, course_id)
 
 
 # LABS
 def add_lab_tool(name):
+    """LangChain tool wrapper: delegates to executor.add_lab with the shared scheduler."""
     return add_lab(_scheduler, name)
 
 
 def modify_lab_tool(old_name, new_name):
+    """LangChain tool wrapper: delegates to executor.modify_lab with the shared scheduler."""
     return modify_lab(_scheduler, old_name, new_name)
 
 
 def delete_lab_tool(name):
+    """LangChain tool wrapper: delegates to executor.delete_lab with the shared scheduler."""
     return delete_lab(_scheduler, name)
 
 
 # ROOMS
 def add_room_tool(name):
+    """LangChain tool wrapper: delegates to executor.add_room with the shared scheduler."""
     return add_room(_scheduler, name)
 
 
 def modify_room_tool(old_name, new_name):
+    """LangChain tool wrapper: delegates to executor.modify_room with the shared scheduler."""
     return modify_room(_scheduler, old_name, new_name)
 
 
 def delete_room_tool(name):
+    """LangChain tool wrapper: delegates to executor.delete_room with the shared scheduler."""
     return delete_room(_scheduler, name)
 
 
@@ -214,39 +229,47 @@ def delete_room_tool(name):
 
 
 def get_time_slot_config_tool():
+    """LangChain tool wrapper: delegates to executor.get_time_slot_config with the shared scheduler."""
     return get_time_slot_config(_scheduler)
 
 
 def add_time_range_tool(day, start, spacing, end):
+    """LangChain tool wrapper: delegates to executor.add_time_range with the shared scheduler."""
     return add_time_range(_scheduler, day, start, spacing, end)
 
 
 def modify_time_range_tool(day, index, start, spacing, end):
+    """LangChain tool wrapper: delegates to executor.modify_time_range with the shared scheduler."""
     return modify_time_range(_scheduler, day, index, start, spacing, end)
 
 
 def delete_time_range_tool(day, index):
+    """LangChain tool wrapper: delegates to executor.delete_time_range with the shared scheduler."""
     return delete_time_range(_scheduler, day, index)
 
 
 def add_class_pattern_tool(credits, meetings, start_time=None, disabled=False):
+    """LangChain tool wrapper: delegates to executor.add_class_pattern with the shared scheduler."""
     return add_class_pattern(_scheduler, credits, meetings, start_time, disabled)
 
 
 def modify_class_pattern_tool(
     index, credits, meetings, start_time=None, disabled=False
 ):
+    """LangChain tool wrapper: delegates to executor.modify_class_pattern with the shared scheduler."""
     return modify_class_pattern(
         _scheduler, index, credits, meetings, start_time, disabled
     )
 
 
 def delete_class_pattern_tool(index):
+    """LangChain tool wrapper: delegates to executor.delete_class_pattern with the shared scheduler."""
     return delete_class_pattern(_scheduler, index)
 
 
 # SCHEDULER
 def run_scheduler_tool(limit, optimize):
+    """LangChain tool wrapper: delegates to executor.run_scheduler with the shared scheduler."""
     return run_scheduler(_scheduler, limit, optimize)
 
 

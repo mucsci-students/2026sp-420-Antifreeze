@@ -113,7 +113,7 @@ class lab:
 
     # Prints all labs in the config.
     # Parameters: config
-    def print_labs(self, config: "CombinedConfig"):
+    def print_labs(self, config: "CombinedConfig"):  # pragma: no cover
         labs = config.config.labs
         print("\nLabs:")
         for lab in labs:

@@ -111,6 +111,9 @@ def register_course_routes(app, scheduler):
 
     @app.route("/courses/<int:index>", methods=["GET"])
     def get_course(index):
+        """Return the full details of a single course by its 0-based list index.
+        Returns 404 if the index is out of range.
+        """
         try:
             course = scheduler.config.config.courses[index]
 

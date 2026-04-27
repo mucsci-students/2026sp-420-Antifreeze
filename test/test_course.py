@@ -112,6 +112,12 @@ class TestExistingItems:
         )
         assert result is False
 
+    def test_duplicate_item(self, course_obj, test_config):
+        result = course_obj.existing_items(
+            test_config, "CS101", ["ROOM1"], ["LAB1"], ["CS101"], ["FakeProfessor"]
+        )
+        assert result is False
+
 
 # delete_course
 

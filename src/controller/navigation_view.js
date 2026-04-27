@@ -13,6 +13,8 @@ export const wrapper = document.getElementById("wrapper");
 // Navigation Buttons
 export const load_button = document.getElementById("load-button");
 export const save_button = document.getElementById("save-button");
+export const save_json = document.getElementById("save-json");
+export const save_csv = document.getElementById("save-csv");
 export const back_button = document.getElementById("back-button");
 export const forward_button = document.getElementById("forward-button");
 export const add_button = document.getElementById("add-button");
@@ -20,8 +22,12 @@ export const modify_button = document.getElementById("modify-button");
 export const delete_button = document.getElementById("delete-button");
 export const view_button = document.getElementById("view-button");
 export const print_button = document.getElementById("print-button");
+export const undo_button = document.getElementById("undo-button");
+export const redo_button = document.getElementById("redo-button");
+export const chat_button = document.getElementById("chat-toggle");
 export function get_chat_button() {
     return document.getElementById("chat-toggle");
+    
 }
 // Field Buttons
 export const faculty_button = document.getElementById("faculty-button");
@@ -39,6 +45,9 @@ export const modify_img = modify_button.querySelector("img");
 export const delete_img = delete_button.querySelector("img");
 export const view_img = view_button.querySelector("img");
 export const print_img = print_button.querySelector("img");
+export const undo_img = undo_button.querySelector("img");
+export const redo_img = redo_button.querySelector("img");
+export const clippy_img = chat_button.querySelector("img");
 
 // Whitespace where information is printed
 export const navigator_div = document.querySelector(".navigator");
@@ -62,6 +71,92 @@ export const popup_header = document.getElementById("popup-header");
 
 // File input when loading a config
 export const file_input = document.getElementById("load");
+
+//Clippy TTS / STT
+export const ttsToggle = document.getElementById("ttsToggle");
+export const sttToggle = document.getElementById("sttToggle");
+
+// Clippy's popup dialogue elements
+export const speech_bubble = document.querySelector(".speech-bubble");
+export const speech_div = document.getElementById("speech");
+export const jokes = "How do robots eat pizza? One byte at a time.\n"
+  + "Why don’t avatars trust binary? It makes up everything in the virtual world.\n"
+  + "How do dolphins compute? They use a Central Porpoising Unit.\n"
+  + "I had a joke about variables but sadly I can’t remember it.\n"
+  + "I have a joke about my work as a software engineer, but it only works for me.\n"
+  + "I have a joke about recursion, but I have a joke about recursion, but I have a joke about recursion, but I ...\n"
+  + "[“hip”,”hip”] hip hip array!\n"
+  + "What’s the most iconic pudding for chocolate loving computer scientists? A GUI chocolate brownie!\n"
+  + "What are digital native’s favorite puddings? Crumble and Raspberry Pi.\n"
+  + "How did the lobster make sure its virtual Christmas cards arrived ok? By sending them with an Error-Correcting Cod.\n"
+  + "There are 10 types of people: those who understand binary, and those who don’t.\n"
+  + "Two bits walked into an expensive bar, but were thrown out because they didn’t have enough for a byte.\n"
+  + "An SQL query goes into a bar, walks up to two tables and asks, “Can I join you?”\n"
+  + "What do you get if you cross a computer with an elephant? Lots of memory.\n"
+  + "Why did the robot cross the road? Because the chicken programmed it to.\n"
+  + "Which came first the chicken or the robot? The chicken. Otherwise, who else would program the robot to cross the road?\n"
+  + "How easy is it to count in binary? It's as easy as 01 10 11.\n"
+  + "How did the first program die? It was executed.\n"
+  + "How did the second program die? From a bug.\n"
+  + "What do trees do on computers? They branch out.\n"
+  + "How do cleaners put their mops in to order? They Bucket sort them.\n"
+  + "How do botanists order their plant samples? Using a tree sort.\n"
+  + "How many computer scientists does it take to change a lightbulb? None, they can see fine by the light of their laptop.\n"
+  + "How many help desk people does it take to change a light bulb? The lightbulb doesn’t need changing. It works fine here in the systems office when I try it. Ticket closed.\n"
+  + "How many software engineers does it take to change a light bulb? It can’t be done. It’s a hardware problem.\n"
+  + "What is a Linux user's favorite game? sudo ku.\n"
+  + "Why do vampire's use Linux? Because they don't like Windows in their house.\n"
+  + "Why did C++ decide to not go out with C? Because quite frankly, C just has no class.";
+
+
+
+
+// ---------------------------------------------------------------------------
+// Clippy dialogue popups feature
+// ---------------------------------------------------------------------------
+export const lines = jokes.split("\n");
+
+// Shuffles the lines array every time the window is loaded
+// Parameters: lines - the array containing the jokes written for Clippy to say
+export function shuffle_lines(lines) {
+  let current_index = lines.length;
+
+  while (current_index != 0) {
+    let random_index = Math.floor(Math.random() * current_index);
+    current_index--;
+
+    [lines[current_index], lines[random_index]] = [lines[random_index], lines[current_index]];
+  }
+
+  return lines;
+}
+
+// Randomizes the appearance of the speech bubble as long as the window is open
+export function change_bubble_display() {
+  speech_bubble.classList.add("hidden");
+  const shuffled = shuffle_lines([...lines]);
+  let index = 0;
+
+  function show_next() {
+    // Set joke text
+    speech_bubble.textContent = shuffled[index % shuffled.length];
+    speech_bubble.classList.remove("hidden");
+    speech_bubble.classList.add("shown");
+    ++index;
+
+    // Show joke for random period of time then hide 
+    const visible_time = Math.floor(Math.random() * 15000) + 5000;
+    setTimeout(() => {
+      speech_bubble.classList.remove("shown");
+      speech_bubble.classList.add("hidden");
+      // Pause before next joke
+      setTimeout(show_next, 20000);
+    }, visible_time);
+  }
+
+  // Small delay before first joke
+  setTimeout(show_next, 5000);
+}
 
 // ---------------------------------------------------------------------------
 // Inline error helpers
@@ -184,7 +279,7 @@ export function render_button_images(back_stack, forward_stack) {
 // Updates add/modify/delete button images based on field and item selection state.
 // Add is enabled whenever a field is active. Modify/Delete only light up when an
 // item is also selected in the list. item_selected defaults to false.
-// Parameters: current_field - active field string or null, item_selected - boolean
+// Parameters: current_field (active field string or null), item_selected (boolean).
 export function render_amd_images(current_field, item_selected = false) {
   if (current_field == null || current_field == "Schedule") {
     add_img.src = "/static/images/add_shadow.png";
@@ -221,6 +316,50 @@ export function render_amd_images(current_field, item_selected = false) {
       delete_button.disabled = true;
     }
   }
+}
+
+// Updates the visual state of the undo and redo buttons.
+// Parameter: command_history (holds undo and redo stacks).
+export function render_undo_redo_state(command_history) {
+  undo_button.disabled = !command_history.can_undo;
+  if (undo_button.disabled === true) {
+    undo_img.src = "/static/images/undo_shadow.png";
+    undo_button.style.color = "#808080";
+  }
+  else {
+    undo_img.src = "/static/images/undo.png";
+    undo_button.style.color = "#484848";
+  }
+
+  redo_button.disabled = !command_history.can_redo;
+  if (redo_button.disabled === true) {
+    redo_img.src = "/static/images/redo_shadow.png";
+    redo_button.style.color = "#808080";
+  }
+  else {
+    redo_img.src = "/static/images/redo.png";
+    redo_button.style.color = "#484848";
+  }
+}
+
+// Updates Clippy chat image based on a randomized time interval between three images
+export function update_clippy() {
+  let current_image = 1;
+  let background_images = document.querySelectorAll("#chat-toggle img");
+  let time = Math.floor(Math.random() * 40000) + 10000;
+  setInterval(() => {
+        // if first image (current_image = 0), then unload last image
+        let previous_image = current_image? current_image - 1: background_images.length-1;
+
+        background_images[previous_image].style.opacity = 0;
+        background_images[current_image].style.opacity = 1;
+        current_image++;
+
+        // if last image, go back to first image
+        if (current_image >= background_images.length) {
+            current_image = 0;
+        }
+  }, time);
 }
 
 // ---------------------------------------------------------------------------
@@ -389,6 +528,9 @@ export function clear_field_containers() {
 // Schedule renderers
 // ---------------------------------------------------------------------------
 
+// Renders the initial schedule generator form into navigator_div.
+// Parameters: count - initial value for the schedule-count input,
+//             optimize - initial checked state for the optimize checkbox
 export function render_schedule_form(count = 10, optimize = true) {
   main.classList.remove("schedule-view-expanded");
   navigator_div.innerHTML = `
@@ -409,6 +551,10 @@ export function render_schedule_form(count = 10, optimize = true) {
   `;
 }
 
+// Re-renders the schedule form with a status message and progress bar container.
+// Called during and after schedule generation.
+// Parameters: count - number of schedules requested, optimize - optimize flag,
+//             status_message - text to display in the #schedule-status div
 export function render_schedule_status(count, optimize, status_message) {
   navigator_div.innerHTML = `
     <h3 id="schedule-generator">Schedule Generator</h3>
@@ -431,6 +577,11 @@ export function render_schedule_status(count, optimize, status_message) {
   `;
 }
 
+// Animates the #progress-bar div from 0% to 100% at a speed scaled by count.
+// Stops advancing at 99% while status_message indicates work is in progress,
+// then jumps to 100% once finished.
+// Parameters: count - number of schedules (affects animation interval speed),
+//             status_message - used to detect whether generation is still running
 export function render_progress_bar(count, status_message) {
   var progress_bar = document.getElementById("progress-bar");
   var width = 0;
@@ -460,6 +611,8 @@ export function render_progress_bar(count, status_message) {
   progress_bar.innerHTML = '100%';
 }
 
+// Enables and highlights the View and Print toolbar buttons after schedules
+// have been successfully generated or a CSV schedule file has been loaded.
 export function render_schedules_generated_buttons() {
   view_img.src = "/static/images/view.png";
   print_img.src = "/static/images/print.png";
@@ -704,6 +857,8 @@ export function render_schedule_view_inline(index, on_load_click, on_group_chang
 // Renders calendar grids into #schedule-calendar-container.
 // For faculty/room/lab modes: one card per entity with a Mon–Fri grid.
 // For course mode: a single grid with all courses.
+// Classes are absolutely positioned by their actual start/end times so that
+// heights are proportional to duration and the time axis has no duplicate labels.
 // Parameters: data - schedule view object from API or get_csv_schedule_view,
 //             index - 0-based schedule index, mode - grouping mode string
 export function render_schedule_calendar(data, index, mode) {
@@ -711,7 +866,7 @@ export function render_schedule_calendar(data, index, mode) {
   if (!container) return;
   container.innerHTML = "";
 
-  const { groups, time_slots, DAY_ABBREVS, DAY_LABELS } = _transform_to_calendar(data);
+  const { groups, time_slots, DAY_ABBREVS, DAY_LABELS } = transform_to_calendar(data);
 
   if (groups.length === 0 || time_slots.length === 0) {
     container.textContent = "No schedule data to display.";
@@ -748,6 +903,33 @@ export function render_schedule_calendar(data, index, mode) {
     }
   }
 
+  // Compute the global time range from all time slot strings so the axis
+  // is consistent across every card.
+  let global_min = Infinity, global_max = -Infinity;
+  for (const ts of time_slots) {
+    const parts = ts.split("-");
+    const s = parse_time_minutes(parts[0].trim());
+    const e = parse_time_minutes(parts.length > 1 ? parts[1].trim() : parts[0].trim());
+    if (s < global_min) global_min = s;
+    if (e > global_max) global_max = e;
+  }
+  // Round outward to the nearest 30-minute boundary for clean tick alignment
+  global_min = Math.floor(global_min / 30) * 30;
+  global_max = Math.ceil(global_max / 30) * 30;
+
+  const PX_PER_MIN  = 2.0;   // vertical scale: pixels per minute
+  const TICK_MIN    = 30;    // draw a grid line every 30 minutes
+  const HEADER_H    = 26;    // px height of day-name header row
+  const BOTTOM_PAD  = 12;    // extra px below last tick so its label isn't clipped
+  const total_height = (global_max - global_min) * PX_PER_MIN;
+
+  // Format minutes-since-midnight as "HH:MM"
+  function fmt_min(minutes) {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  }
+
   groups.forEach(group => {
     const card = document.createElement("div");
     card.className = "schedule-calendar-card";
@@ -759,60 +941,139 @@ export function render_schedule_calendar(data, index, mode) {
       card.appendChild(title);
     }
 
-    const table = document.createElement("table");
-    table.className = "calendar-table";
-
     // Only show days that have at least one event for this group
     const active_days = DAY_ABBREVS.filter(d =>
       group.day_map[d] && Object.keys(group.day_map[d]).length > 0
     );
     const display_days = active_days.length > 0 ? active_days : DAY_ABBREVS;
 
-    // Header row
-    const thead = document.createElement("thead");
-    const head_row = document.createElement("tr");
-    const blank_th = document.createElement("th");
-    blank_th.className = "cal-time-header";
-    head_row.appendChild(blank_th);
+    // ── Outer row: time-axis column + one column per displayed day ──────────
+    const grid_outer = document.createElement("div");
+    grid_outer.style.display = "flex";
+    grid_outer.style.alignItems = "flex-start";
+
+    // ---- Time-axis column ----
+    const time_col = document.createElement("div");
+    time_col.style.flexShrink = "0";
+    time_col.style.width = "48px";
+    time_col.style.display = "flex";
+    time_col.style.flexDirection = "column";
+
+    // Blank cell to align vertically with the day-name headers
+    const time_blank = document.createElement("div");
+    time_blank.style.height = HEADER_H + "px";
+    time_blank.style.flexShrink = "0";
+    time_col.appendChild(time_blank);
+
+    // Time label strip
+    const time_axis = document.createElement("div");
+    time_axis.style.position = "relative";
+    time_axis.style.height = (total_height + BOTTOM_PAD) + "px";
+    for (let t = global_min; t <= global_max; t += TICK_MIN) {
+      const lbl = document.createElement("div");
+      lbl.style.position = "absolute";
+      lbl.style.top = ((t - global_min) * PX_PER_MIN) + "px";
+      lbl.style.transform = "translateY(-50%)";
+      lbl.style.fontSize = "0.70em";
+      lbl.style.color = "#888";
+      lbl.style.right = "4px";
+      lbl.style.whiteSpace = "nowrap";
+      lbl.textContent = fmt_min(t);
+      time_axis.appendChild(lbl);
+    }
+    time_col.appendChild(time_axis);
+    grid_outer.appendChild(time_col);
+
+    // ---- One column per displayed day ----
     display_days.forEach(day => {
-      const th = document.createElement("th");
-      th.className = "cal-day-header";
-      th.textContent = DAY_LABELS[day];
-      head_row.appendChild(th);
-    });
-    thead.appendChild(head_row);
-    table.appendChild(thead);
+      const day_slot_map = group.day_map[day] || {};
+      const max_concurrent = Object.values(day_slot_map).reduce(
+        (mx, slots) => Math.max(mx, slots.length), 1
+      );
+      const day_wrap = document.createElement("div");
+      day_wrap.style.flex = "1";
+      day_wrap.style.minWidth = (max_concurrent * 90) + "px";
+      day_wrap.style.display = "flex";
+      day_wrap.style.flexDirection = "column";
+      day_wrap.style.borderLeft = "1px solid #ccc";
 
-    // One row per unique time slot
-    const tbody = document.createElement("tbody");
-    time_slots.forEach(time => {
-      const row = document.createElement("tr");
+      // Day-name header
+      const day_hdr = document.createElement("div");
+      day_hdr.style.height = HEADER_H + "px";
+      day_hdr.style.display = "flex";
+      day_hdr.style.alignItems = "center";
+      day_hdr.style.justifyContent = "center";
+      day_hdr.style.fontWeight = "bold";
+      day_hdr.style.fontSize = "0.78em";
+      day_hdr.style.background = "#e8e8e8";
+      day_hdr.style.borderBottom = "2px solid #999";
+      day_hdr.textContent = DAY_LABELS[day];
+      day_wrap.appendChild(day_hdr);
 
-      const time_td = document.createElement("td");
-      time_td.className = "cal-time-cell";
-      time_td.textContent = time.split("-")[0].trim();
-      row.appendChild(time_td);
+      // Day body — fixed height, relative for absolute children
+      const day_body = document.createElement("div");
+      day_body.style.position = "relative";
+      day_body.style.height = (total_height + BOTTOM_PAD) + "px";
+      day_body.style.overflow = "hidden";
+      day_body.style.background = "#fff";
 
-      display_days.forEach(day => {
-        const cell_td = document.createElement("td");
-        cell_td.className = "cal-day-cell";
+      // Horizontal grid lines
+      for (let t = global_min; t <= global_max; t += TICK_MIN) {
+        const line = document.createElement("div");
+        line.style.position = "absolute";
+        line.style.top = ((t - global_min) * PX_PER_MIN) + "px";
+        line.style.left = "0";
+        line.style.right = "0";
+        line.style.height = "1px";
+        line.style.background = t % 60 === 0 ? "#d0d0d0" : "#efefef";
+        day_body.appendChild(line);
+      }
 
-        const slots = (group.day_map[day] && group.day_map[day][time]) || [];
-        slots.forEach(slot => {
+      // Absolutely-positioned class blocks
+      const day_slots = day_slot_map;
+      for (const [time_str, slots] of Object.entries(day_slots)) {
+        const parts = time_str.split("-");
+        const start_min = parse_time_minutes(parts[0].trim());
+        const end_min   = parse_time_minutes(parts.length > 1 ? parts[1].trim() : parts[0].trim());
+        const duration  = Math.max(end_min - start_min, 10); // guard against zero-length
+
+        const top_px    = (start_min - global_min) * PX_PER_MIN;
+        const height_px = Math.max(duration * PX_PER_MIN - 3, 14);
+        const n = slots.length;
+
+        slots.forEach((slot, si) => {
           const block = document.createElement("div");
           block.className = "cal-course-block";
+          block.style.position = "absolute";
+          block.style.top = top_px + "px";
+          block.style.height = height_px + "px";
+          block.style.left = `calc(${(si / n) * 100}% + 2px)`;
+          block.style.width = `calc(${(1 / n) * 100}% - 4px)`;
           block.style.backgroundColor = course_colors[slot.course] || "#e0e0e0";
+          block.style.overflow = "hidden";
+          block.style.boxSizing = "border-box";
+          block.style.margin = "0";
 
-          const id_line = document.createElement("div");
-          id_line.className = "cal-course-id";
-          id_line.textContent = slot.section ? `${slot.course}.${slot.section}` : slot.course;
-          block.appendChild(id_line);
-
-          // Secondary detail depends on group mode
           const detail = mode === "faculty" ? slot.room
                        : mode === "room"    ? slot.faculty
                        : mode === "lab"     ? slot.faculty
                        :                      slot.faculty;
+          const course_label = slot.section ? `${slot.course}.${slot.section}` : slot.course;
+
+          // Always put everything in a tooltip so no info is ever truly lost
+          const tooltip_parts = [course_label];
+          if (detail && detail !== "None" && detail !== "—") tooltip_parts.push(detail);
+          tooltip_parts.push(time_str);
+          if (slot.is_lab) tooltip_parts.push("LAB");
+          block.title = tooltip_parts.join(" | ");
+
+          // Course ID is always shown
+          const id_line = document.createElement("div");
+          id_line.className = "cal-course-id";
+          id_line.textContent = course_label;
+          block.appendChild(id_line);
+
+          // Detail (faculty/room)
           if (detail && detail !== "None" && detail !== "—") {
             const detail_line = document.createElement("div");
             detail_line.className = "cal-course-detail";
@@ -820,9 +1081,10 @@ export function render_schedule_calendar(data, index, mode) {
             block.appendChild(detail_line);
           }
 
+          // Time range
           const time_line = document.createElement("div");
           time_line.className = "cal-course-time";
-          time_line.textContent = time;
+          time_line.textContent = time_str;
           block.appendChild(time_line);
 
           if (slot.is_lab) {
@@ -832,24 +1094,22 @@ export function render_schedule_calendar(data, index, mode) {
             block.appendChild(badge);
           }
 
-          cell_td.appendChild(block);
+          day_body.appendChild(block);
         });
+      }
 
-        row.appendChild(cell_td);
-      });
-
-      tbody.appendChild(row);
+      day_wrap.appendChild(day_body);
+      grid_outer.appendChild(day_wrap);
     });
 
-    table.appendChild(tbody);
-    card.appendChild(table);
+    card.appendChild(grid_outer);
     grid_wrap.appendChild(card);
   });
 }
 
 // Transforms API schedule data { mode, days } into calendar-grid format.
 // Returns { groups, time_slots, DAY_ABBREVS, DAY_LABELS }.
-function _transform_to_calendar(data) {
+export function transform_to_calendar(data) {
   const DAY_ABBREVS = ["MON", "TUE", "WED", "THU", "FRI"];
   const DAY_LABELS = { MON: "Monday", TUE: "Tuesday", WED: "Wednesday", THU: "Thursday", FRI: "Friday" };
   // Reverse lookup used when day_group only has day_name (CSV mode)
@@ -871,33 +1131,34 @@ function _transform_to_calendar(data) {
   // Unique time strings sorted by start time
   const time_set = new Set(all_slots.map(s => s.time));
   const time_slots = [...time_set].sort((a, b) =>
-    _parse_time_minutes(a.split("-")[0].trim()) - _parse_time_minutes(b.split("-")[0].trim())
+    parse_time_minutes(a.split("-")[0].trim()) - parse_time_minutes(b.split("-")[0].trim())
   );
 
   const mode = data.mode;
   let groups;
   if (mode === "course") {
-    groups = [{ name: null, day_map: _build_day_time_map(all_slots) }];
+    groups = [{ name: null, day_map: build_day_time_map(all_slots) }];
   } else {
     const key_fn = mode === "faculty" ? s => s.faculty
-                 : mode === "room"    ? s => s.room
+                 : mode === "room"    ? s => (s.is_lab ? s.lab : s.room)
                  :                      s => s.lab;
+    const slots_to_group = mode === "lab" ? all_slots.filter(s => s.is_lab) : all_slots;
     const group_map = {};
-    for (const slot of all_slots) {
+    for (const slot of slots_to_group) {
       const key = key_fn(slot);
       if (!group_map[key]) group_map[key] = [];
       group_map[key].push(slot);
     }
     groups = Object.entries(group_map)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([name, slots]) => ({ name, day_map: _build_day_time_map(slots) }));
+      .map(([name, slots]) => ({ name, day_map: build_day_time_map(slots) }));
   }
 
   return { groups, time_slots, DAY_ABBREVS, DAY_LABELS };
 }
 
 // Builds a nested { day: { time: [slots] } } map from a flat slots array.
-function _build_day_time_map(slots) {
+export function build_day_time_map(slots) {
   const day_map = {};
   for (const slot of slots) {
     if (!day_map[slot.day]) day_map[slot.day] = {};
@@ -909,7 +1170,7 @@ function _build_day_time_map(slots) {
 
 // Parses a time string to minutes since midnight.
 // Handles "9:00", "09:00", "9:00AM", "10:00AM" formats.
-function _parse_time_minutes(t) {
+export function parse_time_minutes(t) {
   const is_pm = /PM/i.test(t);
   const is_am = /AM/i.test(t);
   const clean = t.replace(/[APMapm\s]/g, "");
@@ -1599,11 +1860,13 @@ export function render_modify_time_slots_popup(prefill) {
 // Popup helpers
 // ---------------------------------------------------------------------------
 
+// Shows the AMD popup and disables pointer events on the main wrapper.
 export function show_popup() {
   amd_popup.classList.remove("popup-hidden");
   wrapper.style.pointerEvents = "none";
 }
 
+// Clears the popup form, hides the popup, and restores pointer events.
 export function hide_popup() {
   popup_form.innerHTML = "";
   amd_popup.classList.add("popup-hidden");

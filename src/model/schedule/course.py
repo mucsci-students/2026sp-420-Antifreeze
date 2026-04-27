@@ -217,7 +217,7 @@ class course:
     # Displays course details including credits, assigned rooms, labs,
     # conflicts, and associated faculty
     # Parameters: Configuration file
-    def print_courses(self, config: "CombinedConfig"):
+    def print_courses(self, config: "CombinedConfig"):  # pragma: no cover
         courses = config.config.courses
         print("\nCourses:")
         for course in courses:

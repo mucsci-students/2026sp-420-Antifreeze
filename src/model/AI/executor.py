@@ -6,6 +6,8 @@ from typing import Any
 
 
 def _ensure_list(val):
+    """Coerce any value into a list. None becomes [], a list is returned as-is,
+    and any other type is wrapped in a single-element list."""
     if val is None:
         return []
     if isinstance(val, list):
@@ -14,10 +16,12 @@ def _ensure_list(val):
 
 
 def _clean_list(values):
+    """Return a new list containing only non-empty stripped strings from values."""
     return [v.strip() for v in values if isinstance(v, str) and v.strip()]
 
 
 def _normalize_name(name: str):
+    """Strip leading and trailing whitespace from a name string."""
     return name.strip()
 
 
@@ -59,6 +63,11 @@ def add_faculty(
     lab_preferences=None,
     mandatory_days=None,
 ):
+    """Add a new faculty member to the scheduler config.
+
+    Returns a status dict on success or an error dict if the name already exists
+    or if mandatory days are not covered by availability times.
+    """
     fac_list = scheduler.config.config.faculty
 
     for prof in fac_list:
@@ -118,6 +127,11 @@ def modify_faculty(
     lab_preferences=None,
     mandatory_days=None,
 ):
+    """Modify an existing faculty member identified by old_name.
+
+    Returns a status dict on success, or an error dict if old_name is not found,
+    new_name already exists, or mandatory days are missing from availability times.
+    """
     fac_list = scheduler.config.config.faculty
 
     target = None
@@ -175,6 +189,10 @@ def modify_faculty(
 
 
 def delete_faculty(scheduler, name: str):
+    """Delete the faculty member with the given name (case-insensitive).
+
+    Returns a status dict on success or an error dict if the name is not found.
+    """
     fac_list = scheduler.config.config.faculty
 
     for prof in fac_list:
@@ -186,10 +204,15 @@ def delete_faculty(scheduler, name: str):
 
 
 def list_faculty(scheduler):
+    """Return a dict containing the names of all faculty members in the config."""
     return {"faculty": [{"name": f.name} for f in scheduler.config.config.faculty]}
 
 
 def get_faculty_details(scheduler, name: str):
+    """Return the full config dict for a single faculty member (case-insensitive lookup).
+
+    Returns an error dict if the name is not found.
+    """
     for f in scheduler.config.config.faculty:
         if f.name.upper() == name.upper():
             return {
@@ -217,6 +240,12 @@ def get_faculty_details(scheduler, name: str):
 
 
 def add_course(scheduler, course_id: str, credits: int, room, lab, conflicts, faculty):
+    """Add a new course to the scheduler config.
+
+    room, lab, conflicts, and faculty may be single strings or lists; they are
+    normalised to deduplicated lists before being stored.
+    Returns a status dict on success or an error dict if the course_id already exists.
+    """
     existing = [c.course_id.upper() for c in scheduler.config.config.courses]
 
     if course_id.upper() in existing:
@@ -246,6 +275,10 @@ def add_course(scheduler, course_id: str, credits: int, room, lab, conflicts, fa
 
 
 def get_course_details(scheduler, course_id: str):
+    """Return the full config dict for a single course, including its list index.
+
+    Returns an error dict if the course_id is not found.
+    """
     for i, c in enumerate(scheduler.config.config.courses):
         if c.course_id.upper() == course_id.upper():
             return {
@@ -261,6 +294,10 @@ def get_course_details(scheduler, course_id: str):
 
 
 def delete_course(scheduler, course_id: str):
+    """Delete a course by course_id (case-insensitive).
+
+    Returns a status dict on success or an error dict if the course is not found.
+    """
     existing = [c.course_id.upper() for c in scheduler.config.config.courses]
 
     if course_id.upper() not in existing:
@@ -274,6 +311,11 @@ def delete_course(scheduler, course_id: str):
 def modify_course(
     scheduler, index: int, course_id: str, credits: int, room, lab, conflicts, faculty
 ):
+    """Modify an existing course identified by its 0-based list index.
+
+    All list fields (room, lab, conflicts, faculty) are normalised before storing.
+    Returns a status dict on success or an error dict if the index is out of range.
+    """
     try:
         # same normalization (important)
         room = _ensure_list(room)
@@ -310,6 +352,10 @@ def modify_course(
 
 
 def add_lab(scheduler, name: str):
+    """Add a new lab to the config (case-insensitive duplicate check).
+
+    Returns a status dict on success or an error dict if the name already exists.
+    """
     labs = scheduler.config.config.labs
 
     name = _normalize_name(name)
@@ -323,6 +369,10 @@ def add_lab(scheduler, name: str):
 
 
 def delete_lab(scheduler, name: str):
+    """Delete a lab (case-insensitive) and cascade the removal to course lab lists.
+
+    Returns a status dict on success or an error dict if the lab is not found.
+    """
     labs = scheduler.config.config.labs
 
     actual = _find_in_list(name, labs)
@@ -338,6 +388,11 @@ def delete_lab(scheduler, name: str):
 
 
 def modify_lab(scheduler, old_name: str, new_name: str):
+    """Rename a lab and cascade the change to all course lab lists.
+
+    Returns a status dict on success or an error dict if old_name is not found
+    or new_name already exists.
+    """
     labs = scheduler.config.config.labs
 
     actual_old = _find_in_list(old_name, labs)
@@ -363,6 +418,10 @@ def modify_lab(scheduler, old_name: str, new_name: str):
 
 
 def add_room(scheduler, name: str):
+    """Add a new room to the config (case-insensitive duplicate check).
+
+    Returns a status dict on success or an error dict if the name already exists.
+    """
     rooms = scheduler.config.config.rooms
 
     name = _normalize_name(name)
@@ -376,6 +435,10 @@ def add_room(scheduler, name: str):
 
 
 def delete_room(scheduler, name: str):
+    """Delete a room (case-insensitive) and cascade the removal to course room lists.
+
+    Returns a status dict on success or an error dict if the room is not found.
+    """
     rooms = scheduler.config.config.rooms
 
     actual = _find_in_list(name, rooms)
@@ -391,6 +454,11 @@ def delete_room(scheduler, name: str):
 
 
 def modify_room(scheduler, old_name: str, new_name: str):
+    """Rename a room and cascade the change to all course room lists.
+
+    Returns a status dict on success or an error dict if old_name is not found
+    or new_name already exists.
+    """
     rooms = scheduler.config.config.rooms
 
     actual_old = _find_in_list(old_name, rooms)
@@ -473,6 +541,10 @@ def _ts_serialize_class(cls):
 
 
 def get_time_slot_config(scheduler):
+    """Return the full time slot configuration as a plain dict with 'times' and 'classes' keys.
+
+    Both sub-sections are serialised to plain dicts so they can be returned as JSON.
+    """
     times_raw = scheduler.time_slot.get_times(scheduler.config)
     classes_raw = scheduler.time_slot.get_classes(scheduler.config)
     times = {
@@ -484,6 +556,12 @@ def get_time_slot_config(scheduler):
 
 
 def add_time_range(scheduler, day: str, start: str, spacing: int, end: str):
+    """Add a time-grid range to a day's availability schedule.
+
+    day must be one of MON/TUE/WED/THU/FRI.
+    start and end must be HH:MM strings; spacing is the slot interval in minutes.
+    Returns a status dict or an error dict for an invalid day.
+    """
     day = day.upper()
     if day not in {"MON", "TUE", "WED", "THU", "FRI"}:
         return {"error": f"'{day}' is not a valid day."}
@@ -494,6 +572,10 @@ def add_time_range(scheduler, day: str, start: str, spacing: int, end: str):
 def modify_time_range(
     scheduler, day: str, index: int, start: str, spacing: int, end: str
 ):
+    """Modify an existing time-grid range identified by day and 0-based index.
+
+    Returns a status dict or an error dict if the index does not exist.
+    """
     day = day.upper()
     if not scheduler.time_slot.validate_time_entry(
         scheduler.config, day, "modify", index
@@ -504,6 +586,10 @@ def modify_time_range(
 
 
 def delete_time_range(scheduler, day: str, index: int):
+    """Delete a time-grid range identified by day and 0-based index.
+
+    Returns a status dict or an error dict if the index does not exist.
+    """
     day = day.upper()
     if not scheduler.time_slot.validate_time_entry(
         scheduler.config, day, "delete", index
@@ -520,6 +606,12 @@ def add_class_pattern(
     start_time: str | None = None,
     disabled: bool = False,
 ):
+    """Add a new class meeting pattern to the time slot config.
+
+    meetings is a list of dicts with keys day, duration, and optional lab (bool).
+    start_time is an optional HH:MM override; disabled marks the pattern inactive.
+    Returns a status dict or an error dict if validation fails.
+    """
     if not scheduler.time_slot.validate_class_entry(
         scheduler.config, "add", credits=credits, meetings=meetings
     ):
@@ -538,6 +630,10 @@ def modify_class_pattern(
     start_time: str | None = None,
     disabled: bool = False,
 ):
+    """Modify an existing class meeting pattern by 0-based index.
+
+    Returns a status dict or an error dict if the index is out of range.
+    """
     if not scheduler.time_slot.validate_class_entry(
         scheduler.config, "modify", class_index=index
     ):
@@ -549,6 +645,10 @@ def modify_class_pattern(
 
 
 def delete_class_pattern(scheduler, index: int):
+    """Delete a class meeting pattern by 0-based index.
+
+    Returns a status dict or an error dict if the index is out of range.
+    """
     if not scheduler.time_slot.validate_class_entry(
         scheduler.config, "delete", class_index=index
     ):
@@ -575,4 +675,5 @@ def run_scheduler(scheduler, limit: int, optimize: bool):
 
 
 def open_schedule_tool():
+    """Return a ui_action signal that tells the frontend to open the schedule viewer."""
     return {"ui_action": "open_schedule"}

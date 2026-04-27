@@ -1,5 +1,5 @@
 # Scheduler GUI Application
-## CMSC420-f26
+## CMSC420-s26
 
 ---
 
@@ -24,22 +24,32 @@ A Flask-based web application for generating course schedules. The system is dri
 
 ```bash
 .
+├── .python-version
 ├── LICENSE
-├── README.md
 ├── pyproject.toml
+├── README.md
 ├── uv.lock
+├── .github/
+│   └── ...
 ├── src/
+│   ├── example.csv
+│   ├── example.json
+│   ├── main.py
+│   ├── 2026sp_420_antifreeze.egg-info/
+│   │   └── ...
 │   ├── controller/
-│   │   ├── flask/
-│   │   │   └── ...
-│   │   ├── modifyConfig/
-│   │   │   ├── configCli.py
-│   │   │   ├── modConflict.py
-│   │   │   └── ...
+│   │   ├── jumpscare.js
 │   │   ├── navigation_controller.js
 │   │   ├── navigation_model.js
-│   │   └── navigation_view.js
-│   ├── main.py
+│   │   ├── navigation_view.js
+│   │   ├── flask/
+│   │   │   ├── chat_routes.py
+│   │   │   ├── course_routes.py
+│   │   │   └── ...
+│   │   └── modifyConfig/
+│   │       ├── configCli.py
+│   │       ├── modConflict.py
+│   │       └── ...
 │   ├── model/
 │   │   ├── AI/
 │   │   │   ├── agent.py
@@ -50,15 +60,23 @@ A Flask-based web application for generating course schedules. The system is dri
 │   │       └── ...
 │   └── view/
 │       ├── static/
-│       │   ├── css/
+│       │   ├── empty.json
+│       │   ├── audio/
 │       │   │   └── ...
+│       │   ├── css/
+│       │   │   ├── additional_elements.css
+│       │   │   ├── popup.css
+│       │   │   ├── progress_bar.css
+│       │   │   └── styles.css
 │       │   └── images/
 │       │       └── ...
 │       └── templates/
 │           └── index.html
-└── test/
-    ├── test_conflict.py
-    ├── test_course.py
+├── test/
+│   ├── test_conflict.py
+│   ├── test_course.py
+│   └── ...
+└── uploads/
     └── ...
 ```
 
@@ -71,10 +89,15 @@ A Flask-based web application for generating course schedules. The system is dri
 - **Room Management:** Add, delete, and modify rooms
 - **Lab Management:** Add, delete, and modify labs
 - **Time Slot Management:** Add, delete, and modify time slots with days, times, and spacing
-- **Schedule Generation:** Generate, display, and save optimized schedules\
+- **Back and Forward Functionality:** Move between previously visited field tabs (faculty/courses/...)
+- **Undo and Redo Functionality:** Undo and redo mutating commands (add/modify/delete)
+- **Schedule Generation:** Generate, display, and save optimized schedules in several file formats
 - **Configuration Management:** Import and export configuration files; default at startup is an empty JSON
-- **Schedule Viewer:** View schedules by room, lab, faculty, and day in tabular format
+- **Schedule Viewer:** View multiple generated schedules by room, lab, faculty, and day in tabular format
 - **AI Assistant:** Interactive assistant that can answer questions, modify fields, and generate schedules
+- **Clippy:** The face of Antifreeze's AI assisant, who does fun animations and tells silly jokes
+- **Text-to-Speech and Speech-to-Text:** Talk with the Clippy AI assistant or have it talk to you
+- **FNAF Jumpscare:** You've been warned...
 
 ---
 
@@ -89,6 +112,9 @@ A Flask-based web application for generating course schedules. The system is dri
 3. **uv** 
     - Check with `uv --version` 
     - Download from https://docs.astral.sh/uv/getting-started/installation/
+4. **OpenAI API Key**
+    - In order to interact with Clippy, you must have an OpenAI API key
+    - Retrieve a key from https://platform.openai.com/api-keys
 
 ---
 
@@ -109,7 +135,7 @@ A Flask-based web application for generating course schedules. The system is dri
    uv sync
    ```
 
-4. Activate the virtual environment:
+4. If it isn't already, activate the virtual environment:
    - Linux/macOS: `source .venv/bin/activate`
    - Windows: `source .venv/Scripts/activate`
 
@@ -157,7 +183,7 @@ A Flask-based web application for generating course schedules. The system is dri
 #### Viewing and Printing Schedules
 - Select the **Schedule** tab, choose a count and optimization setting, then generate
 - Click **View** to open the schedule viewer — browse by faculty, room, lab, or day
-- Click **Print** to export the schedules as a PDF
+- Click **Print** to export the schedules as a PDF/HTML
 
 #### AI Assistant (Clippy)
 - Click **Chat** in the top-right toolbar to open the assistant panel
@@ -222,27 +248,37 @@ Available test files:
     - Model handles data, application state, AI logic, and API calls
     - View handles DOM elements, layout, and rendering
     - Controller facilitates user interaction and coordinates between Model and View
-- **Files:** `src/model/`, `src/view/`, `src/controller/`, `src/controller/navigation_model.js`, `src/controller/navigation_view.js`, `src/controller/navigation_controller.js`
+- **Files:** [`src/model/`](src/model/), [`src/view/`](src/view/), [`src/controller/`](src/controller/), [`src/controller/navigation_model.js`](src/controller/navigation_model.js), [`src/controller/navigation_view.js`](src/controller/navigation_view.js), [`src/controller/navigation_controller.js`](src/controller/navigation_controller.js)
 
 #### Memento
 - **Pattern:** Captures and restores an object's internal state
-- **Implementation:** When navigating between views, the current view's state is saved before moving to a new one. The Back and Forward buttons restore those saved states, giving the application browser-like navigation history without the controller needing to know the details of what was saved
-- **File:** `src/controller/navigation_controller.js`
+- **Implementation:** `NavigationMemento` stores the active field tab's content and `NavigationOriginator` creates mementos using 'save()' and restores state with 'restore()'. The controller calls `NavigationOriginator.save()` before every field navigation and pushes the memento onto `back_stack` or `forward_stack`, giving the Back and Forward toolbar buttons functionality to step through user navigation history.
+- **File:** [`src/controller/navigation_controller.js`](src/controller/navigation_controller.js), [`src/controller/navigation_model.js`](src/controller/navigation_model.js)
 
 #### Prototype
 - **Pattern:** A fully initialized instance to be copied or cloned
-- **Implementation:** On startup, the empty configuration is loaded once and stored. When a new configuration file is loaded, the program clones the empty configuration prototype and populates it with the new data
-- **File:** `src/model/schedule/schedule.py`
+- **Implementation:** On startup, the empty configuration is loaded once and stored. When a new configuration file is loaded, the program clones the empty configuration prototype and populates it with the new data.
+- **File:** [`src/model/schedule/schedule.py`](src/model/schedule/schedule.py)
 
 #### Factory
 - **Pattern:** Creates instances of several derived classes from a single point
-- **Implementation:** `build_tools()` constructs and returns a list of `StructuredTool` objects for every scheduler operation. `get_agent()` calls `build_tools()` and passes the result into `create_agent()` to assemble the final AI agent. The rest of the application calls `run_agent()` without needing to know how the tools or agent were built
-- **File:** `src/model/AI/agent.py`
+- **Implementation:** `build_tools()` constructs and returns a list of `StructuredTool` objects for every scheduler operation. `get_agent()` calls `build_tools()` and passes the result into `create_agent()` to assemble the final AI agent. The rest of the application calls `run_agent()` without needing to know how the tools or agent were built.
+- **File:** [`src/model/AI/agent.py`](src/model/AI/agent.py)
+
+#### Command
+- **Pattern:** Encapsulate a command request as an object
+- **Implementation:**: Every mutating operation (add/modify/delete) is wrapped into a command object before being pushed onto `CommandHistory`, which is responsible for maintaining undo and redo stacks. Calling `undo()` pops the latest command, invokes `unexecute()`, and moves it to the redo stack; calling `redo()` does the reverse. Pushing a new command automatically clears the redo stack as seen in other word processing applications.
+- **File:** [`src/controller/navigation_model.js`](src/controller/navigation_model.js), [`src/controller/navigation_view.js`](src/controller/navigation_view.js), [`src/controller/navigation_controller.js`](src/controller/navigation_controller.js)
+
+#### Template
+- **Pattern:** Defer some steps of an algorithm to a subclass
+- **Implementation:**: `Jumpscares` base class defines the overall jumpscare algorithm in `execute()`. Subclasses `Foxy`, `Puppet`, and `Trap` reuse this algorithm while redefining a few steps (GIF and audio) without changing the algorithm. This way all jumpscares follow the same sequence of actions while changing only their content.
+- **File:** [`src/controller/jumpscare.js`](src/controller/jumpscare.js)
 
 ---
 
 ## License
 
-This project is licensed under the MIT License — see the `LICENSE` file for details.
+This project is licensed under the MIT License — see the [License](LICENSE) file for details.
 
 Copyright © 2026 Antifreeze

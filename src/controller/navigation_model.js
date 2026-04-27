@@ -1,7 +1,7 @@
-// ===============================
+// ---------------------------------------------------------------------------
 // MODEL
 //    Application states and all API/data operations
-// ===============================
+// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // States
@@ -42,21 +42,91 @@ export function set_csv_mode(val) { csv_mode = val; }
 export function set_selected_item_data(val) { selected_item_data = val; }
 
 // ---------------------------------------------------------------------------
-// History stack helpers
+// Memento pattern (back/forward)
 // ---------------------------------------------------------------------------
 
-export function push_back_stack(val) { back_stack.push(val); }
+// Only NavigationOriginator can create/read instances of NavigationMemento.
+class NavigationMemento {
+  #field;
+
+  constructor(field) {
+    this.#field = field;
+  }
+
+  get_field() {
+    return this.#field;
+  }
+}
+
+// Saves/restores state using NavigationMementos.
+export const NavigationOriginator = {
+  save() { return new NavigationMemento(current_content); },
+  restore(memento) { current_content = memento.get_field(); }
+};
+
+// ---------------------------------------------------------------------------
+// History stack helpers 
+// ---------------------------------------------------------------------------
+
+export function push_back_stack(memento) { back_stack.push(memento); }
 export function pop_back_stack() { return back_stack.pop(); }
-export function push_forward_stack(val) { forward_stack.push(val); }
+export function push_forward_stack(memento) { forward_stack.push(memento); }
 export function pop_forward_stack() { return forward_stack.pop(); }
 export function clear_forward_stack() { forward_stack = []; }
+
+// ---------------------------------------------------------------------------
+// Command pattern (undo/redo)
+// ---------------------------------------------------------------------------
+
+// CommandHistory holds undo and redo stacks.
+class CommandHistory {
+  #undo_stack = [];
+  #redo_stack = [];
+
+  // Push a new command and clear redo stack (new action invalidates future).
+  push(command) {
+    this.#undo_stack.push(command);
+    this.#redo_stack = [];
+  }
+
+  // Undo most-recent command and move it into redo stack.
+  // Returns the command that was undone, or null if nothing to undo.
+  async undo() {
+    if (this.#undo_stack.length === 0) return null;
+    const cmd = this.#undo_stack.pop();
+    await cmd.unexecute();
+    this.#redo_stack.push(cmd);
+    return cmd;
+  }
+
+  // Redo most-recently undone command and move it into undo stack.
+  // Returns the command that was redone, or null if nothing to redo.
+  async redo() {
+    if (this.#redo_stack.length === 0) return null;
+    const cmd = this.#redo_stack.pop();
+    await cmd.execute();
+    this.#undo_stack.push(cmd);
+    return cmd;
+  }
+
+  get can_undo() { return this.#undo_stack.length > 0; }
+  get can_redo() { return this.#redo_stack.length > 0; }
+
+  // Discard all history.
+  clear() {
+    this.#undo_stack = [];
+    this.#redo_stack = [];
+  }
+}
+
+export const command_history = new CommandHistory();
 
 // ---------------------------------------------------------------------------
 // Config API
 // ---------------------------------------------------------------------------
 
 export async function api_load_empty_config() {
- return await fetch("/load_empty_config", { method: "POST" });
+  return await fetch("/load_empty_config", { method: "POST" });
 }
 
 export async function api_load_config(file) {
@@ -267,7 +337,7 @@ export async function api_get_schedule_count() {
 
 // Parses a multi-schedule CSV file into an array of schedules.
 // Each schedule is an array of course-entry objects.
-// CSV format per row: COURSE.SECTION,FACULTY,ROOM,LAB,TIME1,TIME2,...
+// CSV format per row: COURSE.SECTION,FACULTY,ROOM,LAB,TIME1,TIME2,....
 // Times are "DAY HH:MM-HH:MM" with an optional trailing "^" marking a lab meeting.
 // "Schedule N:" lines are used as delimiters between schedules.
 export function parse_csv_schedules(text) {
@@ -322,6 +392,8 @@ export function parse_csv_schedules(text) {
   return schedules;
 }
 
+
+
 // Converts a parsed CSV schedule into the same data structure the backend
 // returns from /schedule/{index}/view/{mode}, so the existing render functions
 // can display it without any changes.
@@ -363,8 +435,14 @@ export function get_csv_schedule_view(index, mode) {
     lab: s => s.lab
   }[mode] || null;
 
+  const view_slots = mode === "lab"
+    ? all_slots.filter(s => s.is_lab)
+    : mode === "room"
+      ? all_slots.filter(s => !s.is_lab)
+      : all_slots;
+
   const days_map = {};
-  for (const slot of all_slots) {
+  for (const slot of view_slots) {
     (days_map[slot.day] = days_map[slot.day] || []).push(slot);
   }
 
