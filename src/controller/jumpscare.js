@@ -1,3 +1,9 @@
+// ---------------------------------------------------------------------------
+// Jumpscare
+//    using the Template design pattern.
+// ---------------------------------------------------------------------------
+
+// base class for the others to base themselves off of
 class Jumpscares{
     constructor(gif,audio){
         this.gif = gif;
@@ -43,7 +49,8 @@ class Trap extends Jumpscares{
         );
     }
 }
-class JumpscareContext {
+// this calls a different jumpscare for each button pressed 
+class JumpscareTotallity {
   constructor(reaction, chance = 1/2) {
     this.reaction = reaction;
     this.chance = chance;
@@ -53,7 +60,7 @@ class JumpscareContext {
       "labs-button":    new Trap(),
     };
   }
-
+// this function decides the actual percentage chance of getting jumpscared 
   handleClick(targetId) {
     const strategy = this.buttonStrategies[targetId];
 
@@ -67,7 +74,7 @@ class JumpscareContext {
     }
   }
 }
-
+// Actual jumpscare positioning and logic so
 export function spawn_jumpscare() {
   const reaction = document.getElementById("fnaf-image");
   const toggle = document.querySelector("#secret-toggle input[type='checkbox']");
