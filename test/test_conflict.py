@@ -9,17 +9,23 @@ from src.model.schedule.conflict import conflict
 
 # Mock Classes
 class MockCourse:
+    """Minimal stand-in for a course with a conflict list."""
+
     def __init__(self, course_id, conflicts=None):
         self.course_id = course_id
         self.conflicts = conflicts or []
 
 
 class MockInnerConfig:
+    """Holds the flat list of courses used by conflict operations."""
+
     def __init__(self, courses):
         self.courses = courses
 
 
 class MockConfig:
+    """Top-level config stub wrapping MockInnerConfig."""
+
     def __init__(self, courses):
         self.config = MockInnerConfig(courses)
 
@@ -27,6 +33,7 @@ class MockConfig:
 # Fixtures
 @pytest.fixture
 def sample_config():
+    """Return a config with four courses and pre-set conflict relationships."""
     courses = [
         MockCourse("CMSC 140", ["CMSC 161"]),
         MockCourse("CMSC 161", []),
@@ -38,6 +45,7 @@ def sample_config():
 
 @pytest.fixture
 def conflict_obj():
+    """Return a fresh conflict instance for each test."""
     return conflict()
 
 

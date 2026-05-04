@@ -115,21 +115,25 @@ def make_full_config():
 
 @pytest.fixture
 def T():
+    """Return a fresh time_slot_config instance for each test."""
     return time_slot_config()
 
 
 @pytest.fixture
 def times_cfg():
+    """Return a config pre-populated with a realistic time grid."""
     return make_times_config()
 
 
 @pytest.fixture
 def classes_cfg():
+    """Return a config pre-populated with a realistic set of class patterns."""
     return make_classes_config()
 
 
 @pytest.fixture
 def full_cfg():
+    """Return a config with both times and classes populated."""
     return make_full_config()
 
 

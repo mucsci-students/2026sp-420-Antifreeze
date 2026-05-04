@@ -2,6 +2,11 @@ from controller.modifyConfig.utilsCLI import prompt
 import re
 
 
+# Modify Time Slot Configuration
+# Interactively re-enters the full time slot configuration for the scheduler
+# Collects time grid blocks per weekday and class meeting patterns
+# Changes take effect immediately on the scheduler config object
+# Parameters: Scheduler object
 def mod_time_slot(sched):
     try:
         print("Re-enter full Time Slot Configuration")
@@ -9,6 +14,7 @@ def mod_time_slot(sched):
 
         TIME_RE = re.compile(r"^\d{2}:\d{2}$")
 
+        # Converts HH:MM time string to total minutes since midnight
         def to_minutes(t):
             h, m = map(int, t.split(":"))
             return h * 60 + m

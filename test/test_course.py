@@ -12,6 +12,8 @@ from src.model.schedule.course import course
 
 
 class MockCourse:
+    """Minimal stand-in for a course with all configurable fields."""
+
     def __init__(
         self, course_id, credits=3, room=None, lab=None, conflicts=None, faculty=None
     ):
@@ -24,12 +26,16 @@ class MockCourse:
 
 
 class MockFaculty:
+    """Minimal stand-in for a faculty member with course preferences."""
+
     def __init__(self, name):
         self.name = name
         self.course_preferences = {}
 
 
 class MockConfig:
+    """Top-level config stub with two courses, two labs, two rooms, and two faculty."""
+
     def __init__(self):
         self.config = types.SimpleNamespace(
             courses=[MockCourse("CS101"), MockCourse("CS102", conflicts=["CS101"])],
@@ -44,11 +50,13 @@ class MockConfig:
 
 @pytest.fixture
 def test_config():
+    """Return a fresh MockConfig populated with default test data."""
     return MockConfig()
 
 
 @pytest.fixture
 def course_obj():
+    """Return a fresh course instance for each test."""
     return course()
 
 

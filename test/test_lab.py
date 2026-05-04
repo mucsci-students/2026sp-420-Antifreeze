@@ -31,11 +31,15 @@ class MockConfig:
 
 
 class MockCourse:
+    """Minimal stand-in for a course with a lab assignment list."""
+
     def __init__(self, labs):
         self.lab = labs
 
 
 class MockFaculty:
+    """Minimal stand-in for a faculty member with lab preferences."""
+
     def __init__(self, prefs):
         self.lab_preferences = prefs
 
@@ -81,6 +85,7 @@ CMSC 476.01,Zoppetti,Roddy 136,Linux,MON 13:00-13:50,WED 13:00-14:50^,FRI 13:00-
 
 @pytest.fixture
 def L():
+    """Return a fresh lab instance for each test."""
     return lab()
 
 

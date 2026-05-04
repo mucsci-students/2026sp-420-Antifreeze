@@ -31,11 +31,15 @@ class MockConfig:
 
 
 class MockCourse:
+    """Minimal stand-in for a course with a room assignment list."""
+
     def __init__(self, rooms):
         self.room = rooms
 
 
 class MockFaculty:
+    """Minimal stand-in for a faculty member with room preferences."""
+
     def __init__(self, prefs):
         self.room_preferences = prefs
 
@@ -84,6 +88,7 @@ CMSC 476.01,Zoppetti,Roddy 136,Linux,MON 13:00-13:50,WED 13:00-14:50^,FRI 13:00-
 
 @pytest.fixture
 def R():
+    """Return a fresh room instance for each test."""
     return room()
 
 
@@ -323,6 +328,8 @@ class TestGetRoomIds:
 
 
 class TestGetRoomScheduleStructure:
+    """Verify the top-level structure of the parsed room schedule dict."""
+
     def test_returns_a_dict(self, sample_schedule):
         assert isinstance(sample_schedule, dict)
 
